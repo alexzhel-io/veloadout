@@ -10,6 +10,7 @@ import { checkRateLimit } from '@/infrastructure/security/rateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 const querySchema = z.string().trim().min(2).max(200);
 
