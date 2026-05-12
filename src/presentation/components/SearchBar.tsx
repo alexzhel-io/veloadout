@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { categoryIcon } from '@/domain/gear/GearCategoryIcon';
 import { CATEGORY_LABELS } from '@/domain/gear/GearCategory';
 import { matchVariantByQuery } from '@/domain/gear/GearVariant';
-import { createClient } from '@/infrastructure/supabase/client';
 import type { GearEntry } from './GearCalculator';
 
 type SearchState = 'idle' | 'searching_db' | 'searching_ai' | 'not_found';
@@ -119,20 +118,11 @@ export function SearchBar({ onAdd }: Props) {
     const variant = variants[variantIdx];
     // Save to shared catalog only for AI-found items
     if (candidate.source === 'ai') {
-      // Save directly from browser — server-side Node.js can't always reach Supabase
-      const supabase = createClient();
-      supabase.from('gear_items').upsert({
-        id: candidate.item.id,
-        names_json: candidate.item.names,
-        aliases_json: candidate.item.aliases ?? [],
-        volume_liters: candidate.item.volumeLiters,
-        weight_grams: candidate.item.weightGrams ?? null,
-        category: candidate.item.category,
-        source_url: candidate.item.sourceUrl ?? null,
-        variants_json: candidate.item.variants ?? [],
-      }).then(({ error }) => {
-        if (error) console.error('[gear_items upsert]', error.message);
-      });
+      fetch('/api/lookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item: candidate.item }),
+      }).then(r => { if (!r.ok) r.json().then(e => console.error('[lookup POST]', e)); });
     }
     addItem(candidate.item, candidate.query, candidate.source, variant, candidate.confidence);
   }
