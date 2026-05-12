@@ -23,6 +23,8 @@ A web application for bikepacking riders: the user enters their gear, the system
 | FR-1.9 | On repeat search the item is found from DB and variants are shown again | ✅ |
 | FR-1.10 | "Dig deeper" button lets the user re-run AI search up to 2 more times (depth 2 → 3) with a larger web-search budget and stricter prompt — works for both AI and DB results | ✅ |
 | FR-1.11 | Refining an existing DB record preserves its id so upsert updates the row in place | ✅ |
+| FR-1.12 | If DB search returns multiple matches a PickList is shown; user picks the exact product, then sees ConfirmCard with variant selector | ✅ |
+| FR-1.13 | If "Dig deeper" AI search returns not_found, the previous result card is restored instead of showing an error | ✅ |
 
 ### FR-2: Gear list
 
