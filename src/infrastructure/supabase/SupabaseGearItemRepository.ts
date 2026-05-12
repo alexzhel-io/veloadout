@@ -85,7 +85,7 @@ export class SupabaseGearItemRepository implements IGearItemRepository {
 
   async save(item: GearItem): Promise<void> {
     const props = item.toPlain();
-    await this.supabase.from('gear_items').upsert({
+    const { error } = await this.supabase.from('gear_items').upsert({
       id: props.id,
       names_json: props.names,
       aliases_json: props.aliases,
@@ -95,8 +95,8 @@ export class SupabaseGearItemRepository implements IGearItemRepository {
       source_url: props.sourceUrl ?? null,
       verified_at: props.verifiedAt?.toISOString() ?? null,
       variants_json: props.variants ?? [],
-      // search_text is generated — no need to pass it
     });
+    if (error) throw new Error(`Supabase save failed: ${error.message} (code: ${error.code})`);
   }
 
   async listAll(): Promise<GearItem[]> {

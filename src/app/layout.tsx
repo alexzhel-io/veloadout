@@ -6,10 +6,7 @@ export const metadata: Metadata = {
   description: 'Bikepacking Gear Volume Calculator',
 };
 
+// Passthrough — locale layout renders <html> and <body> with the correct lang attribute
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html>
-      <body>{children}</body>
-    </html>
-  );
+  return children as React.ReactElement;
 }

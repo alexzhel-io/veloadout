@@ -1,6 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { ToastProvider } from '@/presentation/components/Toast';
 import { CookieBanner } from '@/presentation/components/CookieBanner';
 
@@ -58,17 +59,19 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale}>
-      <head>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <body>
+        <Script
+          id="json-ld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
-          <script
+          <Script
             defer
             data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
             src="https://plausible.io/js/script.js"
           />
         )}
-      </head>
-      <body>
         <NextIntlClientProvider messages={messages}>
           <ToastProvider>
             {children}

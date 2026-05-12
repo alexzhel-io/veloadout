@@ -122,7 +122,9 @@ export function SearchBar({ onAdd }: Props) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ item: candidate.item }),
-      }).catch(() => {});
+      }).then(async r => {
+        if (!r.ok) console.error('[lookup POST]', r.status, await r.text());
+      }).catch(e => console.error('[lookup POST] network error', e));
     }
     addItem(candidate.item, candidate.query, candidate.source, variant, candidate.confidence);
   }

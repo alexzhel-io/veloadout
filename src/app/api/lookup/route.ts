@@ -116,6 +116,11 @@ export async function POST(req: NextRequest) {
   });
 
   const repo = await buildRepo();
-  await repo.save(gearItem);
+  try {
+    await repo.save(gearItem);
+  } catch (err) {
+    console.error('[lookup POST] save failed:', err);
+    return NextResponse.json({ error: String(err) }, { status: 500 });
+  }
   return NextResponse.json({ ok: true });
 }
