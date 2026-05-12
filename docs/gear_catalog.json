@@ -1626,5 +1626,1520 @@
     "variants": [
       {"sizeLabel": "Standard", "volumeLiters": 0.18, "weightGrams": 195}
     ]
+  },
+  {
+    "id": "firemaple-feast-1",
+    "names": {"en": "Fire Maple Feast 1", "de": "Fire Maple Feast 1 Kochsystem", "ru": "Файр Мейпл Фист 1"},
+    "aliases": ["fire maple feast", "firemaple feast 1", "feast 1 stove"],
+    "volume_liters": 1.1,
+    "weight_grams": 480,
+    "category": "cooking",
+    "source_url": "https://www.firemaplegear.com/products/feast-1-cooking-system",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 1.1, "weightGrams": 480}
+    ]
+  },
+  {
+    "id": "firemaple-blade-2",
+    "names": {"en": "Fire Maple Blade 2", "de": "Fire Maple Blade 2 Kocher", "ru": "Файр Мейпл Блейд 2"},
+    "aliases": ["fire maple blade 2", "blade 2 stove", "firemaple blade"],
+    "volume_liters": 0.12,
+    "weight_grams": 48,
+    "category": "cooking",
+    "source_url": "https://www.firemaplegear.com/products/blade-2-stove",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.12, "weightGrams": 48}
+    ]
+  },
+  {
+    "id": "firemaple-greenpeak",
+    "names": {"en": "Fire Maple Greenpeak", "de": "Fire Maple Greenpeak Kocher", "ru": "Файр Мейпл Гринпик"},
+    "aliases": ["greenpeak stove", "firemaple greenpeak", "fms-116t"],
+    "volume_liters": 0.1,
+    "weight_grams": 45,
+    "category": "cooking",
+    "source_url": "https://www.firemaplegear.com/products/greenpeak-stove",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.1, "weightGrams": 45}
+    ]
+  },
+  {
+    "id": "firemaple-petrel",
+    "names": {"en": "Fire Maple Petrel", "de": "Fire Maple Petrel Topf", "ru": "Файр Мейпл Петрел"},
+    "aliases": ["petrel pot", "firemaple petrel", "fire maple petrel ultralight"],
+    "volume_liters": 0.5,
+    "weight_grams": 116,
+    "category": "cooking",
+    "source_url": "https://www.firemaplegear.com/products/petrel-pot",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.5, "weightGrams": 116}
+    ]
+  },
+  {
+    "id": "firemaple-polaris",
+    "names": {"en": "Fire Maple Polaris", "de": "Fire Maple Polaris Kochsystem", "ru": "Файр Мейпл Поларис"},
+    "aliases": ["polaris stove", "firemaple polaris"],
+    "volume_liters": 1.2,
+    "weight_grams": 437,
+    "category": "cooking",
+    "source_url": "https://www.firemaplegear.com/products/polaris-cooking-system",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 1.2, "weightGrams": 437}
+    ]
+  },
+  {
+    "id": "optimus-crux-lite",
+    "names": {"en": "Optimus Crux Lite", "de": "Optimus Crux Lite Kocher", "ru": "Оптимус Крукс Лайт"},
+    "aliases": ["crux lite", "optimus crux"],
+    "volume_liters": 0.18,
+    "weight_grams": 72,
+    "category": "cooking",
+    "source_url": "https://www.optimusstoves.com/en/products/stoves/crux-lite",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.18, "weightGrams": 72}
+    ]
+  },
+  {
+    "id": "kovea-supalite-titanium",
+    "names": {"en": "Kovea Supalite Titanium", "de": "Kovea Supalite Titan Kocher", "ru": "Ковеа Супалайт Титаниум"},
+    "aliases": ["kovea supalite", "supalite titanium"],
+    "volume_liters": 0.15,
+    "weight_grams": 55,
+    "category": "cooking",
+    "source_url": "https://kovea.com/product/supalite-titanium-stove/",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.15, "weightGrams": 55}
+    ]
+  },
+  {
+    "id": "primus-omnifuel-ii",
+    "names": {"en": "Primus OmniFuel II", "de": "Primus OmniFuel II Multifuelkocher", "ru": "Примус ОмниФьюэл II"},
+    "aliases": ["omnifuel 2", "primus omnifuel"],
+    "volume_liters": 0.9,
+    "weight_grams": 450,
+    "category": "cooking",
+    "source_url": "https://www.primusequipment.com/products/stoves/omnifuel-ii",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.9, "weightGrams": 450}
+    ]
+  },
+  {
+    "id": "msr-whisperlite-international",
+    "names": {"en": "MSR WhisperLite International", "de": "MSR WhisperLite International Multifuelkocher", "ru": "ЭмЭсАр Виспалайт Интернешнл"},
+    "aliases": ["whisperlite", "msr whisperlite", "whisperlite intl"],
+    "volume_liters": 0.8,
+    "weight_grams": 354,
+    "category": "cooking",
+    "source_url": "https://www.msrgear.com/stoves/liquid-fuel-stoves/whisperlite-international-stove/06632.html",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.8, "weightGrams": 354}
+    ]
+  },
+  {
+    "id": "trangia-spirit-burner",
+    "names": {"en": "Trangia Spirit Burner", "de": "Trangia Spiritusbrenner", "ru": "Трангия Спиртовая Горелка"},
+    "aliases": ["trangia burner", "trangia alcohol stove", "spirit burner"],
+    "volume_liters": 0.15,
+    "weight_grams": 110,
+    "category": "cooking",
+    "source_url": "https://www.trangia.se/en/produkt/spirit-burner-with-screw-cap/",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.15, "weightGrams": 110}
+    ]
+  },
+  {
+    "id": "esbit-pocket-stove",
+    "names": {"en": "Esbit Pocket Stove", "de": "Esbit Trockenbrennstoff-Kocher", "ru": "Эсбит Покет Стоув"},
+    "aliases": ["esbit stove", "esbit pocket"],
+    "volume_liters": 0.12,
+    "weight_grams": 92,
+    "category": "cooking",
+    "source_url": "https://www.esbit.de/en/products/stoves/pocket-stove-large/",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.12, "weightGrams": 92}
+    ]
+  },
+  {
+    "id": "fuel-canister-100g",
+    "names": {"en": "Gas Canister 100g", "de": "Gaskartusche 100g", "ru": "Газовый баллон 100г"},
+    "aliases": ["100g canister", "iso butane 100", "gas 100"],
+    "volume_liters": 0.2,
+    "weight_grams": 200,
+    "category": "cooking",
+    "source_url": "https://www.msrgear.com/stoves/fuel-bottles-accessories/isopro-fuel/05297.html",
+    "variants": [
+      {"sizeLabel": "100g", "volumeLiters": 0.2, "weightGrams": 200}
+    ]
+  },
+  {
+    "id": "fuel-canister-230g",
+    "names": {"en": "Gas Canister 230g", "de": "Gaskartusche 230g", "ru": "Газовый баллон 230г"},
+    "aliases": ["230g canister", "iso butane 230", "gas 230"],
+    "volume_liters": 0.4,
+    "weight_grams": 370,
+    "category": "cooking",
+    "source_url": "https://www.msrgear.com/stoves/fuel-bottles-accessories/isopro-fuel/05298.html",
+    "variants": [
+      {"sizeLabel": "230g", "volumeLiters": 0.4, "weightGrams": 370}
+    ]
+  },
+  {
+    "id": "fuel-canister-450g",
+    "names": {"en": "Gas Canister 450g", "de": "Gaskartusche 450g", "ru": "Газовый баллон 450г"},
+    "aliases": ["450g canister", "iso butane 450", "gas 450"],
+    "volume_liters": 0.7,
+    "weight_grams": 660,
+    "category": "cooking",
+    "source_url": "https://www.msrgear.com/stoves/fuel-bottles-accessories/isopro-fuel/05299.html",
+    "variants": [
+      {"sizeLabel": "450g", "volumeLiters": 0.7, "weightGrams": 660}
+    ]
+  },
+  {
+    "id": "mini-bic-lighter",
+    "names": {"en": "Mini Bic Lighter", "de": "Mini Bic Feuerzeug", "ru": "Мини зажигалка Bic"},
+    "aliases": ["bic lighter", "mini bic", "lighter"],
+    "volume_liters": 0.03,
+    "weight_grams": 11,
+    "category": "cooking",
+    "source_url": "https://us.bic.com/en_us/mini-classic-lighter",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.03, "weightGrams": 11}
+    ]
+  },
+  {
+    "id": "light-my-fire-firesteel-2",
+    "names": {"en": "Light My Fire FireSteel 2.0", "de": "Light My Fire FireSteel 2.0 Feuerstahl", "ru": "Лайт Май Файр ФайрСтил 2.0"},
+    "aliases": ["firesteel", "ferro rod", "light my fire firesteel"],
+    "volume_liters": 0.04,
+    "weight_grams": 28,
+    "category": "cooking",
+    "source_url": "https://lightmyfire.com/products/firesteel-2-0-scout",
+    "variants": [
+      {"sizeLabel": "Scout", "volumeLiters": 0.04, "weightGrams": 28}
+    ]
+  },
+  {
+    "id": "cumulus-quilt-350",
+    "names": {"en": "Cumulus Quilt 350", "de": "Cumulus Quilt 350 Daunenquilt", "ru": "Кумулюс Квилт 350"},
+    "aliases": ["cumulus quilt", "quilt 350"],
+    "volume_liters": 3.5,
+    "weight_grams": 540,
+    "category": "sleep",
+    "source_url": "https://sklep.cumulus.equipment/en/quilts/quilt-350/",
+    "variants": [
+      {"sizeLabel": "Regular", "volumeLiters": 3.5, "weightGrams": 540},
+      {"sizeLabel": "Long", "volumeLiters": 4.0, "weightGrams": 595}
+    ]
+  },
+  {
+    "id": "cumulus-lite-line-300",
+    "names": {"en": "Cumulus Lite Line 300", "de": "Cumulus Lite Line 300 Daunenschlafsack", "ru": "Кумулюс Лайт Лайн 300"},
+    "aliases": ["lite line 300", "cumulus lite line"],
+    "volume_liters": 3.5,
+    "weight_grams": 555,
+    "category": "sleep",
+    "source_url": "https://sklep.cumulus.equipment/en/sleeping-bags/lite-line-300/",
+    "variants": [
+      {"sizeLabel": "Regular", "volumeLiters": 3.5, "weightGrams": 555}
+    ]
+  },
+  {
+    "id": "pajak-radical-8z",
+    "names": {"en": "Pajak Radical 8Z", "de": "Pajak Radical 8Z Daunenschlafsack", "ru": "Пайяк Радикал 8Z"},
+    "aliases": ["pajak radical", "radical 8z"],
+    "volume_liters": 4.0,
+    "weight_grams": 650,
+    "category": "sleep",
+    "source_url": "https://pajak.com.pl/en/products/radical-8z",
+    "variants": [
+      {"sizeLabel": "Regular", "volumeLiters": 4.0, "weightGrams": 650}
+    ]
+  },
+  {
+    "id": "phd-minim-300",
+    "names": {"en": "PHD Minim 300", "de": "PHD Minim 300 Daunenschlafsack", "ru": "ПиЭйчДи Миним 300"},
+    "aliases": ["phd minim", "minim 300"],
+    "volume_liters": 3.8,
+    "weight_grams": 580,
+    "category": "sleep",
+    "source_url": "https://www.phdesigns.co.uk/minim-300-down-sleeping-bag",
+    "variants": [
+      {"sizeLabel": "Regular", "volumeLiters": 3.8, "weightGrams": 580}
+    ]
+  },
+  {
+    "id": "katabatic-flex-22",
+    "names": {"en": "Katabatic Flex 22", "de": "Katabatic Flex 22 Daunenquilt", "ru": "Катабатик Флекс 22"},
+    "aliases": ["katabatic flex", "flex 22 quilt"],
+    "volume_liters": 4.0,
+    "weight_grams": 595,
+    "category": "sleep",
+    "source_url": "https://katabaticgear.com/quilts/flex-quilt/",
+    "variants": [
+      {"sizeLabel": "Regular", "volumeLiters": 4.0, "weightGrams": 595}
+    ]
+  },
+  {
+    "id": "katabatic-palisade-30",
+    "names": {"en": "Katabatic Palisade 30", "de": "Katabatic Palisade 30 Daunenquilt", "ru": "Катабатик Палисад 30"},
+    "aliases": ["katabatic palisade", "palisade 30"],
+    "volume_liters": 3.5,
+    "weight_grams": 510,
+    "category": "sleep",
+    "source_url": "https://katabaticgear.com/quilts/palisade-30-quilt/",
+    "variants": [
+      {"sizeLabel": "Regular", "volumeLiters": 3.5, "weightGrams": 510}
+    ]
+  },
+  {
+    "id": "zpacks-classic-quilt-20",
+    "names": {"en": "Zpacks Classic Quilt 20", "de": "Zpacks Classic Quilt 20 Daunenquilt", "ru": "Зипакс Классик Квилт 20"},
+    "aliases": ["zpacks quilt 20", "classic quilt 20"],
+    "volume_liters": 3.8,
+    "weight_grams": 540,
+    "category": "sleep",
+    "source_url": "https://zpacks.com/products/classic-sleeping-bag",
+    "variants": [
+      {"sizeLabel": "Regular", "volumeLiters": 3.8, "weightGrams": 540}
+    ]
+  },
+  {
+    "id": "hammock-gear-burrow-econ-20",
+    "names": {"en": "Hammock Gear Burrow Econ 20", "de": "Hammock Gear Burrow Econ 20 Daunenquilt", "ru": "Хеммок Гир Берроу Эконом 20"},
+    "aliases": ["hg burrow", "burrow econ 20", "hammock gear burrow"],
+    "volume_liters": 4.2,
+    "weight_grams": 595,
+    "category": "sleep",
+    "source_url": "https://www.hammockgear.com/burrow-econ-20-quilt/",
+    "variants": [
+      {"sizeLabel": "Regular", "volumeLiters": 4.2, "weightGrams": 595}
+    ]
+  },
+  {
+    "id": "nunatak-arc-uls",
+    "names": {"en": "Nunatak Arc UL Specialist", "de": "Nunatak Arc UL Quilt", "ru": "Нунатак Арк УЛ Спешалист"},
+    "aliases": ["nunatak arc", "arc uls", "arc ul"],
+    "volume_liters": 3.0,
+    "weight_grams": 480,
+    "category": "sleep",
+    "source_url": "https://www.nunatakusa.com/store/p2/arc-ultralight-specialist-quilt.html",
+    "variants": [
+      {"sizeLabel": "Regular", "volumeLiters": 3.0, "weightGrams": 480}
+    ]
+  },
+  {
+    "id": "exped-downmat-hl-winter",
+    "names": {"en": "Exped DownMat HL Winter", "de": "Exped DownMat HL Winter Isomatte", "ru": "Экспед ДаунМат ХЛ Винтер"},
+    "aliases": ["downmat hl", "exped downmat", "exped winter mat"],
+    "volume_liters": 3.5,
+    "weight_grams": 695,
+    "category": "sleep",
+    "source_url": "https://www.exped.com/usa/en/product-category/mats/downmat-hl-winter",
+    "variants": [
+      {"sizeLabel": "Medium", "volumeLiters": 3.5, "weightGrams": 695},
+      {"sizeLabel": "Long Wide", "volumeLiters": 4.2, "weightGrams": 870}
+    ]
+  },
+  {
+    "id": "exped-ultra-3r",
+    "names": {"en": "Exped Ultra 3R", "de": "Exped Ultra 3R Isomatte", "ru": "Экспед Ультра 3R"},
+    "aliases": ["ultra 3r", "exped ultra"],
+    "volume_liters": 2.4,
+    "weight_grams": 480,
+    "category": "sleep",
+    "source_url": "https://www.exped.com/usa/en/product-category/mats/ultra-3r",
+    "variants": [
+      {"sizeLabel": "Medium", "volumeLiters": 2.4, "weightGrams": 480},
+      {"sizeLabel": "Long Wide", "volumeLiters": 3.2, "weightGrams": 620}
+    ]
+  },
+  {
+    "id": "exped-synmat-hl",
+    "names": {"en": "Exped SynMat HL", "de": "Exped SynMat HL Isomatte", "ru": "Экспед СинМат ХЛ"},
+    "aliases": ["synmat hl", "exped synmat"],
+    "volume_liters": 2.5,
+    "weight_grams": 460,
+    "category": "sleep",
+    "source_url": "https://www.exped.com/usa/en/product-category/mats/synmat-hl",
+    "variants": [
+      {"sizeLabel": "Medium", "volumeLiters": 2.5, "weightGrams": 460}
+    ]
+  },
+  {
+    "id": "nemo-hornet-osmo-1p",
+    "names": {"en": "Nemo Hornet OSMO 1P", "de": "Nemo Hornet OSMO 1P Zelt", "ru": "Немо Хорнет ОСМО 1П"},
+    "aliases": ["hornet osmo 1p", "nemo hornet 1p"],
+    "volume_liters": 4.0,
+    "weight_grams": 935,
+    "category": "shelter",
+    "source_url": "https://www.nemoequipment.com/products/hornet-osmo",
+    "variants": [
+      {"sizeLabel": "1P", "volumeLiters": 4.0, "weightGrams": 935}
+    ]
+  },
+  {
+    "id": "msr-access-2",
+    "names": {"en": "MSR Access 2", "de": "MSR Access 2 Vier-Jahreszeiten-Zelt", "ru": "ЭмЭсАр Аксесс 2"},
+    "aliases": ["msr access", "access 2"],
+    "volume_liters": 7.0,
+    "weight_grams": 1900,
+    "category": "shelter",
+    "source_url": "https://www.msrgear.com/tents/4-season-tents/access-2-person-mountaineering-tent/02747.html",
+    "variants": [
+      {"sizeLabel": "2P", "volumeLiters": 7.0, "weightGrams": 1900}
+    ]
+  },
+  {
+    "id": "msr-thru-hiker-tarp-100",
+    "names": {"en": "MSR Thru-Hiker 100 Tarp", "de": "MSR Thru-Hiker 100 Tarp Plane", "ru": "ЭмЭсАр Тру-Хайкер 100 Тарп"},
+    "aliases": ["thru hiker 100", "msr tarp 100"],
+    "volume_liters": 1.0,
+    "weight_grams": 245,
+    "category": "shelter",
+    "source_url": "https://www.msrgear.com/tents/tarp-shelters/thru-hiker-100-wing/13301.html",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 1.0, "weightGrams": 245}
+    ]
+  },
+  {
+    "id": "dd-hammocks-tarp-3x3",
+    "names": {"en": "DD Hammocks Tarp 3x3", "de": "DD Hammocks Tarp 3x3 Plane", "ru": "ДД Хеммокс Тарп 3х3"},
+    "aliases": ["dd tarp 3x3", "dd hammocks 3x3"],
+    "volume_liters": 1.5,
+    "weight_grams": 790,
+    "category": "shelter",
+    "source_url": "https://www.ddhammocks.com/product/dd-tarp-3x3",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 1.5, "weightGrams": 790}
+    ]
+  },
+  {
+    "id": "snugpak-stratosphere-bivy",
+    "names": {"en": "Snugpak Stratosphere Bivy", "de": "Snugpak Stratosphere Biwaksack", "ru": "Снагпак Стратосфере Биви"},
+    "aliases": ["stratosphere bivy", "snugpak stratosphere"],
+    "volume_liters": 2.0,
+    "weight_grams": 1100,
+    "category": "shelter",
+    "source_url": "https://www.snugpak.com/shelters/stratosphere",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 2.0, "weightGrams": 1100}
+    ]
+  },
+  {
+    "id": "rab-superlite-bivy",
+    "names": {"en": "Rab Superlite Bivy", "de": "Rab Superlite Biwaksack", "ru": "Раб Суперлайт Биви"},
+    "aliases": ["rab superlite", "superlite bivy"],
+    "volume_liters": 0.6,
+    "weight_grams": 270,
+    "category": "shelter",
+    "source_url": "https://rab.equipment/eu/superlite-bivi",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.6, "weightGrams": 270}
+    ]
+  },
+  {
+    "id": "alpkit-hunka-xl",
+    "names": {"en": "Alpkit Hunka XL", "de": "Alpkit Hunka XL Biwaksack", "ru": "Алпкит Хунка XL"},
+    "aliases": ["hunka xl", "alpkit hunka", "alpkit bivy"],
+    "volume_liters": 1.2,
+    "weight_grams": 480,
+    "category": "shelter",
+    "source_url": "https://alpkit.com/products/hunka-xl",
+    "variants": [
+      {"sizeLabel": "XL", "volumeLiters": 1.2, "weightGrams": 480},
+      {"sizeLabel": "Standard", "volumeLiters": 0.9, "weightGrams": 380}
+    ]
+  },
+  {
+    "id": "ledlenser-mh7",
+    "names": {"en": "Ledlenser MH7", "de": "Ledlenser MH7 Stirnlampe", "ru": "Ледленсер MH7"},
+    "aliases": ["mh7", "ledlenser headlamp"],
+    "volume_liters": 0.2,
+    "weight_grams": 168,
+    "category": "electronics",
+    "source_url": "https://www.ledlenser.com/us/headlamps/mh7/",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.2, "weightGrams": 168}
+    ]
+  },
+  {
+    "id": "ledlenser-neo10r",
+    "names": {"en": "Ledlenser NEO10R", "de": "Ledlenser NEO10R Stirnlampe", "ru": "Ледленсер NEO10R"},
+    "aliases": ["neo10r", "ledlenser neo"],
+    "volume_liters": 0.18,
+    "weight_grams": 158,
+    "category": "electronics",
+    "source_url": "https://www.ledlenser.com/us/headlamps/neo10r/",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.18, "weightGrams": 158}
+    ]
+  },
+  {
+    "id": "silva-trail-runner-free-h",
+    "names": {"en": "Silva Trail Runner Free H", "de": "Silva Trail Runner Free H Stirnlampe", "ru": "Силва Трейл Раннер Фри H"},
+    "aliases": ["silva trail runner", "trail runner free h"],
+    "volume_liters": 0.15,
+    "weight_grams": 99,
+    "category": "electronics",
+    "source_url": "https://silvasweden.com/products/trail-runner-free-h",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.15, "weightGrams": 99}
+    ]
+  },
+  {
+    "id": "zebralight-h600",
+    "names": {"en": "Zebralight H600", "de": "Zebralight H600 Stirnlampe", "ru": "Зебралайт H600"},
+    "aliases": ["zebralight h600", "h600 headlamp"],
+    "volume_liters": 0.08,
+    "weight_grams": 79,
+    "category": "electronics",
+    "source_url": "https://www.zebralight.com/H600w-Mk-IV-18650-XHP50-2-Floody-Headlamp-Neutral-White-High-CRI_p_320.html",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.08, "weightGrams": 79}
+    ]
+  },
+  {
+    "id": "xiaomi-redmi-power-bank-20000",
+    "names": {"en": "Xiaomi Redmi Power Bank 20000", "de": "Xiaomi Redmi Powerbank 20000", "ru": "Сяоми Редми Павербанк 20000"},
+    "aliases": ["xiaomi 20000", "redmi powerbank 20000"],
+    "volume_liters": 0.5,
+    "weight_grams": 440,
+    "category": "electronics",
+    "source_url": "https://www.mi.com/global/redmi-power-bank-20000mah",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.5, "weightGrams": 440}
+    ]
+  },
+  {
+    "id": "ravpower-pd-pioneer-20000",
+    "names": {"en": "Ravpower PD Pioneer 20000", "de": "Ravpower PD Pioneer 20000 Powerbank", "ru": "Равпауэр ПД Пионир 20000"},
+    "aliases": ["ravpower 20000", "ravpower pioneer"],
+    "volume_liters": 0.5,
+    "weight_grams": 420,
+    "category": "electronics",
+    "source_url": "https://www.ravpower.com/products/rp-pb201-20000mah-60w-pd-power-bank",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.5, "weightGrams": 420}
+    ]
+  },
+  {
+    "id": "aukey-pb-y32",
+    "names": {"en": "Aukey PB-Y32 20000mAh", "de": "Aukey PB-Y32 20000mAh Powerbank", "ru": "Окей PB-Y32 20000mAh"},
+    "aliases": ["aukey 20000", "pb-y32"],
+    "volume_liters": 0.5,
+    "weight_grams": 425,
+    "category": "electronics",
+    "source_url": "https://www.aukey.com/products/pb-y32",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.5, "weightGrams": 425}
+    ]
+  },
+  {
+    "id": "sinewave-revolution",
+    "names": {"en": "Sinewave Revolution", "de": "Sinewave Revolution Dynamo-USB-Lader", "ru": "Сайнвейв Революшн"},
+    "aliases": ["sinewave revolution", "dynamo charger sinewave"],
+    "volume_liters": 0.07,
+    "weight_grams": 75,
+    "category": "electronics",
+    "source_url": "https://sinewavecycles.com/products/revolution",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.07, "weightGrams": 75}
+    ]
+  },
+  {
+    "id": "sinewave-beacon-2",
+    "names": {"en": "Sinewave Beacon 2", "de": "Sinewave Beacon 2 Dynamo-Licht/USB", "ru": "Сайнвейв Бикон 2"},
+    "aliases": ["sinewave beacon", "beacon 2 dynamo"],
+    "volume_liters": 0.12,
+    "weight_grams": 153,
+    "category": "electronics",
+    "source_url": "https://sinewavecycles.com/products/beacon",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.12, "weightGrams": 153}
+    ]
+  },
+  {
+    "id": "tout-terrain-plug6-plus",
+    "names": {"en": "Tout Terrain Plug6 Plus", "de": "Tout Terrain Plug6 Plus USB-Lader", "ru": "Тут Террейн Плаг6 Плюс"},
+    "aliases": ["plug6 plus", "tout terrain plug", "plug 6"],
+    "volume_liters": 0.08,
+    "weight_grams": 87,
+    "category": "electronics",
+    "source_url": "https://en.tout-terrain.de/plug-6-plus.html",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.08, "weightGrams": 87}
+    ]
+  },
+  {
+    "id": "forumslader-v6",
+    "names": {"en": "Forumslader V6", "de": "Forumslader V6 Dynamo-USB-Lader", "ru": "Форумсладер V6"},
+    "aliases": ["forumslader v6", "forumslader"],
+    "volume_liters": 0.2,
+    "weight_grams": 195,
+    "category": "electronics",
+    "source_url": "https://www.forumslader.de/produkte/forumslader-v6",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.2, "weightGrams": 195}
+    ]
+  },
+  {
+    "id": "busch-mueller-ixon-space",
+    "names": {"en": "Busch+Müller IXON Space", "de": "Busch+Müller IXON Space Fahrradlampe", "ru": "Буш+Мюллер IXON Спейс"},
+    "aliases": ["ixon space", "b+m ixon", "busch muller ixon"],
+    "volume_liters": 0.2,
+    "weight_grams": 197,
+    "category": "electronics",
+    "source_url": "https://www.bumm.de/en/produkte/akku-scheinwerfer/produkt/176rt.html",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.2, "weightGrams": 197}
+    ]
+  },
+  {
+    "id": "busch-mueller-ixon-iq-premium",
+    "names": {"en": "Busch+Müller IXON IQ Premium", "de": "Busch+Müller IXON IQ Premium Fahrradlampe", "ru": "Буш+Мюллер IXON IQ Премиум"},
+    "aliases": ["ixon iq premium", "b+m ixon iq"],
+    "volume_liters": 0.18,
+    "weight_grams": 180,
+    "category": "electronics",
+    "source_url": "https://www.bumm.de/en/produkte/akku-scheinwerfer/produkt/175qrt.html",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.18, "weightGrams": 180}
+    ]
+  },
+  {
+    "id": "supernova-m99-pro",
+    "names": {"en": "Supernova M99 Pro", "de": "Supernova M99 Pro Fahrradlampe", "ru": "Супернова M99 Про"},
+    "aliases": ["supernova m99", "m99 pro"],
+    "volume_liters": 0.15,
+    "weight_grams": 175,
+    "category": "electronics",
+    "source_url": "https://supernova-lights.com/en/products/m99-pro/",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.15, "weightGrams": 175}
+    ]
+  },
+  {
+    "id": "exposure-strada-mk12",
+    "names": {"en": "Exposure Strada MK12", "de": "Exposure Strada MK12 Fahrradlampe", "ru": "Экспоужер Страда МК12"},
+    "aliases": ["strada mk12", "exposure strada"],
+    "volume_liters": 0.18,
+    "weight_grams": 218,
+    "category": "electronics",
+    "source_url": "https://www.exposurelights.com/products/strada-mk12",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.18, "weightGrams": 218}
+    ]
+  },
+  {
+    "id": "biolite-solarpanel-10-plus",
+    "names": {"en": "BioLite SolarPanel 10+", "de": "BioLite SolarPanel 10+ Solarpanel", "ru": "БиоЛайт СоларПанель 10+"},
+    "aliases": ["biolite solarpanel 10", "solar panel 10+"],
+    "volume_liters": 0.55,
+    "weight_grams": 590,
+    "category": "electronics",
+    "source_url": "https://www.bioliteenergy.com/products/solarpanel-10",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.55, "weightGrams": 590}
+    ]
+  },
+  {
+    "id": "goal-zero-nomad-10",
+    "names": {"en": "Goal Zero Nomad 10", "de": "Goal Zero Nomad 10 Solarpanel", "ru": "Гол Зиро Номад 10"},
+    "aliases": ["nomad 10", "goal zero nomad"],
+    "volume_liters": 0.6,
+    "weight_grams": 590,
+    "category": "electronics",
+    "source_url": "https://www.goalzero.com/products/nomad-10",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.6, "weightGrams": 590}
+    ]
+  },
+  {
+    "id": "shimano-pro-mini-pump",
+    "names": {"en": "PRO Performance Mini Pump", "de": "PRO Performance Mini Pumpe", "ru": "ПРО Перформанс Мини Насос"},
+    "aliases": ["pro mini pump", "shimano pro pump"],
+    "volume_liters": 0.2,
+    "weight_grams": 105,
+    "category": "tools",
+    "source_url": "https://www.pro-bikegear.com/global/en-gb/products/tools/performance-mini-pump",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.2, "weightGrams": 105}
+    ]
+  },
+  {
+    "id": "birzman-velocity-mp",
+    "names": {"en": "Birzman Velocity MP", "de": "Birzman Velocity MP Pumpe", "ru": "Бирзман Велосити МП"},
+    "aliases": ["birzman velocity", "velocity mp"],
+    "volume_liters": 0.25,
+    "weight_grams": 115,
+    "category": "tools",
+    "source_url": "https://www.birzman.com/product-detail/Velocity-MP",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.25, "weightGrams": 115}
+    ]
+  },
+  {
+    "id": "crankbrothers-klic-hv",
+    "names": {"en": "Crankbrothers Klic HV", "de": "Crankbrothers Klic HV Pumpe", "ru": "Крэнкбразерс Клик ХВ"},
+    "aliases": ["klic hv", "crankbrothers klic"],
+    "volume_liters": 0.22,
+    "weight_grams": 122,
+    "category": "tools",
+    "source_url": "https://www.crankbrothers.com/products/klic-hv",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.22, "weightGrams": 122}
+    ]
+  },
+  {
+    "id": "co2-inflator-cartridge",
+    "names": {"en": "CO2 Inflator + Cartridge", "de": "CO2 Inflator mit Kartusche", "ru": "CO2 Инфлятор с картриджем"},
+    "aliases": ["co2 inflator", "co2 cartridge", "genuine innovations"],
+    "volume_liters": 0.1,
+    "weight_grams": 85,
+    "category": "tools",
+    "source_url": "https://www.lezyne.com/product-controldrive.php",
+    "variants": [
+      {"sizeLabel": "16g", "volumeLiters": 0.1, "weightGrams": 85},
+      {"sizeLabel": "25g", "volumeLiters": 0.12, "weightGrams": 110}
+    ]
+  },
+  {
+    "id": "park-tool-tire-levers-tl-1",
+    "names": {"en": "Park Tool TL-1 Tire Levers", "de": "Park Tool TL-1 Reifenheber", "ru": "Парк Тул TL-1 Монтировки"},
+    "aliases": ["park tool tl-1", "tl-1 levers", "tire levers"],
+    "volume_liters": 0.05,
+    "weight_grams": 33,
+    "category": "tools",
+    "source_url": "https://www.parktool.com/product/tire-lever-set-tl-1-2-c",
+    "variants": [
+      {"sizeLabel": "Set of 3", "volumeLiters": 0.05, "weightGrams": 33}
+    ]
+  },
+  {
+    "id": "pedros-tire-levers",
+    "names": {"en": "Pedro's Tire Levers", "de": "Pedro's Reifenheber", "ru": "Педрос Монтировки"},
+    "aliases": ["pedros levers", "pedro's tire levers"],
+    "volume_liters": 0.05,
+    "weight_grams": 36,
+    "category": "tools",
+    "source_url": "https://pedros.com/products/tire-levers/",
+    "variants": [
+      {"sizeLabel": "Pair", "volumeLiters": 0.05, "weightGrams": 36}
+    ]
+  },
+  {
+    "id": "park-tool-vp-1-patch-kit",
+    "names": {"en": "Park Tool VP-1 Patch Kit", "de": "Park Tool VP-1 Flickzeug", "ru": "Парк Тул VP-1 Ремкомплект"},
+    "aliases": ["vp-1 patch", "park tool patch kit"],
+    "volume_liters": 0.05,
+    "weight_grams": 28,
+    "category": "tools",
+    "source_url": "https://www.parktool.com/product/vulcanizing-patch-kit-vp-1",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.05, "weightGrams": 28}
+    ]
+  },
+  {
+    "id": "park-tool-gp-2-glueless-patch",
+    "names": {"en": "Park Tool GP-2 Glueless Patches", "de": "Park Tool GP-2 Selbstklebendes Flickzeug", "ru": "Парк Тул GP-2 Самоклеящиеся заплатки"},
+    "aliases": ["gp-2 patches", "glueless patches"],
+    "volume_liters": 0.03,
+    "weight_grams": 12,
+    "category": "tools",
+    "source_url": "https://www.parktool.com/product/super-patch-kit-gp-2",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.03, "weightGrams": 12}
+    ]
+  },
+  {
+    "id": "dynaplug-racer-pro",
+    "names": {"en": "Dynaplug Racer Pro", "de": "Dynaplug Racer Pro Tubeless-Reparatur", "ru": "Дайнаплаг Рейсер Про"},
+    "aliases": ["dynaplug racer", "dynaplug pro"],
+    "volume_liters": 0.05,
+    "weight_grams": 45,
+    "category": "tools",
+    "source_url": "https://dynaplug.com/products/racer-pro",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.05, "weightGrams": 45}
+    ]
+  },
+  {
+    "id": "stans-dart-tool",
+    "names": {"en": "Stan's DART Tool", "de": "Stan's DART Tubeless-Werkzeug", "ru": "Стэнс ДАРТ Инструмент"},
+    "aliases": ["stans dart", "dart tool tubeless"],
+    "volume_liters": 0.05,
+    "weight_grams": 42,
+    "category": "tools",
+    "source_url": "https://www.notubes.com/dart-tool",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.05, "weightGrams": 42}
+    ]
+  },
+  {
+    "id": "spare-tube-700c",
+    "names": {"en": "Spare Inner Tube 700c", "de": "Ersatzschlauch 700c", "ru": "Запасная камера 700c"},
+    "aliases": ["spare tube 700", "inner tube 700c"],
+    "volume_liters": 0.25,
+    "weight_grams": 170,
+    "category": "tools",
+    "source_url": "https://www.continental-tires.com/bicycle/tubes",
+    "variants": [
+      {"sizeLabel": "700c", "volumeLiters": 0.25, "weightGrams": 170},
+      {"sizeLabel": "29er MTB", "volumeLiters": 0.35, "weightGrams": 220}
+    ]
+  },
+  {
+    "id": "spare-tube-mtb-275",
+    "names": {"en": "Spare Inner Tube 27.5\"", "de": "Ersatzschlauch 27.5\"", "ru": "Запасная камера 27.5\""},
+    "aliases": ["spare tube 27.5", "mtb tube 27.5"],
+    "volume_liters": 0.3,
+    "weight_grams": 200,
+    "category": "tools",
+    "source_url": "https://www.schwalbe.com/en/schlauch",
+    "variants": [
+      {"sizeLabel": "27.5\"", "volumeLiters": 0.3, "weightGrams": 200}
+    ]
+  },
+  {
+    "id": "tubolito-s-tubo-road",
+    "names": {"en": "Tubolito S-Tubo Road", "de": "Tubolito S-Tubo Road Ersatzschlauch", "ru": "Туболито S-Tubo Road"},
+    "aliases": ["tubolito s-tubo", "tubolito road"],
+    "volume_liters": 0.08,
+    "weight_grams": 38,
+    "category": "tools",
+    "source_url": "https://tubolito.com/en/product/s-tubo-road/",
+    "variants": [
+      {"sizeLabel": "Road", "volumeLiters": 0.08, "weightGrams": 38}
+    ]
+  },
+  {
+    "id": "chain-quick-link",
+    "names": {"en": "Chain Quick Link", "de": "Kettenschloss", "ru": "Замок цепи"},
+    "aliases": ["quick link", "chain link", "powerlink", "missing link"],
+    "volume_liters": 0.01,
+    "weight_grams": 3,
+    "category": "tools",
+    "source_url": "https://www.sram.com/en/sram/road/parts/chains",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.01, "weightGrams": 3}
+    ]
+  },
+  {
+    "id": "derailleur-hanger-spare",
+    "names": {"en": "Spare Derailleur Hanger", "de": "Ersatz-Schaltauge", "ru": "Запасной петух"},
+    "aliases": ["derailleur hanger", "hanger spare", "schaltauge"],
+    "volume_liters": 0.02,
+    "weight_grams": 12,
+    "category": "tools",
+    "source_url": "https://wheelsmfg.com/derailleur-hangers",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.02, "weightGrams": 12}
+    ]
+  },
+  {
+    "id": "spoke-wrench-mini",
+    "names": {"en": "Mini Spoke Wrench", "de": "Mini Speichenschlüssel", "ru": "Мини Спицевой ключ"},
+    "aliases": ["spoke wrench", "spoke key", "speichenschlüssel"],
+    "volume_liters": 0.02,
+    "weight_grams": 18,
+    "category": "tools",
+    "source_url": "https://www.parktool.com/product/spoke-wrench-set-sw-0-1-2-3",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.02, "weightGrams": 18}
+    ]
+  },
+  {
+    "id": "chain-breaker-mini",
+    "names": {"en": "Mini Chain Breaker", "de": "Mini Kettennieter", "ru": "Мини Выжимка цепи"},
+    "aliases": ["chain breaker", "chain tool", "kettennieter"],
+    "volume_liters": 0.05,
+    "weight_grams": 55,
+    "category": "tools",
+    "source_url": "https://www.parktool.com/product/chain-tool-ct-6",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.05, "weightGrams": 55}
+    ]
+  },
+  {
+    "id": "fiber-fix-spoke",
+    "names": {"en": "FiberFix Emergency Spoke", "de": "FiberFix Notspeiche", "ru": "ФайберФикс Аварийная спица"},
+    "aliases": ["fiber fix spoke", "emergency spoke"],
+    "volume_liters": 0.02,
+    "weight_grams": 14,
+    "category": "tools",
+    "source_url": "https://www.fiberfix.com/products/fiberfix-replacement-spoke",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.02, "weightGrams": 14}
+    ]
+  },
+  {
+    "id": "chain-lube-bottle",
+    "names": {"en": "Chain Lube (small bottle)", "de": "Kettenöl (kleine Flasche)", "ru": "Смазка для цепи (флакон)"},
+    "aliases": ["chain lube", "chain oil", "muc-off lube", "wolf tooth wt-1"],
+    "volume_liters": 0.08,
+    "weight_grams": 60,
+    "category": "tools",
+    "source_url": "https://muc-off.com/products/c3-dry-ceramic-lube",
+    "variants": [
+      {"sizeLabel": "50ml", "volumeLiters": 0.08, "weightGrams": 60}
+    ]
+  },
+  {
+    "id": "leatherman-skeletool",
+    "names": {"en": "Leatherman Skeletool", "de": "Leatherman Skeletool Multitool", "ru": "Лезерман Скелетул"},
+    "aliases": ["leatherman skeletool", "skeletool"],
+    "volume_liters": 0.1,
+    "weight_grams": 142,
+    "category": "tools",
+    "source_url": "https://www.leatherman.com/skeletool-3.html",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.1, "weightGrams": 142}
+    ]
+  },
+  {
+    "id": "duct-tape-mini-roll",
+    "names": {"en": "Duct Tape Mini Roll", "de": "Panzerband Mini-Rolle", "ru": "Армированный скотч мини"},
+    "aliases": ["duct tape", "gaffer tape", "panzerband"],
+    "volume_liters": 0.06,
+    "weight_grams": 40,
+    "category": "tools",
+    "source_url": "https://www.gorilla-glue.com/gorilla-tape/mini-duct",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.06, "weightGrams": 40}
+    ]
+  },
+  {
+    "id": "zip-ties-bundle",
+    "names": {"en": "Zip Ties Bundle", "de": "Kabelbinder Set", "ru": "Стяжки набор"},
+    "aliases": ["zip ties", "cable ties", "kabelbinder"],
+    "volume_liters": 0.05,
+    "weight_grams": 25,
+    "category": "tools",
+    "source_url": "https://www.amazon.com/s?k=zip+ties",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.05, "weightGrams": 25}
+    ]
+  },
+  {
+    "id": "adventure-medical-ultralight-3",
+    "names": {"en": "Adventure Medical Ultralight/Watertight .3", "de": "Adventure Medical Ultralight .3 Erste-Hilfe-Set", "ru": "Эдвенче Медикал Ультралайт .3"},
+    "aliases": ["amk .3", "ultralight watertight 3", "adventure medical 3"],
+    "volume_liters": 0.4,
+    "weight_grams": 110,
+    "category": "other",
+    "source_url": "https://www.adventuremedicalkits.com/ultralight-watertight-3-first-aid-kit.html",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.4, "weightGrams": 110}
+    ]
+  },
+  {
+    "id": "adventure-medical-ultralight-7",
+    "names": {"en": "Adventure Medical Ultralight/Watertight .7", "de": "Adventure Medical Ultralight .7 Erste-Hilfe-Set", "ru": "Эдвенче Медикал Ультралайт .7"},
+    "aliases": ["amk .7", "ultralight watertight 7", "adventure medical 7"],
+    "volume_liters": 0.8,
+    "weight_grams": 230,
+    "category": "other",
+    "source_url": "https://www.adventuremedicalkits.com/ultralight-watertight-7-first-aid-kit.html",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.8, "weightGrams": 230}
+    ]
+  },
+  {
+    "id": "lifesystems-trek-first-aid",
+    "names": {"en": "Lifesystems Trek First Aid Kit", "de": "Lifesystems Trek Erste-Hilfe-Set", "ru": "Лайфсистемс Трек Аптечка"},
+    "aliases": ["lifesystems trek", "trek first aid"],
+    "volume_liters": 0.5,
+    "weight_grams": 180,
+    "category": "other",
+    "source_url": "https://www.lifesystems.co.uk/products/trek-first-aid-kit",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.5, "weightGrams": 180}
+    ]
+  },
+  {
+    "id": "lifesystems-pocket-first-aid",
+    "names": {"en": "Lifesystems Pocket First Aid Kit", "de": "Lifesystems Pocket Erste-Hilfe-Set", "ru": "Лайфсистемс Покет Аптечка"},
+    "aliases": ["lifesystems pocket", "pocket first aid"],
+    "volume_liters": 0.3,
+    "weight_grams": 100,
+    "category": "other",
+    "source_url": "https://www.lifesystems.co.uk/products/pocket-first-aid-kit",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.3, "weightGrams": 100}
+    ]
+  },
+  {
+    "id": "sol-emergency-blanket",
+    "names": {"en": "SOL Emergency Blanket", "de": "SOL Rettungsdecke", "ru": "СОЛ Спасательное одеяло"},
+    "aliases": ["sol blanket", "emergency blanket", "rettungsdecke"],
+    "volume_liters": 0.1,
+    "weight_grams": 85,
+    "category": "other",
+    "source_url": "https://www.surviveoutdoorslonger.com/emergency-blanket/",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.1, "weightGrams": 85}
+    ]
+  },
+  {
+    "id": "coghlan-whistle",
+    "names": {"en": "Coghlan's Survival Whistle", "de": "Coghlan's Notfallpfeife", "ru": "Когланс Свисток"},
+    "aliases": ["coghlans whistle", "survival whistle", "fox 40"],
+    "volume_liters": 0.02,
+    "weight_grams": 12,
+    "category": "other",
+    "source_url": "https://coghlans.com/products/safety-whistle",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.02, "weightGrams": 12}
+    ]
+  },
+  {
+    "id": "bear-spray-counter-assault",
+    "names": {"en": "Counter Assault Bear Spray", "de": "Counter Assault Bärenspray", "ru": "Каунтер Ассолт Спрей от медведя"},
+    "aliases": ["bear spray", "counter assault", "bärenspray"],
+    "volume_liters": 0.5,
+    "weight_grams": 340,
+    "category": "other",
+    "source_url": "https://counterassault.com/products/bear-deterrent",
+    "variants": [
+      {"sizeLabel": "8.1oz", "volumeLiters": 0.5, "weightGrams": 340}
+    ]
+  },
+  {
+    "id": "helinox-chair-zero",
+    "names": {"en": "Helinox Chair Zero", "de": "Helinox Chair Zero Campingstuhl", "ru": "Хелинокс Чейр Зиро"},
+    "aliases": ["helinox chair zero", "chair zero"],
+    "volume_liters": 1.4,
+    "weight_grams": 490,
+    "category": "other",
+    "source_url": "https://helinox.com/products/chair-zero",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 1.4, "weightGrams": 490},
+      {"sizeLabel": "High-Back", "volumeLiters": 1.7, "weightGrams": 615}
+    ]
+  },
+  {
+    "id": "helinox-ground-chair",
+    "names": {"en": "Helinox Ground Chair", "de": "Helinox Ground Chair", "ru": "Хелинокс Граунд Чейр"},
+    "aliases": ["helinox ground", "ground chair"],
+    "volume_liters": 1.5,
+    "weight_grams": 615,
+    "category": "other",
+    "source_url": "https://helinox.com/products/ground-chair",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 1.5, "weightGrams": 615}
+    ]
+  },
+  {
+    "id": "thermarest-z-seat",
+    "names": {"en": "Thermarest Z Seat", "de": "Thermarest Z Seat Sitzkissen", "ru": "Термарест Зет Сит"},
+    "aliases": ["z seat", "thermarest sit pad"],
+    "volume_liters": 0.4,
+    "weight_grams": 60,
+    "category": "other",
+    "source_url": "https://www.thermarest.com/seats/z-seat/z-seat.html",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.4, "weightGrams": 60}
+    ]
+  },
+  {
+    "id": "crazy-creek-hex-2-original",
+    "names": {"en": "Crazy Creek Hex 2.0 Original Chair", "de": "Crazy Creek Hex 2.0 Original Stuhl", "ru": "Крейзи Крик Хекс 2.0"},
+    "aliases": ["crazy creek hex", "crazy creek chair"],
+    "volume_liters": 2.5,
+    "weight_grams": 685,
+    "category": "other",
+    "source_url": "https://crazycreek.com/products/hex-2-0-original-chair",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 2.5, "weightGrams": 685}
+    ]
+  },
+  {
+    "id": "deuce-of-spades-trowel",
+    "names": {"en": "Deuce of Spades Trowel", "de": "Deuce of Spades Schaufel", "ru": "Деус оф Спейдс Лопатка"},
+    "aliases": ["deuce trowel", "trowel deuce"],
+    "volume_liters": 0.05,
+    "weight_grams": 17,
+    "category": "other",
+    "source_url": "https://thetentlab.com/the-deuce-3-ultralight-backcountry-trowel/",
+    "variants": [
+      {"sizeLabel": "#2", "volumeLiters": 0.05, "weightGrams": 17}
+    ]
+  },
+  {
+    "id": "qiwiz-big-dig-trowel",
+    "names": {"en": "QiWiz Big Dig Trowel", "de": "QiWiz Big Dig Schaufel", "ru": "КиВиз Биг Диг Лопатка"},
+    "aliases": ["qiwiz trowel", "big dig"],
+    "volume_liters": 0.06,
+    "weight_grams": 14,
+    "category": "other",
+    "source_url": "https://qiwiz.net/products/big-dig",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.06, "weightGrams": 14}
+    ]
+  },
+  {
+    "id": "sea-to-summit-ultra-sil-dry-sack-8l",
+    "names": {"en": "Sea to Summit Ultra-Sil Dry Sack 8L", "de": "Sea to Summit Ultra-Sil Trockensack 8L", "ru": "Си ту Саммит Ультра-Сил Гермомешок 8Л"},
+    "aliases": ["ultra-sil dry sack", "sts dry sack", "ultra sil 8l"],
+    "volume_liters": 0.2,
+    "weight_grams": 35,
+    "category": "other",
+    "source_url": "https://seatosummit.com/products/ultra-sil-dry-sack",
+    "variants": [
+      {"sizeLabel": "4L", "volumeLiters": 0.15, "weightGrams": 25},
+      {"sizeLabel": "8L", "volumeLiters": 0.2, "weightGrams": 35},
+      {"sizeLabel": "13L", "volumeLiters": 0.25, "weightGrams": 45},
+      {"sizeLabel": "20L", "volumeLiters": 0.3, "weightGrams": 58},
+      {"sizeLabel": "35L", "volumeLiters": 0.4, "weightGrams": 75}
+    ]
+  },
+  {
+    "id": "sea-to-summit-ultra-sil-stuff-sack",
+    "names": {"en": "Sea to Summit Ultra-Sil Stuff Sack", "de": "Sea to Summit Ultra-Sil Packsack", "ru": "Си ту Саммит Ультра-Сил Компрессионный мешок"},
+    "aliases": ["ultra-sil stuff sack", "sts stuff sack"],
+    "volume_liters": 0.15,
+    "weight_grams": 18,
+    "category": "other",
+    "source_url": "https://seatosummit.com/products/ultra-sil-stuff-sack",
+    "variants": [
+      {"sizeLabel": "4L", "volumeLiters": 0.1, "weightGrams": 12},
+      {"sizeLabel": "9L", "volumeLiters": 0.15, "weightGrams": 18},
+      {"sizeLabel": "13L", "volumeLiters": 0.2, "weightGrams": 22},
+      {"sizeLabel": "20L", "volumeLiters": 0.25, "weightGrams": 28}
+    ]
+  },
+  {
+    "id": "exped-fold-drybag-bs",
+    "names": {"en": "Exped Fold Drybag BS", "de": "Exped Fold Drybag BS Trockensack", "ru": "Экспед Фолд Драйбэг BS"},
+    "aliases": ["exped fold drybag", "fold drybag"],
+    "volume_liters": 0.25,
+    "weight_grams": 60,
+    "category": "other",
+    "source_url": "https://www.exped.com/usa/en/product-category/dry-bags/fold-drybag-bs",
+    "variants": [
+      {"sizeLabel": "S 5L", "volumeLiters": 0.15, "weightGrams": 40},
+      {"sizeLabel": "M 8L", "volumeLiters": 0.2, "weightGrams": 50},
+      {"sizeLabel": "L 13L", "volumeLiters": 0.25, "weightGrams": 60},
+      {"sizeLabel": "XL 22L", "volumeLiters": 0.35, "weightGrams": 75}
+    ]
+  },
+  {
+    "id": "nemo-dagger-stuff-sack",
+    "names": {"en": "Nemo Dagger Stuff Sack", "de": "Nemo Dagger Packsack", "ru": "Немо Даггер Компрессионный мешок"},
+    "aliases": ["nemo stuff sack"],
+    "volume_liters": 0.18,
+    "weight_grams": 30,
+    "category": "other",
+    "source_url": "https://www.nemoequipment.com/products/dagger-stuff-sack",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.18, "weightGrams": 30}
+    ]
+  },
+  {
+    "id": "kryptonite-kryptolok-mini-7",
+    "names": {"en": "Kryptonite KryptoLok Mini-7", "de": "Kryptonite KryptoLok Mini-7 Bügelschloss", "ru": "Криптонайт КриптоЛок Мини-7"},
+    "aliases": ["kryptolok mini", "kryptonite mini 7", "krypto u-lock"],
+    "volume_liters": 0.7,
+    "weight_grams": 1060,
+    "category": "other",
+    "source_url": "https://www.kryptonitelock.com/en/products/product-details.kryptolok-mini-7.html",
+    "variants": [
+      {"sizeLabel": "Mini-7", "volumeLiters": 0.7, "weightGrams": 1060}
+    ]
+  },
+  {
+    "id": "kryptonite-evolution-mini-7",
+    "names": {"en": "Kryptonite Evolution Mini-7", "de": "Kryptonite Evolution Mini-7 Bügelschloss", "ru": "Криптонайт Эволюшн Мини-7"},
+    "aliases": ["evolution mini", "kryptonite evolution"],
+    "volume_liters": 0.75,
+    "weight_grams": 1340,
+    "category": "other",
+    "source_url": "https://www.kryptonitelock.com/en/products/product-details.evolution-mini-7.html",
+    "variants": [
+      {"sizeLabel": "Mini-7", "volumeLiters": 0.75, "weightGrams": 1340}
+    ]
+  },
+  {
+    "id": "kryptonite-kryptoflex-cable",
+    "names": {"en": "Kryptonite KryptoFlex 1018 Cable", "de": "Kryptonite KryptoFlex Kabelschloss", "ru": "Криптонайт КриптоФлекс Трос"},
+    "aliases": ["kryptoflex", "cable lock", "kabelschloss"],
+    "volume_liters": 0.5,
+    "weight_grams": 425,
+    "category": "other",
+    "source_url": "https://www.kryptonitelock.com/en/products/product-details.kryptoflex-1018-combo.html",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.5, "weightGrams": 425}
+    ]
+  },
+  {
+    "id": "abus-bordo-lite-mini",
+    "names": {"en": "Abus Bordo Lite Mini 6055", "de": "Abus Bordo Lite Mini 6055 Faltschloss", "ru": "Абус Бордо Лайт Мини"},
+    "aliases": ["abus bordo lite", "bordo 6055", "abus folding lock"],
+    "volume_liters": 0.6,
+    "weight_grams": 700,
+    "category": "other",
+    "source_url": "https://www.abus.com/eng/Mobile-Security/Bike-Safety-Security/Bike-locks/Folding-locks/BORDO-Lite-Mini-6055",
+    "variants": [
+      {"sizeLabel": "60cm", "volumeLiters": 0.6, "weightGrams": 700}
+    ]
+  },
+  {
+    "id": "tigr-mini",
+    "names": {"en": "TiGr Mini", "de": "TiGr Mini Titanschloss", "ru": "ТиГр Мини"},
+    "aliases": ["tigr mini", "titanium lock"],
+    "volume_liters": 0.5,
+    "weight_grams": 510,
+    "category": "other",
+    "source_url": "https://tigrlock.com/products/tigr-mini",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.5, "weightGrams": 510}
+    ]
+  },
+  {
+    "id": "ottertex-bear-canister",
+    "names": {"en": "BearVault BV500 Bear Canister", "de": "BearVault BV500 Bärenkanister", "ru": "Бирвол BV500 Контейнер от медведя"},
+    "aliases": ["bearvault bv500", "bear canister", "bv500"],
+    "volume_liters": 11.5,
+    "weight_grams": 1180,
+    "category": "other",
+    "source_url": "https://bearvault.com/products/bv500",
+    "variants": [
+      {"sizeLabel": "BV450", "volumeLiters": 7.2, "weightGrams": 950},
+      {"sizeLabel": "BV475", "volumeLiters": 9.0, "weightGrams": 1060},
+      {"sizeLabel": "BV500", "volumeLiters": 11.5, "weightGrams": 1180}
+    ]
+  },
+  {
+    "id": "ursack-major",
+    "names": {"en": "Ursack Major", "de": "Ursack Major bärensicherer Beutel", "ru": "Урсак Мейджор"},
+    "aliases": ["ursack major", "ursack"],
+    "volume_liters": 0.8,
+    "weight_grams": 218,
+    "category": "other",
+    "source_url": "https://ursack.com/products/ursack-major",
+    "variants": [
+      {"sizeLabel": "Major 10.65L", "volumeLiters": 0.8, "weightGrams": 218}
+    ]
+  },
+  {
+    "id": "msr-packtowl-personal",
+    "names": {"en": "PackTowl Personal", "de": "PackTowl Personal Mikrofaserhandtuch", "ru": "ПакТауэл Персонал"},
+    "aliases": ["packtowl", "packtowl personal", "microfiber towel"],
+    "volume_liters": 0.2,
+    "weight_grams": 100,
+    "category": "other",
+    "source_url": "https://packtowl.com/products/personal",
+    "variants": [
+      {"sizeLabel": "M", "volumeLiters": 0.2, "weightGrams": 100},
+      {"sizeLabel": "L", "volumeLiters": 0.3, "weightGrams": 145}
+    ]
+  },
+  {
+    "id": "sea-to-summit-aeros-pillow",
+    "names": {"en": "Sea to Summit Aeros Pillow Premium", "de": "Sea to Summit Aeros Premium Kissen", "ru": "Си ту Саммит Аэрос Премиум Подушка"},
+    "aliases": ["aeros pillow", "sts pillow", "aeros premium"],
+    "volume_liters": 0.3,
+    "weight_grams": 80,
+    "category": "sleep",
+    "source_url": "https://seatosummit.com/products/aeros-premium-pillow",
+    "variants": [
+      {"sizeLabel": "Regular", "volumeLiters": 0.3, "weightGrams": 80},
+      {"sizeLabel": "Large", "volumeLiters": 0.4, "weightGrams": 110}
+    ]
+  },
+  {
+    "id": "nemo-fillo-pillow",
+    "names": {"en": "Nemo Fillo Pillow", "de": "Nemo Fillo Kissen", "ru": "Немо Филло Подушка"},
+    "aliases": ["nemo fillo", "fillo pillow"],
+    "volume_liters": 0.45,
+    "weight_grams": 275,
+    "category": "sleep",
+    "source_url": "https://www.nemoequipment.com/products/fillo",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.45, "weightGrams": 275}
+    ]
+  },
+  {
+    "id": "exped-air-pillow-ul",
+    "names": {"en": "Exped Air Pillow UL", "de": "Exped Air Pillow UL Kissen", "ru": "Экспед Эйр Пиллоу УЛ"},
+    "aliases": ["exped air pillow", "air pillow ul"],
+    "volume_liters": 0.25,
+    "weight_grams": 45,
+    "category": "sleep",
+    "source_url": "https://www.exped.com/usa/en/product-category/pillows/air-pillow-ul",
+    "variants": [
+      {"sizeLabel": "M", "volumeLiters": 0.25, "weightGrams": 45},
+      {"sizeLabel": "L", "volumeLiters": 0.35, "weightGrams": 65}
+    ]
+  },
+  {
+    "id": "sea-to-summit-reactor-liner",
+    "names": {"en": "Sea to Summit Reactor Liner", "de": "Sea to Summit Reactor Schlafsack-Inlett", "ru": "Си ту Саммит Реактор Вкладыш"},
+    "aliases": ["reactor liner", "sts reactor", "sleeping bag liner"],
+    "volume_liters": 0.5,
+    "weight_grams": 248,
+    "category": "sleep",
+    "source_url": "https://seatosummit.com/products/reactor-sleeping-bag-liner",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.5, "weightGrams": 248},
+      {"sizeLabel": "Extreme", "volumeLiters": 0.8, "weightGrams": 400}
+    ]
+  },
+  {
+    "id": "knog-pwr-rider",
+    "names": {"en": "Knog PWR Rider", "de": "Knog PWR Rider Fahrradlampe", "ru": "Ног ПВР Райдер"},
+    "aliases": ["pwr rider", "knog pwr"],
+    "volume_liters": 0.15,
+    "weight_grams": 167,
+    "category": "electronics",
+    "source_url": "https://www.knog.com/products/pwr-rider",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.15, "weightGrams": 167}
+    ]
+  },
+  {
+    "id": "garmin-varia-rtl515",
+    "names": {"en": "Garmin Varia RTL515 Radar Tail Light", "de": "Garmin Varia RTL515 Radar-Rücklicht", "ru": "Гармин Вария RTL515 Радар"},
+    "aliases": ["varia rtl515", "garmin varia", "varia radar"],
+    "volume_liters": 0.1,
+    "weight_grams": 71,
+    "category": "electronics",
+    "source_url": "https://www.garmin.com/en-US/p/698001",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.1, "weightGrams": 71}
+    ]
+  },
+  {
+    "id": "nitecore-tip-2",
+    "names": {"en": "Nitecore TIP 2", "de": "Nitecore TIP 2 Schlüsselbundlampe", "ru": "Найткор TIP 2"},
+    "aliases": ["nitecore tip2", "tip 2 keychain"],
+    "volume_liters": 0.03,
+    "weight_grams": 28,
+    "category": "electronics",
+    "source_url": "https://www.nitecore.com/Products/Detail?id=600",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.03, "weightGrams": 28}
+    ]
+  },
+  {
+    "id": "rovyvon-aurora-a5",
+    "names": {"en": "Rovyvon Aurora A5", "de": "Rovyvon Aurora A5 Schlüsselbundlampe", "ru": "Ровивон Аврора А5"},
+    "aliases": ["rovyvon a5", "aurora a5"],
+    "volume_liters": 0.02,
+    "weight_grams": 22,
+    "category": "electronics",
+    "source_url": "https://www.rovyvon.com/products/aurora-a5",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.02, "weightGrams": 22}
+    ]
+  },
+  {
+    "id": "small-rear-tail-light-usb",
+    "names": {"en": "Generic USB Rear Light", "de": "Generisches USB-Rücklicht", "ru": "Обычный USB задний фонарь"},
+    "aliases": ["usb rear light", "generic tail light"],
+    "volume_liters": 0.05,
+    "weight_grams": 32,
+    "category": "electronics",
+    "source_url": "https://www.amazon.com/s?k=usb+rear+bike+light",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.05, "weightGrams": 32}
+    ]
+  },
+  {
+    "id": "sks-airworx-plus",
+    "names": {"en": "SKS Airworx Plus", "de": "SKS Airworx Plus Minipumpe", "ru": "СКС Эйрворкс Плюс"},
+    "aliases": ["sks airworx", "airworx plus"],
+    "volume_liters": 0.4,
+    "weight_grams": 210,
+    "category": "tools",
+    "source_url": "https://www.sks-germany.com/en/products/airworx-plus-10-0/",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.4, "weightGrams": 210}
+    ]
+  },
+  {
+    "id": "topeak-mountain-morph",
+    "names": {"en": "Topeak Mountain Morph", "de": "Topeak Mountain Morph Pumpe", "ru": "Топик Маунтин Морф"},
+    "aliases": ["mountain morph", "topeak mountain morph"],
+    "volume_liters": 0.5,
+    "weight_grams": 270,
+    "category": "tools",
+    "source_url": "https://www.topeak.com/global/en/products/mini-pumps/87-mountain-morph",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.5, "weightGrams": 270}
+    ]
+  },
+  {
+    "id": "blackburn-core-mini-pump",
+    "names": {"en": "Blackburn Core Mini Pump", "de": "Blackburn Core Mini Pumpe", "ru": "Блекборн Кор Мини Насос"},
+    "aliases": ["blackburn core mini", "core mini pump"],
+    "volume_liters": 0.2,
+    "weight_grams": 105,
+    "category": "tools",
+    "source_url": "https://www.blackburndesign.com/products/core-mini-pump",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.2, "weightGrams": 105}
+    ]
+  },
+  {
+    "id": "lezyne-rap-ii-19",
+    "names": {"en": "Lezyne Rap II 19", "de": "Lezyne Rap II 19 Multitool", "ru": "Лизин Рэп II 19"},
+    "aliases": ["lezyne rap 19", "rap ii 19"],
+    "volume_liters": 0.15,
+    "weight_grams": 196,
+    "category": "tools",
+    "source_url": "https://ride.lezyne.com/products/rap-ii-19",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.15, "weightGrams": 196}
+    ]
+  },
+  {
+    "id": "lezyne-sv-pro-11",
+    "names": {"en": "Lezyne SV Pro 11", "de": "Lezyne SV Pro 11 Multitool", "ru": "Лизин СВ Про 11"},
+    "aliases": ["sv pro 11", "lezyne sv11"],
+    "volume_liters": 0.08,
+    "weight_grams": 122,
+    "category": "tools",
+    "source_url": "https://ride.lezyne.com/products/sv-pro-11",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.08, "weightGrams": 122}
+    ]
+  },
+  {
+    "id": "fix-mfg-the-wheelie-wrench",
+    "names": {"en": "Fix Mfg Wheelie Wrench Pro", "de": "Fix Mfg Wheelie Wrench Multitool", "ru": "Фикс Мфг Уили Ренч Про"},
+    "aliases": ["wheelie wrench", "fix mfg wheelie", "fixmfg"],
+    "volume_liters": 0.1,
+    "weight_grams": 165,
+    "category": "tools",
+    "source_url": "https://fixmfg.com/products/wheelie-wrench-pro",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.1, "weightGrams": 165}
+    ]
+  },
+  {
+    "id": "msr-pocket-rocket-kit",
+    "names": {"en": "MSR PocketRocket Kit", "de": "MSR PocketRocket Kit Kochsystem", "ru": "ЭмЭсАр ПокетРокет Кит"},
+    "aliases": ["pocketrocket kit", "msr pr kit"],
+    "volume_liters": 1.0,
+    "weight_grams": 482,
+    "category": "cooking",
+    "source_url": "https://www.msrgear.com/stoves/canister-stoves/pocketrocket-stove-kit/10171.html",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 1.0, "weightGrams": 482}
+    ]
+  },
+  {
+    "id": "vargo-titanium-bot-700",
+    "names": {"en": "Vargo Titanium BOT 700", "de": "Vargo Titanium BOT 700 Topf", "ru": "Варго Титаниум БОТ 700"},
+    "aliases": ["vargo bot 700", "ti bot 700"],
+    "volume_liters": 0.55,
+    "weight_grams": 134,
+    "category": "cooking",
+    "source_url": "https://vargooutdoors.com/titanium-bot-700.html",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.55, "weightGrams": 134}
+    ]
+  },
+  {
+    "id": "snow-peak-trek-700-ti",
+    "names": {"en": "Snow Peak Trek 700 Titanium", "de": "Snow Peak Trek 700 Titan Topf", "ru": "Сноу Пик Трек 700 Титаниум"},
+    "aliases": ["snow peak trek 700", "trek 700 ti"],
+    "volume_liters": 0.5,
+    "weight_grams": 136,
+    "category": "cooking",
+    "source_url": "https://www.snowpeak.com/products/trek-700-titanium",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.5, "weightGrams": 136}
+    ]
+  },
+  {
+    "id": "alpkit-mytipot",
+    "names": {"en": "Alpkit MytiPot", "de": "Alpkit MytiPot Titan Topf", "ru": "Алпкит МайтиПот"},
+    "aliases": ["alpkit mytipot", "mytimug", "mytipot"],
+    "volume_liters": 0.45,
+    "weight_grams": 105,
+    "category": "cooking",
+    "source_url": "https://alpkit.com/products/mytipot",
+    "variants": [
+      {"sizeLabel": "650ml", "volumeLiters": 0.45, "weightGrams": 105},
+      {"sizeLabel": "900ml", "volumeLiters": 0.6, "weightGrams": 145}
+    ]
+  },
+  {
+    "id": "ortlieb-stuff-sack-pd350",
+    "names": {"en": "Ortlieb PD350 Drybag", "de": "Ortlieb PD350 Trockensack", "ru": "Ортлиб PD350 Гермомешок"},
+    "aliases": ["ortlieb pd350", "ortlieb drybag"],
+    "volume_liters": 0.3,
+    "weight_grams": 95,
+    "category": "other",
+    "source_url": "https://www.ortlieb.com/en/dry-bag-pd350.html",
+    "variants": [
+      {"sizeLabel": "7L", "volumeLiters": 0.2, "weightGrams": 80},
+      {"sizeLabel": "13L", "volumeLiters": 0.3, "weightGrams": 95},
+      {"sizeLabel": "22L", "volumeLiters": 0.4, "weightGrams": 130}
+    ]
+  },
+  {
+    "id": "petzl-bindi",
+    "names": {"en": "Petzl Bindi", "de": "Petzl Bindi Stirnlampe", "ru": "Петцль Бинди"},
+    "aliases": ["petzl bindi", "bindi headlamp"],
+    "volume_liters": 0.05,
+    "weight_grams": 35,
+    "category": "electronics",
+    "source_url": "https://www.petzl.com/US/en/Sport/Headlamps/BINDI",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.05, "weightGrams": 35}
+    ]
+  },
+  {
+    "id": "biolite-headlamp-330",
+    "names": {"en": "BioLite HeadLamp 330", "de": "BioLite HeadLamp 330 Stirnlampe", "ru": "БиоЛайт ХедЛамп 330"},
+    "aliases": ["biolite headlamp 330", "biolite 330"],
+    "volume_liters": 0.13,
+    "weight_grams": 69,
+    "category": "electronics",
+    "source_url": "https://www.bioliteenergy.com/products/headlamp-330",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.13, "weightGrams": 69}
+    ]
+  },
+  {
+    "id": "fenix-hm65r",
+    "names": {"en": "Fenix HM65R", "de": "Fenix HM65R Stirnlampe", "ru": "Феникс HM65R"},
+    "aliases": ["fenix hm65r", "hm65r"],
+    "volume_liters": 0.2,
+    "weight_grams": 124,
+    "category": "electronics",
+    "source_url": "https://www.fenixlighting.com/products/fenix-hm65r",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.2, "weightGrams": 124}
+    ]
+  },
+  {
+    "id": "wahoo-elemnt-bolt-cable",
+    "names": {"en": "USB-C Charging Cable", "de": "USB-C Ladekabel", "ru": "Кабель зарядки USB-C"},
+    "aliases": ["usb cable", "charging cable", "usb-c cable"],
+    "volume_liters": 0.04,
+    "weight_grams": 25,
+    "category": "electronics",
+    "source_url": "https://www.anker.com/products/a8852",
+    "variants": [
+      {"sizeLabel": "Short 0.3m", "volumeLiters": 0.02, "weightGrams": 12},
+      {"sizeLabel": "Standard 1m", "volumeLiters": 0.04, "weightGrams": 25}
+    ]
+  },
+  {
+    "id": "anker-65w-charger",
+    "names": {"en": "Anker 65W USB-C Wall Charger", "de": "Anker 65W USB-C Netzteil", "ru": "Анкер 65W USB-C Зарядка"},
+    "aliases": ["anker 65w", "wall charger", "usb-c charger"],
+    "volume_liters": 0.08,
+    "weight_grams": 110,
+    "category": "electronics",
+    "source_url": "https://www.anker.com/products/a2664",
+    "variants": [
+      {"sizeLabel": "Standard", "volumeLiters": 0.08, "weightGrams": 110}
+    ]
   }
 ]
