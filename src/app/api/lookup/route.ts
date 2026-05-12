@@ -67,9 +67,10 @@ export async function GET(req: NextRequest) {
   const repo = await buildRepo();
 
   if (dbOnly) {
-    const item = await repo.findByQuery(query);
-    if (!item) return NextResponse.json({ status: 'not_found' });
-    return NextResponse.json({ status: 'found_db', item: itemPayload(item) });
+    const items = await repo.findManyByQuery(query, 8);
+    if (items.length === 0) return NextResponse.json({ status: 'not_found' });
+    if (items.length === 1) return NextResponse.json({ status: 'found_db', item: itemPayload(items[0]) });
+    return NextResponse.json({ status: 'found_many', items: items.map(itemPayload) });
   }
 
   // Rate-limit AI calls

@@ -9,7 +9,7 @@ import { CATEGORY_LABELS } from '@/domain/gear/GearCategory';
 import { matchVariantByQuery } from '@/domain/gear/GearVariant';
 import type { GearEntry } from './GearCalculator';
 
-type SearchState = 'idle' | 'searching_db' | 'searching_ai' | 'not_found';
+type SearchState = 'idle' | 'searching_db' | 'searching_ai' | 'not_found' | 'picking';
 
 interface Variant { sizeLabel: string; volumeLiters: number; weightGrams?: number }
 
@@ -43,6 +43,7 @@ export function SearchBar({ onAdd }: Props) {
   const [query, setQuery] = useState('');
   const [state, setState] = useState<SearchState>('idle');
   const [candidate, setCandidate] = useState<Candidate | null>(null);
+  const [pickList, setPickList] = useState<Candidate['item'][]>([]);
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const isLoading = state === 'searching_db' || state === 'searching_ai';
@@ -51,14 +52,18 @@ export function SearchBar({ onAdd }: Props) {
     const q = query.trim();
     if (!q || isLoading) return;
     setCandidate(null);
+    setPickList([]);
 
     setState('searching_db');
     try {
       const res = await fetch(`/api/lookup?q=${encodeURIComponent(q)}&db_only=1`);
       const data = await res.json();
-      if (data.status !== 'not_found') {
-        // Always show ConfirmCard for DB hits — gives the user access to
-        // variant picker and the "dig deeper" retry button
+      if (data.status === 'found_many') {
+        setPickList(data.items);
+        setState('picking');
+        return;
+      }
+      if (data.status === 'found_db') {
         const variants: Variant[] = data.item.variants ?? [];
         const matched = matchVariantByQuery(variants, q);
         const idx = matched ? variants.indexOf(matched) : 0;
@@ -72,14 +77,35 @@ export function SearchBar({ onAdd }: Props) {
     await runAiSearch(q, 1);
   }
 
-  async function runAiSearch(q: string, depth: number, preserveId?: string) {
+  function pickItem(item: Candidate['item']) {
+    const variants: Variant[] = item.variants ?? [];
+    const matched = matchVariantByQuery(variants, query.trim());
+    const idx = matched ? variants.indexOf(matched) : 0;
+    setSelectedVariantIdx(idx);
+    setCandidate({ query: query.trim(), source: 'db', item, depth: 1 });
+    setPickList([]);
+    setState('idle');
+  }
+
+  function cancelPick() {
+    setPickList([]);
+    setState('idle');
+    inputRef.current?.focus();
+  }
+
+  async function runAiSearch(q: string, depth: number, preserveId?: string, fallback?: Candidate) {
     setState('searching_ai');
     try {
       const res = await fetch(`/api/lookup?q=${encodeURIComponent(q)}&depth=${depth}`);
       const data = await res.json();
       if (data.status === 'not_found') {
-        setState('not_found');
-        setTimeout(() => setState('idle'), 3500);
+        if (fallback) {
+          setCandidate(fallback);
+          setState('idle');
+        } else {
+          setState('not_found');
+          setTimeout(() => setState('idle'), 3500);
+        }
         return;
       }
       // If refining an existing DB record, keep its id so upsert updates the row
@@ -91,16 +117,19 @@ export function SearchBar({ onAdd }: Props) {
       setCandidate({ query: q, source: 'ai', item: data.item, confidence: data.confidence, volumeNote: data.volumeNote, depth });
       setState('idle');
     } catch {
-      setState('not_found');
-      setTimeout(() => setState('idle'), 3500);
+      if (fallback) {
+        setCandidate(fallback);
+        setState('idle');
+      } else {
+        setState('not_found');
+        setTimeout(() => setState('idle'), 3500);
+      }
     }
   }
 
   function digDeeper() {
     if (!candidate || candidate.depth >= MAX_DEPTH) return;
-    // Preserve id so the final upsert updates the same row (DB hits) or
-    // keeps a stable identity across retries (AI hits)
-    runAiSearch(candidate.query, candidate.depth + 1, candidate.item.id);
+    runAiSearch(candidate.query, candidate.depth + 1, candidate.item.id, candidate);
   }
 
   function addItem(item: Candidate['item'], q: string, source: 'db' | 'ai', variant?: Variant, confidence?: string) {
@@ -168,7 +197,7 @@ export function SearchBar({ onAdd }: Props) {
         </div>
         <button
           onClick={handleSearch}
-          disabled={!query.trim() || isLoading}
+          disabled={!query.trim() || isLoading || !!candidate || state === 'picking'}
           className="flex items-center gap-2 px-5 py-3 bg-accent hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed rounded-xl text-white text-sm font-medium transition-colors shadow-accent"
         >
           {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
@@ -183,6 +212,15 @@ export function SearchBar({ onAdd }: Props) {
         </div>
       )}
 
+      {state === 'picking' && pickList.length > 0 && (
+        <PickList
+          items={pickList}
+          locale={locale}
+          onPick={pickItem}
+          onCancel={cancelPick}
+        />
+      )}
+
       {candidate && (
         <ConfirmCard
           candidate={candidate}
@@ -195,6 +233,52 @@ export function SearchBar({ onAdd }: Props) {
           isLoading={isLoading}
         />
       )}
+    </div>
+  );
+}
+
+function PickList({ items, locale, onPick, onCancel }: {
+  items: Candidate['item'][];
+  locale: string;
+  onPick: (item: Candidate['item']) => void;
+  onCancel: () => void;
+}) {
+  const t = useTranslations('search');
+  return (
+    <div className="rounded-xl border border-accent/30 bg-accent/5 p-4 animate-slide-up space-y-2">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-accent font-medium uppercase tracking-wider">{t('found_db_badge')}</p>
+        <button onClick={onCancel} className="text-text-muted hover:text-white transition-colors">
+          <XCircle size={14} />
+        </button>
+      </div>
+      <div className="space-y-1">
+        {items.map(item => {
+          const name = item.names[locale] ?? item.names['en'];
+          const icon = categoryIcon(item.category);
+          const catLabels = CATEGORY_LABELS[item.category as keyof typeof CATEGORY_LABELS];
+          const catLabel = catLabels ? (catLabels[locale] ?? catLabels['en']) : item.category;
+          const firstVariant = item.variants?.[0];
+          const vol = firstVariant?.volumeLiters ?? item.volumeLiters;
+          const hasVariants = (item.variants?.length ?? 0) > 1;
+          return (
+            <button
+              key={item.id}
+              onClick={() => onPick(item)}
+              className="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg border border-white/[0.07] hover:border-accent/40 hover:bg-accent/10 text-left transition-all group"
+            >
+              <div className="flex-1 min-w-0">
+                <p className="text-text-muted text-xs">{icon} {catLabel}</p>
+                <p className="text-white text-sm font-medium truncate group-hover:text-white">{name}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-white font-semibold">{vol}L</p>
+                {hasVariants && <p className="text-text-muted text-xs">{item.variants.length} sizes</p>}
+              </div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -78,6 +78,41 @@ export class SupabaseGearItemRepository implements IGearItemRepository {
     return rowToGearItem(match);
   }
 
+  async findManyByQuery(query: string, limit = 8): Promise<GearItem[]> {
+    const norm = normalize(query);
+    if (!norm) return [];
+
+    const { data, error } = await this.supabase
+      .from('gear_items')
+      .select('id,names_json,aliases_json,volume_liters,weight_grams,category,source_url,verified_at,created_at,variants_json')
+      .ilike('search_text', `%${norm}%`)
+      .limit(40);
+
+    if (error) {
+      console.error('[gear_items findManyByQuery]', error.message);
+      return [];
+    }
+    if (!data || data.length === 0) return [];
+
+    const rows = data as GearItemRow[];
+
+    // Score and rank
+    const scored = rows.map(row => {
+      const allNames = [
+        ...Object.values(row.names_json ?? {}),
+        ...(row.aliases_json ?? []),
+      ].map(normalize);
+      let score = 0;
+      if (allNames.some(n => n === norm)) score = 3;
+      else if (allNames.some(n => n.startsWith(norm))) score = 2;
+      else if (allNames.some(n => n.includes(norm))) score = 1;
+      return { row, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, limit).map(s => rowToGearItem(s.row));
+  }
+
   async findById(id: string): Promise<GearItem | null> {
     const { data, error } = await this.supabase
       .from('gear_items')
