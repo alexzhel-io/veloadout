@@ -21,6 +21,8 @@ A web application for bikepacking riders: the user enters their gear, the system
 | FR-1.7 | If a size is mentioned in the query — the matching variant is pre-selected | ✅ |
 | FR-1.8 | Confirmed AI item is saved to the shared catalog (for all users) | ✅ |
 | FR-1.9 | On repeat search the item is found from DB and variants are shown again | ✅ |
+| FR-1.10 | "Dig deeper" button lets the user re-run AI search up to 2 more times (depth 2 → 3) with a larger web-search budget and stricter prompt — works for both AI and DB results | ✅ |
+| FR-1.11 | Refining an existing DB record preserves its id so upsert updates the row in place | ✅ |
 
 ### FR-2: Gear list
 
@@ -143,11 +145,12 @@ A web application for bikepacking riders: the user enters their gear, the system
 | AI-1 | Use **packed/compressed** volume, not unpacked |
 | AI-2 | Realistic ranges: tents 3–12L, sleeping bags 2–8L, down jackets 1–4L |
 | AI-3 | For products with sizes — return `variants` array with all sizes |
-| AI-4 | Multi-turn web_search loop (up to 5 iterations) |
+| AI-4 | Multi-turn web_search loop, budget scales with depth: 3/6/10 searches, 5/8/12 turns, 2048/4096/4096 tokens |
 | AI-5 | Fallback to knowledge-only if web_search is unavailable |
 | AI-6 | Confidence: `high` / `medium` / `low` |
 | AI-7 | `volumeNote` explaining the figure (packed, compression sack, etc.) |
 | AI-8 | Names in all three languages (EN / DE / RU) |
+| AI-9 | Deeper search (depth ≥2) skips DB cache and uses a stricter prompt nudging the model to enumerate every size variant |
 
 ---
 

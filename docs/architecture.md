@@ -160,9 +160,21 @@ sequenceDiagram
         API-->>B: {status:"found_ai", item, variants}
     end
 
+    rect rgb(254, 243, 199)
+        Note over B,LLM: Stage 3 — optional "dig deeper" retry (≤2×)
+        Note over B: User clicks button on ConfirmCard
+        B->>API: GET ?q=MSR Hubba&depth=2
+        Note over API,LLM: Skips DB cache; max_uses=6,<br>max_turns=8, stricter prompt
+        API->>AI: search("MSR Hubba", depth=2)
+        AI->>LLM: enumerate-all-sizes prompt
+        LLM-->>AI: JSON with more variants
+        AI-->>API: GearSearchResult
+        API-->>B: {status:"found_ai", item, variants}
+        Note over B: original id preserved →<br>upsert updates same row
+    end
+
     rect rgb(209, 250, 229)
-        Note over B,DB: Stage 3 — user confirms & saves
-        Note over B: User sees ConfirmCard,<br>selects size variant
+        Note over B,DB: Stage 4 — user confirms & saves
         B->>API: POST {item: {...}}
         API->>Repo: save(GearItem)
         Repo->>DB: UPSERT gear_items
@@ -315,7 +327,7 @@ graph TD
 graph LR
     subgraph Public["🟢 Public — no auth required"]
         L1["GET /api/lookup?db_only=1<br>fast DB search"]
-        L2["GET /api/lookup<br>DB → AI fallback"]
+        L2["GET /api/lookup&depth=1..3<br>DB → AI fallback;<br>depth≥2 skips DB cache"]
         L3["POST /api/lookup<br>save confirmed item"]
         P["GET /api/presets<br>static presets list"]
     end
