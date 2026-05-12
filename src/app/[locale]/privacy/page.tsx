@@ -29,7 +29,7 @@ export default function PrivacyPage() {
         <li>Delete your account and all associated data at any time (sign in → request deletion via email)</li>
         <li>Object to processing</li>
       </ul>
-      <p>Contact: <a href="mailto:eugenez@gmx.de">eugenez@gmx.de</a></p>
+      <p>Contact: [deine E-Mail hier eintragen]</p>
 
       <h2>5. Cookies</h2>
       <p>We use only essential cookies for session/authentication. No analytics or advertising cookies.</p>
