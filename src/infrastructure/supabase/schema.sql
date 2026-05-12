@@ -14,24 +14,38 @@ create table if not exists gear_items (
   source_url    text,
   verified_at   timestamptz,
   created_at    timestamptz not null default now(),
-  variants_json jsonb not null default '[]'::jsonb,
-  search_text   text generated always as (
-    lower(
-      (names_json::text) || ' ' || (aliases_json::text)
-    )
-  ) stored
+  variants_json jsonb not null default '[]'::jsonb
 );
 
+-- Add search_text column if not exists (migration-safe)
+alter table gear_items add column if not exists search_text text;
+
+-- Populate search_text for all existing rows
+update gear_items
+set search_text = lower((names_json::text) || ' ' || (aliases_json::text))
+where search_text is null or search_text = '';
+
+-- Trigger to keep search_text in sync on insert/update
+create or replace function gear_items_update_search_text()
+returns trigger as $$
+begin
+  new.search_text := lower((new.names_json::text) || ' ' || (new.aliases_json::text));
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists gear_items_search_text_trigger on gear_items;
+create trigger gear_items_search_text_trigger
+  before insert or update on gear_items
+  for each row execute function gear_items_update_search_text();
+
+-- Indexes
 create index if not exists idx_gear_items_category on gear_items(category);
-create index if not exists idx_gear_items_search_gin on gear_items using gin (search_text gin_trgm_ops);
-
--- Backfill search_text for existing rows (no-op for generated column, just in case)
--- Generated columns update automatically on insert/update.
-
--- Drop old indexes that are superseded
 drop index if exists idx_gear_items_names_gin;
 drop index if exists idx_gear_items_aliases_gin;
+create index if not exists idx_gear_items_search_gin on gear_items using gin (search_text gin_trgm_ops);
 
+-- RLS
 alter table gear_items enable row level security;
 drop policy if exists "Anyone can read gear items" on gear_items;
 create policy "Anyone can read gear items"
@@ -80,7 +94,7 @@ create policy "Users see own list items"
   on gear_list_items for all
   using (list_id in (select id from gear_lists where user_id = auth.uid()));
 
--- Auto-update updated_at
+-- Auto-update updated_at on gear_lists
 create or replace function update_updated_at()
 returns trigger as $$
 begin new.updated_at = now(); return new; end;
