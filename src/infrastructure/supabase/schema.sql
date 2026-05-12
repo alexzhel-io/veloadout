@@ -2,6 +2,8 @@
 -- Idempotent: safe to run multiple times
 
 -- Global gear catalog
+create extension if not exists pg_trgm;
+
 create table if not exists gear_items (
   id            text primary key,
   names_json    jsonb not null,
@@ -12,12 +14,23 @@ create table if not exists gear_items (
   source_url    text,
   verified_at   timestamptz,
   created_at    timestamptz not null default now(),
-  variants_json jsonb not null default '[]'::jsonb
+  variants_json jsonb not null default '[]'::jsonb,
+  search_text   text generated always as (
+    lower(
+      (names_json::text) || ' ' || (aliases_json::text)
+    )
+  ) stored
 );
+
 create index if not exists idx_gear_items_category on gear_items(category);
-create extension if not exists pg_trgm;
-create index if not exists idx_gear_items_names_gin on gear_items using gin ((names_json::text) gin_trgm_ops);
-create index if not exists idx_gear_items_aliases_gin on gear_items using gin ((aliases_json::text) gin_trgm_ops);
+create index if not exists idx_gear_items_search_gin on gear_items using gin (search_text gin_trgm_ops);
+
+-- Backfill search_text for existing rows (no-op for generated column, just in case)
+-- Generated columns update automatically on insert/update.
+
+-- Drop old indexes that are superseded
+drop index if exists idx_gear_items_names_gin;
+drop index if exists idx_gear_items_aliases_gin;
 
 alter table gear_items enable row level security;
 drop policy if exists "Anyone can read gear items" on gear_items;
