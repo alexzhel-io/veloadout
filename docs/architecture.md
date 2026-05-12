@@ -76,7 +76,6 @@ src/
 │   ├── supabase/
 │   │   ├── client.ts                    ← browser client
 │   │   ├── server.ts                    ← SSR client (cookies)
-│   │   ├── anonClient.ts                ← plain client (writes)
 │   │   ├── SupabaseGearItemRepository.ts
 │   │   ├── SupabaseGearListRepository.ts
 │   │   ├── schema.sql
@@ -288,19 +287,17 @@ graph LR
 graph TD
     SC["🍪 server.ts<br>createServerSupabaseClient<br>reads auth cookies"]
     BC["🌐 client.ts<br>createBrowserClient<br>browser-side auth"]
-    AC["🔑 anonClient.ts<br>plain createClient<br>no cookies"]
 
     SC -->|auth check| PG["app/locale/page.tsx"]
     SC -->|session refresh| MW["middleware.ts"]
     SC -->|read user lists| LR["GET /api/lists"]
     SC -->|save user lists| LS["POST /api/lists"]
     SC -->|gear search| GS["GET /api/lookup"]
-    AC -->|save gear catalog| GW["POST /api/lookup"]
+    SC -->|save gear catalog| GW["POST /api/lookup"]
     BC -->|sign out| AB["AuthButton.tsx"]
 
     style SC fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
     style BC fill:#e0e7ff,stroke:#6366f1,color:#1e1b4b
-    style AC fill:#d1fae5,stroke:#059669,color:#064e3b
     style PG fill:#f3f4f6,stroke:#9ca3af,color:#111827
     style MW fill:#f3f4f6,stroke:#9ca3af,color:#111827
     style LR fill:#f3f4f6,stroke:#9ca3af,color:#111827
@@ -309,8 +306,6 @@ graph TD
     style GW fill:#f3f4f6,stroke:#9ca3af,color:#111827
     style AB fill:#f3f4f6,stroke:#9ca3af,color:#111827
 ```
-
-> `anonClient` is used specifically for writes to `gear_items` —<br>the cookie-based client failed with `TypeError: fetch failed` on server-side upserts.
 
 ---
 
