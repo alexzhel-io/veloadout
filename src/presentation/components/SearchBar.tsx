@@ -57,17 +57,14 @@ export function SearchBar({ onAdd }: Props) {
       const res = await fetch(`/api/lookup?q=${encodeURIComponent(q)}&db_only=1`);
       const data = await res.json();
       if (data.status !== 'not_found') {
+        // Always show ConfirmCard for DB hits — gives the user access to
+        // variant picker and the "dig deeper" retry button
         const variants: Variant[] = data.item.variants ?? [];
-        if (variants.length > 1) {
-          // Show variant picker even for DB hits
-          const matched = matchVariantByQuery(variants, q);
-          const idx = matched ? variants.indexOf(matched) : 0;
-          setSelectedVariantIdx(idx);
-          setCandidate({ query: q, source: 'db', item: data.item, depth: 1 });
-          setState('idle');
-        } else {
-          addItem(data.item, q, 'db', variants[0]);
-        }
+        const matched = matchVariantByQuery(variants, q);
+        const idx = matched ? variants.indexOf(matched) : 0;
+        setSelectedVariantIdx(idx);
+        setCandidate({ query: q, source: 'db', item: data.item, depth: 1 });
+        setState('idle');
         return;
       }
     } catch { /* fall through */ }
@@ -75,7 +72,7 @@ export function SearchBar({ onAdd }: Props) {
     await runAiSearch(q, 1);
   }
 
-  async function runAiSearch(q: string, depth: number) {
+  async function runAiSearch(q: string, depth: number, preserveId?: string) {
     setState('searching_ai');
     try {
       const res = await fetch(`/api/lookup?q=${encodeURIComponent(q)}&depth=${depth}`);
@@ -85,6 +82,8 @@ export function SearchBar({ onAdd }: Props) {
         setTimeout(() => setState('idle'), 3500);
         return;
       }
+      // If refining an existing DB record, keep its id so upsert updates the row
+      if (preserveId) data.item.id = preserveId;
       const variants: Variant[] = data.item.variants ?? [];
       const matched = matchVariantByQuery(variants, q);
       const idx = matched ? variants.indexOf(matched) : 0;
@@ -98,8 +97,10 @@ export function SearchBar({ onAdd }: Props) {
   }
 
   function digDeeper() {
-    if (!candidate || candidate.source !== 'ai' || candidate.depth >= MAX_DEPTH) return;
-    runAiSearch(candidate.query, candidate.depth + 1);
+    if (!candidate || candidate.depth >= MAX_DEPTH) return;
+    // Preserve id so the final upsert updates the same row (DB hits) or
+    // keeps a stable identity across retries (AI hits)
+    runAiSearch(candidate.query, candidate.depth + 1, candidate.item.id);
   }
 
   function addItem(item: Candidate['item'], q: string, source: 'db' | 'ai', variant?: Variant, confidence?: string) {
@@ -217,7 +218,7 @@ function ConfirmCard({ candidate, locale, selectedIdx, onSelectIdx, onConfirm, o
   const selected = variants[selectedIdx] ?? { volumeLiters: candidate.item.volumeLiters, weightGrams: candidate.item.weightGrams };
   const confidenceColor = candidate.confidence === 'high' ? 'text-success' : candidate.confidence === 'low' ? 'text-warning' : 'text-text-secondary';
   const hasVariants = variants.length > 1;
-  const canDigDeeper = candidate.source === 'ai' && candidate.depth < MAX_DEPTH;
+  const canDigDeeper = candidate.depth < MAX_DEPTH;
 
   return (
     <div className="rounded-xl border border-accent/30 bg-accent/5 p-4 animate-slide-up space-y-3">
