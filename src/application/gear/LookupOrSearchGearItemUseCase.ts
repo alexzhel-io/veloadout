@@ -13,13 +13,16 @@ export class LookupOrSearchGearItemUseCase {
     private readonly searchService: IGearSearchService,
   ) {}
 
-  async execute(query: string, saveOnFind = false): Promise<LookupResult> {
+  async execute(query: string, saveOnFind = false, depth = 1): Promise<LookupResult> {
     const normalized = query.trim().toLowerCase();
 
-    const fromDb = await this.repository.findByQuery(normalized);
-    if (fromDb) return { status: 'found_db', item: fromDb };
+    // Only check DB on first attempt — deeper searches skip cache and go straight to AI
+    if (depth <= 1) {
+      const fromDb = await this.repository.findByQuery(normalized);
+      if (fromDb) return { status: 'found_db', item: fromDb };
+    }
 
-    const searchResult = await this.searchService.search(query);
+    const searchResult = await this.searchService.search(query, depth);
     if (!searchResult) return { status: 'not_found' };
 
     // Only save to DB if explicitly confirmed (saveOnFind = true)

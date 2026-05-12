@@ -8,5 +8,5 @@ export interface GearSearchResult {
 }
 
 export interface IGearSearchService {
-  search(query: string): Promise<GearSearchResult | null>;
+  search(query: string, depth?: number): Promise<GearSearchResult | null>;
 }

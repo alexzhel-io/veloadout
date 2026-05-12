@@ -78,8 +78,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Rate limit exceeded. Try again later.' }, { status: 429 });
   }
 
+  const depthRaw = parseInt(req.nextUrl.searchParams.get('depth') ?? '1', 10);
+  const depth = Math.max(1, Math.min(3, Number.isFinite(depthRaw) ? depthRaw : 1));
+
   const useCase = new LookupOrSearchGearItemUseCase(repo, new ClaudeGearSearchService());
-  const result = await useCase.execute(query, false); // don't auto-save — wait for user confirm
+  const result = await useCase.execute(query, false, depth); // don't auto-save — wait for user confirm
   if (result.status === 'not_found') return NextResponse.json({ status: 'not_found' });
 
   return NextResponse.json({

@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Search, Plus, Loader2, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { Search, Plus, Loader2, AlertCircle, CheckCircle, XCircle, Sparkles } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { categoryIcon } from '@/domain/gear/GearCategoryIcon';
 import { CATEGORY_LABELS } from '@/domain/gear/GearCategory';
@@ -28,7 +28,10 @@ interface Candidate {
   };
   confidence?: string;
   volumeNote?: string;
+  depth: number;
 }
+
+const MAX_DEPTH = 3;
 
 interface Props {
   onAdd: (entry: GearEntry) => void;
@@ -60,7 +63,7 @@ export function SearchBar({ onAdd }: Props) {
           const matched = matchVariantByQuery(variants, q);
           const idx = matched ? variants.indexOf(matched) : 0;
           setSelectedVariantIdx(idx);
-          setCandidate({ query: q, source: 'db', item: data.item });
+          setCandidate({ query: q, source: 'db', item: data.item, depth: 1 });
           setState('idle');
         } else {
           addItem(data.item, q, 'db', variants[0]);
@@ -69,9 +72,13 @@ export function SearchBar({ onAdd }: Props) {
       }
     } catch { /* fall through */ }
 
+    await runAiSearch(q, 1);
+  }
+
+  async function runAiSearch(q: string, depth: number) {
     setState('searching_ai');
     try {
-      const res = await fetch(`/api/lookup?q=${encodeURIComponent(q)}`);
+      const res = await fetch(`/api/lookup?q=${encodeURIComponent(q)}&depth=${depth}`);
       const data = await res.json();
       if (data.status === 'not_found') {
         setState('not_found');
@@ -82,12 +89,17 @@ export function SearchBar({ onAdd }: Props) {
       const matched = matchVariantByQuery(variants, q);
       const idx = matched ? variants.indexOf(matched) : 0;
       setSelectedVariantIdx(idx);
-      setCandidate({ query: q, source: 'ai', item: data.item, confidence: data.confidence, volumeNote: data.volumeNote });
+      setCandidate({ query: q, source: 'ai', item: data.item, confidence: data.confidence, volumeNote: data.volumeNote, depth });
       setState('idle');
     } catch {
       setState('not_found');
       setTimeout(() => setState('idle'), 3500);
     }
+  }
+
+  function digDeeper() {
+    if (!candidate || candidate.source !== 'ai' || candidate.depth >= MAX_DEPTH) return;
+    runAiSearch(candidate.query, candidate.depth + 1);
   }
 
   function addItem(item: Candidate['item'], q: string, source: 'db' | 'ai', variant?: Variant, confidence?: string) {
@@ -178,19 +190,23 @@ export function SearchBar({ onAdd }: Props) {
           onSelectIdx={setSelectedVariantIdx}
           onConfirm={confirmCandidate}
           onReject={rejectCandidate}
+          onDigDeeper={digDeeper}
+          isLoading={isLoading}
         />
       )}
     </div>
   );
 }
 
-function ConfirmCard({ candidate, locale, selectedIdx, onSelectIdx, onConfirm, onReject }: {
+function ConfirmCard({ candidate, locale, selectedIdx, onSelectIdx, onConfirm, onReject, onDigDeeper, isLoading }: {
   candidate: Candidate;
   locale: string;
   selectedIdx: number;
   onSelectIdx: (i: number) => void;
   onConfirm: (variantIdx: number) => void;
   onReject: () => void;
+  onDigDeeper: () => void;
+  isLoading: boolean;
 }) {
   const t = useTranslations('search');
   const name = candidate.item.names[locale] ?? candidate.item.names['en'];
@@ -201,6 +217,7 @@ function ConfirmCard({ candidate, locale, selectedIdx, onSelectIdx, onConfirm, o
   const selected = variants[selectedIdx] ?? { volumeLiters: candidate.item.volumeLiters, weightGrams: candidate.item.weightGrams };
   const confidenceColor = candidate.confidence === 'high' ? 'text-success' : candidate.confidence === 'low' ? 'text-warning' : 'text-text-secondary';
   const hasVariants = variants.length > 1;
+  const canDigDeeper = candidate.source === 'ai' && candidate.depth < MAX_DEPTH;
 
   return (
     <div className="rounded-xl border border-accent/30 bg-accent/5 p-4 animate-slide-up space-y-3">
@@ -256,18 +273,31 @@ function ConfirmCard({ candidate, locale, selectedIdx, onSelectIdx, onConfirm, o
       <div className="flex gap-2 pt-1">
         <button
           onClick={() => onConfirm(selectedIdx)}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-accent hover:bg-accent-hover rounded-lg text-white text-sm font-medium transition-colors"
+          disabled={isLoading}
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-accent hover:bg-accent-hover disabled:opacity-40 rounded-lg text-white text-sm font-medium transition-colors"
         >
           <CheckCircle size={14} />
           {hasVariants ? `${t('confirm')} · ${variants[selectedIdx]?.sizeLabel}` : t('confirm')}
         </button>
         <button
           onClick={onReject}
-          className="flex items-center justify-center gap-2 px-4 py-2 border border-white/[0.07] hover:border-white/20 rounded-lg text-text-secondary hover:text-white text-sm transition-colors"
+          disabled={isLoading}
+          className="flex items-center justify-center gap-2 px-4 py-2 border border-white/[0.07] hover:border-white/20 disabled:opacity-40 rounded-lg text-text-secondary hover:text-white text-sm transition-colors"
         >
           <XCircle size={14} /> {t('reject')}
         </button>
       </div>
+
+      {canDigDeeper && (
+        <button
+          onClick={onDigDeeper}
+          disabled={isLoading}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-accent/30 bg-accent/5 hover:bg-accent/10 disabled:opacity-40 rounded-lg text-accent text-xs font-medium transition-colors"
+        >
+          {isLoading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+          {t('dig_deeper')} · {candidate.depth}/{MAX_DEPTH}
+        </button>
+      )}
     </div>
   );
 }

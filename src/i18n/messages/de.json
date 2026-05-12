@@ -20,7 +20,8 @@
     "found_db_badge": "Aus Datenbank",
     "confirm": "Zur Liste",
     "reject": "Nicht das",
-    "select_size": "Größe wählen"
+    "select_size": "Größe wählen",
+    "dig_deeper": "Im Web gründlicher suchen"
   },
   "presets": {
     "title": "Schnell hinzufügen",

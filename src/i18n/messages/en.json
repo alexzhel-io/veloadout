@@ -20,7 +20,8 @@
     "found_db_badge": "From database",
     "confirm": "Add to list",
     "reject": "Not this",
-    "select_size": "Select size"
+    "select_size": "Select size",
+    "dig_deeper": "Search the web more thoroughly"
   },
   "presets": {
     "title": "Quick add presets",
