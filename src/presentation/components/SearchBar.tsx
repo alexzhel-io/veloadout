@@ -160,11 +160,22 @@ export function SearchBar({ onAdd }: Props) {
     const variant = variants[variantIdx];
     // Save to shared catalog only for AI-found items
     if (candidate.source === 'ai') {
-      fetch('/api/lookup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ item: candidate.item }),
-      }).then(r => { if (!r.ok) r.json().then(e => console.error('[lookup POST]', e)); });
+      try {
+        const r = await fetch('/api/lookup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ item: candidate.item }),
+          keepalive: true,
+        });
+        if (!r.ok) {
+          const e = await r.json().catch(() => ({}));
+          console.error('[lookup POST] save failed:', r.status, e);
+        } else {
+          console.log('[lookup POST] saved:', candidate.item.id);
+        }
+      } catch (err) {
+        console.error('[lookup POST] network error:', err);
+      }
     }
     addItem(candidate.item, candidate.query, candidate.source, variant, candidate.confidence);
   }
