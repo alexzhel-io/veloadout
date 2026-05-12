@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "title": "Veloadout — Bikepacking Gear Volume Calculator",
+    "description": "Calculate the total volume of your bikepacking gear and get bag recommendations."
+  },
+  "nav": {
+    "tagline": "Bikepacking Gear Calculator"
+  },
+  "hero": {
+    "title": "Know your load before you go",
+    "subtitle": "Add your gear, we calculate the volume. Instantly know which bags you need."
+  },
+  "search": {
+    "placeholder": "E.g. sleeping bag, Ortlieb Seat-Pack, rain jacket...",
+    "add": "Add",
+    "searching_db": "Searching database...",
+    "searching_ai": "Searching the web with AI...",
+    "not_found": "Could not find volume data for this item.",
+    "found_ai_badge": "Found via AI",
+    "found_db_badge": "From database"
+  },
+  "presets": {
+    "title": "Quick add presets",
+    "subtitle": "Typical volumes for common gear — check to add instantly"
+  },
+  "list": {
+    "title": "Your gear list",
+    "empty": "Add your first item above or use the presets.",
+    "item_col": "Item",
+    "volume_col": "Volume",
+    "qty_col": "Qty",
+    "total_col": "Total",
+    "remove": "Remove",
+    "total_label": "Total volume"
+  },
+  "bags": {
+    "title": "Bag recommendation",
+    "subtitle": "Based on your total, here's how to distribute across your setup.",
+    "fill": "fill"
+  },
+  "confidence": {
+    "high": "High confidence",
+    "medium": "Medium confidence",
+    "low": "Low confidence — verify manually"
+  },
+  "categories": {
+    "sleep": "Sleep",
+    "shelter": "Shelter",
+    "clothing": "Clothing",
+    "cooking": "Cooking",
+    "tools": "Tools & Repair",
+    "electronics": "Electronics",
+    "navigation": "Navigation",
+    "hygiene": "Hygiene",
+    "food": "Food",
+    "water": "Water",
+    "other": "Other"
+  },
+  "footer": {
+    "text": "Volume data is crowd-sourced and AI-assisted. Always verify critical gear specs."
+  }
+}

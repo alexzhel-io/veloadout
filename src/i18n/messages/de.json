@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "title": "Veloadout — Bikepacking Volumenrechner",
+    "description": "Berechne das Gesamtvolumen deiner Bikepacking-Ausrüstung und erhalte Taschenempfehlungen."
+  },
+  "nav": {
+    "tagline": "Bikepacking Volumenrechner"
+  },
+  "hero": {
+    "title": "Kenne deine Last, bevor du losgehst",
+    "subtitle": "Füge deine Ausrüstung hinzu, wir berechnen das Volumen. Sofort wissen, welche Taschen du brauchst."
+  },
+  "search": {
+    "placeholder": "Z.B. Schlafsack, Ortlieb Seat-Pack, Regenjacke...",
+    "add": "Hinzufügen",
+    "searching_db": "Datenbank wird durchsucht...",
+    "searching_ai": "KI durchsucht das Web...",
+    "not_found": "Keine Volumendaten für diesen Artikel gefunden.",
+    "found_ai_badge": "Per KI gefunden",
+    "found_db_badge": "Aus Datenbank"
+  },
+  "presets": {
+    "title": "Schnell hinzufügen",
+    "subtitle": "Typische Volumina für gängige Ausrüstung — zum sofortigen Hinzufügen ankreuzen"
+  },
+  "list": {
+    "title": "Deine Packliste",
+    "empty": "Füge oben deinen ersten Artikel hinzu oder nutze die Voreinstellungen.",
+    "item_col": "Artikel",
+    "volume_col": "Volumen",
+    "qty_col": "Anz.",
+    "total_col": "Gesamt",
+    "remove": "Entfernen",
+    "total_label": "Gesamtvolumen"
+  },
+  "bags": {
+    "title": "Taschenempfehlung",
+    "subtitle": "Basierend auf deinem Gesamtvolumen — so verteilst du deine Ausrüstung.",
+    "fill": "Füllstand"
+  },
+  "confidence": {
+    "high": "Hohe Zuverlässigkeit",
+    "medium": "Mittlere Zuverlässigkeit",
+    "low": "Geringe Zuverlässigkeit — bitte manuell überprüfen"
+  },
+  "categories": {
+    "sleep": "Schlafen",
+    "shelter": "Unterkunft",
+    "clothing": "Kleidung",
+    "cooking": "Kochen",
+    "tools": "Werkzeug",
+    "electronics": "Elektronik",
+    "navigation": "Navigation",
+    "hygiene": "Hygiene",
+    "food": "Essen",
+    "water": "Wasser",
+    "other": "Sonstiges"
+  },
+  "footer": {
+    "text": "Volumendaten sind community-basiert und KI-unterstützt. Bitte überprüfe kritische Angaben selbst."
+  }
+}
