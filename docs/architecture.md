@@ -17,11 +17,11 @@ graph TD
     Vercel -->|API calls| Anthropic
     Anthropic -->|web_search| Web
 
-    style User fill:#7c3aed,stroke:#5b21b6,color:#fff
-    style Vercel fill:#1c1a2e,stroke:#7c3aed,color:#fff
-    style Supabase fill:#1e4d3a,stroke:#34d399,color:#fff
-    style Anthropic fill:#1e3a4d,stroke:#60a5fa,color:#fff
-    style Web fill:#2d2d2d,stroke:#888,color:#fff
+    style User fill:#e0e7ff,stroke:#6366f1,color:#1e1b4b
+    style Vercel fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    style Supabase fill:#d1fae5,stroke:#059669,color:#064e3b
+    style Anthropic fill:#fef3c7,stroke:#d97706,color:#451a03
+    style Web fill:#f3f4f6,stroke:#6b7280,color:#111827
 ```
 
 ---
@@ -39,13 +39,13 @@ graph TD
     A -->|uses interfaces| D
     I -->|implements| D
 
-    style P fill:#7c3aed,stroke:#5b21b6,color:#fff
-    style A fill:#1e3a4d,stroke:#60a5fa,color:#fff
-    style D fill:#1e4d3a,stroke:#34d399,color:#fff
-    style I fill:#4d1e1e,stroke:#f87171,color:#fff
+    style P fill:#e0e7ff,stroke:#6366f1,color:#1e1b4b
+    style A fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    style D fill:#d1fae5,stroke:#059669,color:#064e3b
+    style I fill:#fce7f3,stroke:#db2777,color:#500724
 ```
 
-> Стрелки направлены внутрь: Domain не зависит ни от чего. Infrastructure зависит от Domain, но не наоборот.
+> Arrows point inward: Domain depends on nothing. Infrastructure depends on Domain, never the other way around.
 
 ---
 
@@ -129,40 +129,47 @@ src/
 
 ```mermaid
 sequenceDiagram
-    participant B as Browser
-    participant API as /api/lookup
-    participant Repo as SupabaseGearItemRepository
-    participant DB as Supabase Postgres
-    participant AI as ClaudeGearSearchService
-    participant LLM as Claude Haiku
+    participant B as 🌐 Browser
+    participant API as ⚡ /api/lookup
+    participant Repo as 🗄️ GearItemRepo
+    participant DB as 🐘 Supabase DB
+    participant AI as 🤖 ClaudeSearch
+    participant LLM as ✨ Claude Haiku
 
-    B->>API: GET ?q=MSR Hubba&db_only=1
-    API->>Repo: findByQuery()
-    Repo->>DB: SELECT WHERE search_text ILIKE '%msr hubba%'
-    DB-->>Repo: [] not found
-    Repo-->>API: null
-    API-->>B: {status: "not_found"}
+    rect rgb(224, 242, 254)
+        Note over B,DB: Stage 1 — fast DB lookup
+        B->>API: GET ?q=MSR Hubba&db_only=1
+        API->>Repo: findByQuery()
+        Repo->>DB: SELECT WHERE search_text ILIKE '%msr hubba%'
+        DB-->>Repo: [] not found
+        Repo-->>API: null
+        API-->>B: {status: "not_found"}
+    end
 
-    B->>API: GET ?q=MSR Hubba
-    API->>Repo: findByQuery()
-    Repo->>DB: ILIKE query
-    DB-->>Repo: [] not found
-    Repo-->>API: null
-    API->>AI: search("MSR Hubba")
-    AI->>LLM: system prompt + user query
-    LLM-->>AI: tool_use: web_search
-    AI->>LLM: tool_result (web content)
-    LLM-->>AI: text: JSON with variants
-    AI-->>API: GearSearchResult
-    API-->>B: {status:"found_ai", item, variants}
+    rect rgb(224, 231, 255)
+        Note over B,LLM: Stage 2 — AI search
+        B->>API: GET ?q=MSR Hubba
+        API->>Repo: findByQuery()
+        Repo->>DB: ILIKE query
+        DB-->>Repo: [] not found
+        API->>AI: search("MSR Hubba")
+        AI->>LLM: system prompt + user query
+        LLM-->>AI: tool_use: web_search
+        AI->>LLM: tool_result (web content)
+        LLM-->>AI: JSON with variants
+        AI-->>API: GearSearchResult
+        API-->>B: {status:"found_ai", item, variants}
+    end
 
-    Note over B: User sees ConfirmCard<br>selects size variant
-
-    B->>API: POST {item: {...}}
-    API->>Repo: save(GearItem)
-    Repo->>DB: UPSERT gear_items
-    DB-->>Repo: ok
-    API-->>B: {ok: true}
+    rect rgb(209, 250, 229)
+        Note over B,DB: Stage 3 — user confirms & saves
+        Note over B: User sees ConfirmCard,<br>selects size variant
+        B->>API: POST {item: {...}}
+        API->>Repo: save(GearItem)
+        Repo->>DB: UPSERT gear_items
+        DB-->>Repo: ok
+        API-->>B: {ok: true}
+    end
 ```
 
 ---
@@ -171,27 +178,32 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant U as User
-    participant App as Veloadout
-    participant API as /api/auth
-    participant SB as Supabase Auth
-    participant Email as Email inbox
+    participant U as 👤 User
+    participant App as 🚴 Veloadout
+    participant API as ⚡ /api/auth
+    participant SB as 🔐 Supabase Auth
+    participant Email as 📧 Email inbox
 
-    U->>App: clicks Sign in
-    U->>App: enters email
-    App->>API: POST {email, locale}
-    API->>SB: signInWithOtp(email)
-    SB->>Email: magic link → /[locale]/auth/callback
-    API-->>App: {ok: true}
-    App-->>U: "Check your email"
+    rect rgb(254, 243, 199)
+        Note over U,SB: Request magic link
+        U->>App: clicks Sign in
+        U->>App: enters email
+        App->>API: POST {email, locale}
+        API->>SB: signInWithOtp(email)
+        SB->>Email: magic link → /[locale]/auth/callback
+        API-->>App: {ok: true}
+        App-->>U: "Check your email"
+    end
 
-    U->>Email: opens link
-    Email->>App: GET /[locale]/auth/callback?code=xxx
-    App->>SB: exchangeCodeForSession(code)
-    SB-->>App: session cookie
-    App-->>U: redirect → /[locale]
-
-    Note over App,SB: Middleware refreshes<br>session on every request
+    rect rgb(209, 250, 229)
+        Note over U,SB: Verify and establish session
+        U->>Email: opens link
+        Email->>App: GET /[locale]/auth/callback?code=xxx
+        App->>SB: exchangeCodeForSession(code)
+        SB-->>App: session cookie
+        App-->>U: redirect → /[locale]
+        Note over App,SB: Middleware refreshes<br>session on every request
+    end
 ```
 
 ---
@@ -247,25 +259,25 @@ erDiagram
 
 ```mermaid
 graph LR
-    subgraph gear_items["gear_items (shared catalog)"]
+    subgraph gear_items["🌍 gear_items — shared catalog"]
         GI_R["SELECT<br>anyone"]
         GI_I["INSERT<br>anyone"]
         GI_U["UPDATE<br>anyone"]
     end
 
-    subgraph gear_lists["gear_lists (user data)"]
+    subgraph gear_lists["🔒 gear_lists — user data"]
         GL_ALL["ALL ops<br>own rows only<br>auth.uid() = user_id"]
     end
 
-    subgraph gear_list_items["gear_list_items (user data)"]
+    subgraph gear_list_items["🔒 gear_list_items — user data"]
         GLI_ALL["ALL ops<br>via own lists only"]
     end
 
-    style GI_R fill:#1e4d3a,stroke:#34d399,color:#fff
-    style GI_I fill:#1e4d3a,stroke:#34d399,color:#fff
-    style GI_U fill:#1e4d3a,stroke:#34d399,color:#fff
-    style GL_ALL fill:#4d3a1e,stroke:#fb923c,color:#fff
-    style GLI_ALL fill:#4d3a1e,stroke:#fb923c,color:#fff
+    style GI_R fill:#d1fae5,stroke:#059669,color:#064e3b
+    style GI_I fill:#d1fae5,stroke:#059669,color:#064e3b
+    style GI_U fill:#d1fae5,stroke:#059669,color:#064e3b
+    style GL_ALL fill:#fef3c7,stroke:#d97706,color:#451a03
+    style GLI_ALL fill:#fef3c7,stroke:#d97706,color:#451a03
 ```
 
 ---
@@ -274,11 +286,11 @@ graph LR
 
 ```mermaid
 graph TD
-    SC["server.ts<br>createServerSupabaseClient<br>reads auth cookies"]
-    BC["client.ts<br>createBrowserClient<br>browser-side auth"]
-    AC["anonClient.ts<br>plain createClient<br>no cookies"]
+    SC["🍪 server.ts<br>createServerSupabaseClient<br>reads auth cookies"]
+    BC["🌐 client.ts<br>createBrowserClient<br>browser-side auth"]
+    AC["🔑 anonClient.ts<br>plain createClient<br>no cookies"]
 
-    SC -->|auth check| PG["app/[locale]/page.tsx"]
+    SC -->|auth check| PG["app/locale/page.tsx"]
     SC -->|session refresh| MW["middleware.ts"]
     SC -->|read user lists| LR["GET /api/lists"]
     SC -->|save user lists| LS["POST /api/lists"]
@@ -286,12 +298,19 @@ graph TD
     AC -->|save gear catalog| GW["POST /api/lookup"]
     BC -->|sign out| AB["AuthButton.tsx"]
 
-    style SC fill:#1e3a4d,stroke:#60a5fa,color:#fff
-    style BC fill:#4d1e4d,stroke:#c084fc,color:#fff
-    style AC fill:#1e4d3a,stroke:#34d399,color:#fff
+    style SC fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    style BC fill:#e0e7ff,stroke:#6366f1,color:#1e1b4b
+    style AC fill:#d1fae5,stroke:#059669,color:#064e3b
+    style PG fill:#f3f4f6,stroke:#9ca3af,color:#111827
+    style MW fill:#f3f4f6,stroke:#9ca3af,color:#111827
+    style LR fill:#f3f4f6,stroke:#9ca3af,color:#111827
+    style LS fill:#f3f4f6,stroke:#9ca3af,color:#111827
+    style GS fill:#f3f4f6,stroke:#9ca3af,color:#111827
+    style GW fill:#f3f4f6,stroke:#9ca3af,color:#111827
+    style AB fill:#f3f4f6,stroke:#9ca3af,color:#111827
 ```
 
-> `anonClient` используется специально для записи в `gear_items` —<br>cookie-based клиент падал с `TypeError: fetch failed` при upsert на сервере.
+> `anonClient` is used specifically for writes to `gear_items` —<br>the cookie-based client failed with `TypeError: fetch failed` on server-side upserts.
 
 ---
 
@@ -299,14 +318,14 @@ graph TD
 
 ```mermaid
 graph LR
-    subgraph Public["Public (no auth)"]
+    subgraph Public["🟢 Public — no auth required"]
         L1["GET /api/lookup?db_only=1<br>fast DB search"]
         L2["GET /api/lookup<br>DB → AI fallback"]
         L3["POST /api/lookup<br>save confirmed item"]
         P["GET /api/presets<br>static presets list"]
     end
 
-    subgraph Auth["Auth (Supabase session)"]
+    subgraph Auth["🔐 Auth — Supabase session required"]
         A1["POST /api/auth<br>send magic link"]
         A2["DELETE /api/auth<br>sign out"]
         LS1["GET /api/lists<br>load user list"]
@@ -314,15 +333,15 @@ graph LR
         LS3["DELETE /api/lists<br>GDPR delete"]
     end
 
-    style L1 fill:#1e4d3a,stroke:#34d399,color:#fff
-    style L2 fill:#1e4d3a,stroke:#34d399,color:#fff
-    style L3 fill:#1e4d3a,stroke:#34d399,color:#fff
-    style P fill:#1e4d3a,stroke:#34d399,color:#fff
-    style A1 fill:#4d3a1e,stroke:#fb923c,color:#fff
-    style A2 fill:#4d3a1e,stroke:#fb923c,color:#fff
-    style LS1 fill:#4d3a1e,stroke:#fb923c,color:#fff
-    style LS2 fill:#4d3a1e,stroke:#fb923c,color:#fff
-    style LS3 fill:#4d3a1e,stroke:#fb923c,color:#fff
+    style L1 fill:#d1fae5,stroke:#059669,color:#064e3b
+    style L2 fill:#d1fae5,stroke:#059669,color:#064e3b
+    style L3 fill:#d1fae5,stroke:#059669,color:#064e3b
+    style P fill:#d1fae5,stroke:#059669,color:#064e3b
+    style A1 fill:#fef3c7,stroke:#d97706,color:#451a03
+    style A2 fill:#fce7f3,stroke:#db2777,color:#500724
+    style LS1 fill:#fef3c7,stroke:#d97706,color:#451a03
+    style LS2 fill:#fef3c7,stroke:#d97706,color:#451a03
+    style LS3 fill:#fce7f3,stroke:#db2777,color:#500724
 ```
 
 ---
@@ -331,26 +350,26 @@ graph LR
 
 ```mermaid
 graph TD
-    R["Request"]
-    RL["checkRateLimit<br>in-memory buckets<br>Map key → count + resetAt"]
-    OK["✅ pass through"]
+    R["📨 Request"]
+    RL["🛡️ checkRateLimit<br>in-memory Map<br>key → count + resetAt"]
+    OK["✅ Pass through"]
     BLOCK["🚫 429 Too Many Requests"]
 
     R --> RL
     RL -->|allowed| OK
     RL -->|exceeded| BLOCK
 
-    L1["AI lookup<br>20 req / IP / hour"]
-    L2["Magic link by IP<br>5 req / IP / 10 min"]
-    L3["Magic link by email<br>3 req / email / 10 min"]
+    L1["🤖 AI lookup<br>20 req / IP / hour"]
+    L2["📧 Magic link by IP<br>5 req / IP / 10 min"]
+    L3["✉️ Magic link by email<br>3 req / email / 10 min"]
 
-    style R fill:#2d2d2d,stroke:#888,color:#fff
-    style RL fill:#1e3a4d,stroke:#60a5fa,color:#fff
-    style OK fill:#1e4d3a,stroke:#34d399,color:#fff
-    style BLOCK fill:#4d1e1e,stroke:#f87171,color:#fff
-    style L1 fill:#1c1a2e,stroke:#7c3aed,color:#fff
-    style L2 fill:#1c1a2e,stroke:#7c3aed,color:#fff
-    style L3 fill:#1c1a2e,stroke:#7c3aed,color:#fff
+    style R fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    style RL fill:#e0e7ff,stroke:#6366f1,color:#1e1b4b
+    style OK fill:#d1fae5,stroke:#059669,color:#064e3b
+    style BLOCK fill:#fce7f3,stroke:#db2777,color:#500724
+    style L1 fill:#fef3c7,stroke:#d97706,color:#451a03
+    style L2 fill:#fef3c7,stroke:#d97706,color:#451a03
+    style L3 fill:#fef3c7,stroke:#d97706,color:#451a03
 ```
 
 ---
@@ -359,12 +378,12 @@ graph TD
 
 ```mermaid
 graph LR
-    REQ["request /"]
-    MW["middleware.ts<br>next-intl + Supabase session"]
-    EN["/en"]
-    DE["/de"]
-    RU["/ru"]
-    MSG["messages/<br>en.json · de.json · ru.json"]
+    REQ["📨 request /"]
+    MW["⚙️ middleware.ts<br>next-intl + Supabase session"]
+    EN["🇬🇧 /en"]
+    DE["🇩🇪 /de"]
+    RU["🇷🇺 /ru"]
+    MSG["📝 messages/<br>en.json · de.json · ru.json"]
 
     REQ -->|detect locale| MW
     MW --> EN
@@ -372,12 +391,12 @@ graph LR
     MW --> RU
     EN & DE & RU -->|getMessages| MSG
 
-    style REQ fill:#2d2d2d,stroke:#888,color:#fff
-    style MW fill:#7c3aed,stroke:#5b21b6,color:#fff
-    style EN fill:#1e3a4d,stroke:#60a5fa,color:#fff
-    style DE fill:#1e4d3a,stroke:#34d399,color:#fff
-    style RU fill:#4d3a1e,stroke:#fb923c,color:#fff
-    style MSG fill:#1c1a2e,stroke:#7c3aed,color:#fff
+    style REQ fill:#f3f4f6,stroke:#9ca3af,color:#111827
+    style MW fill:#e0e7ff,stroke:#6366f1,color:#1e1b4b
+    style EN fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    style DE fill:#d1fae5,stroke:#059669,color:#064e3b
+    style RU fill:#fce7f3,stroke:#db2777,color:#500724
+    style MSG fill:#fef3c7,stroke:#d97706,color:#451a03
 ```
 
 ---
@@ -386,17 +405,17 @@ graph LR
 
 ```mermaid
 graph TD
-    LL["LocaleLayout<br>html · body · providers"]
-    TC["ToastProvider"]
-    CB["CookieBanner"]
-    GC["GearCalculator<br>state: entries · listId · saving"]
+    LL["🌐 LocaleLayout<br>html · body · providers"]
+    TC["🔔 ToastProvider"]
+    CB["🍪 CookieBanner"]
+    GC["⚙️ GearCalculator<br>state: entries · listId · saving"]
 
-    SB["SearchBar<br>two-stage search<br>ConfirmCard"]
-    PP["PresetPanel<br>toggle presets"]
-    GL["GearList<br>entries · totals"]
-    BRP["BagRecommendationPanel<br>handlebar · frame · seat"]
-    AB["AuthButton<br>magic link modal"]
-    LS["LanguageSwitcher"]
+    SB["🔍 SearchBar<br>two-stage search · ConfirmCard"]
+    PP["⚡ PresetPanel<br>toggle presets"]
+    GL["📋 GearList<br>entries · totals"]
+    BRP["🎒 BagRecommendationPanel<br>handlebar · frame · seat"]
+    AB["👤 AuthButton<br>magic link modal"]
+    LS["🌍 LanguageSwitcher"]
 
     LL --> TC
     TC --> CB
@@ -408,16 +427,16 @@ graph TD
     GC --> AB
     GC --> LS
 
-    style LL fill:#7c3aed,stroke:#5b21b6,color:#fff
-    style TC fill:#4d3a1e,stroke:#fb923c,color:#fff
-    style GC fill:#1e3a4d,stroke:#60a5fa,color:#fff
-    style SB fill:#1e4d3a,stroke:#34d399,color:#fff
-    style PP fill:#1e4d3a,stroke:#34d399,color:#fff
-    style GL fill:#1e4d3a,stroke:#34d399,color:#fff
-    style BRP fill:#1e4d3a,stroke:#34d399,color:#fff
-    style CB fill:#4d1e1e,stroke:#f87171,color:#fff
-    style AB fill:#1c1a2e,stroke:#7c3aed,color:#fff
-    style LS fill:#1c1a2e,stroke:#7c3aed,color:#fff
+    style LL fill:#e0e7ff,stroke:#6366f1,color:#1e1b4b
+    style TC fill:#fef3c7,stroke:#d97706,color:#451a03
+    style CB fill:#fce7f3,stroke:#db2777,color:#500724
+    style GC fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    style SB fill:#d1fae5,stroke:#059669,color:#064e3b
+    style PP fill:#d1fae5,stroke:#059669,color:#064e3b
+    style GL fill:#d1fae5,stroke:#059669,color:#064e3b
+    style BRP fill:#d1fae5,stroke:#059669,color:#064e3b
+    style AB fill:#fff7ed,stroke:#ea580c,color:#431407
+    style LS fill:#f0fdf4,stroke:#16a34a,color:#14532d
 ```
 
 ---
@@ -426,22 +445,28 @@ graph TD
 
 ```mermaid
 sequenceDiagram
-    participant U as User action
-    participant GC as GearCalculator
-    participant T as debounce timer
-    participant AC as AbortController
-    participant API as /api/lists
+    participant U as 👤 User action
+    participant GC as ⚙️ GearCalculator
+    participant T as ⏱️ debounce timer
+    participant AC as 🛑 AbortController
+    participant API as ⚡ /api/lists
 
-    U->>GC: add / remove / qty change
-    GC->>T: clearTimeout(prev)
-    GC->>T: setTimeout(saveList, 2000ms)
-    Note over T: waits 2 seconds...
-    T->>AC: abort previous request
-    T->>API: POST {listId, items}
-    API-->>GC: {ok: true}
-    GC-->>U: ✅ Saved toast / indicator
+    rect rgb(224, 242, 254)
+        Note over U,GC: User makes a change
+        U->>GC: add / remove / qty change
+        GC->>T: clearTimeout(prev)
+        GC->>T: setTimeout(saveList, 2000ms)
+    end
 
-    Note over GC: If user changes list<br>again within 2s —<br>timer resets, request aborted
+    rect rgb(209, 250, 229)
+        Note over T,API: Debounce fires
+        T->>AC: abort previous request
+        T->>API: POST {listId, items}
+        API-->>GC: {ok: true}
+        GC-->>U: ✅ Saved indicator
+    end
+
+    Note over GC: If user changes list again<br>within 2s — timer resets,<br>previous request aborted
 ```
 
 ---
@@ -450,23 +475,23 @@ sequenceDiagram
 
 ```mermaid
 graph TD
-    INSERT["INSERT / UPDATE<br>gear_items"]
-    TRG["BEFORE trigger:<br>gear_items_search_text_trigger"]
-    ST["search_text =<br>lower(names_json::text<br>|| aliases_json::text)"]
-    GIN["GIN trigram index<br>idx_gear_items_search_gin"]
-    Q["ILIKE '%query%'<br>on search_text"]
-    RS["≤20 rows returned<br>re-ranked in JS"]
+    INSERT["✏️ INSERT / UPDATE<br>gear_items"]
+    TRG["⚡ BEFORE trigger:<br>gear_items_search_text_trigger"]
+    ST["📝 search_text =<br>lower(names_json::text<br>|| aliases_json::text)"]
+    GIN["🔍 GIN trigram index<br>idx_gear_items_search_gin"]
+    Q["🔎 ILIKE '%query%'<br>on search_text"]
+    RS["✅ ≤20 rows returned<br>re-ranked in JS"]
 
     INSERT --> TRG --> ST --> GIN
     Q -->|uses index| GIN
     GIN --> RS
 
-    style INSERT fill:#4d3a1e,stroke:#fb923c,color:#fff
-    style TRG fill:#1e3a4d,stroke:#60a5fa,color:#fff
-    style ST fill:#1c1a2e,stroke:#7c3aed,color:#fff
-    style GIN fill:#1e4d3a,stroke:#34d399,color:#fff
-    style Q fill:#2d2d2d,stroke:#888,color:#fff
-    style RS fill:#1e4d3a,stroke:#34d399,color:#fff
+    style INSERT fill:#fef3c7,stroke:#d97706,color:#451a03
+    style TRG fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    style ST fill:#e0e7ff,stroke:#6366f1,color:#1e1b4b
+    style GIN fill:#d1fae5,stroke:#059669,color:#064e3b
+    style Q fill:#fce7f3,stroke:#db2777,color:#500724
+    style RS fill:#d1fae5,stroke:#059669,color:#064e3b
 ```
 
 ---
@@ -475,13 +500,13 @@ graph TD
 
 ```mermaid
 graph TD
-    GH["GitHub<br>alexzhel-io/veloadout<br>main branch"]
-    VR["Vercel<br>Next.js serverless<br>Edge CDN"]
-    SB["Supabase<br>EU region<br>Postgres + Auth"]
-    CF["Cloudflare<br>DNS + DDoS"]
-    PL["Plausible<br>analytics"]
-    ANT["Anthropic API<br>Claude Haiku"]
-    DOM["veloadout.com"]
+    GH["🐙 GitHub<br>main branch"]
+    VR["⬡ Vercel<br>Next.js serverless<br>Edge CDN"]
+    SB["🐘 Supabase<br>EU region<br>Postgres + Auth"]
+    CF["🔶 Cloudflare<br>DNS + DDoS"]
+    PL["📊 Plausible<br>analytics"]
+    ANT["🤖 Anthropic API<br>Claude Haiku"]
+    DOM["🌐 veloadout.com"]
 
     GH -->|push → auto deploy| VR
     CF -->|CNAME| VR
@@ -490,11 +515,11 @@ graph TD
     VR -->|API calls| ANT
     VR -.->|script tag| PL
 
-    style GH fill:#2d2d2d,stroke:#888,color:#fff
-    style VR fill:#1c1a2e,stroke:#7c3aed,color:#fff
-    style SB fill:#1e4d3a,stroke:#34d399,color:#fff
-    style CF fill:#4d3a1e,stroke:#fb923c,color:#fff
-    style PL fill:#1e3a4d,stroke:#60a5fa,color:#fff
-    style ANT fill:#4d1e4d,stroke:#c084fc,color:#fff
-    style DOM fill:#7c3aed,stroke:#5b21b6,color:#fff
+    style GH fill:#f3f4f6,stroke:#6b7280,color:#111827
+    style VR fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    style SB fill:#d1fae5,stroke:#059669,color:#064e3b
+    style CF fill:#fef3c7,stroke:#d97706,color:#451a03
+    style PL fill:#e0e7ff,stroke:#6366f1,color:#1e1b4b
+    style ANT fill:#fce7f3,stroke:#db2777,color:#500724
+    style DOM fill:#fff7ed,stroke:#ea580c,color:#431407
 ```
