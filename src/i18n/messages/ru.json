@@ -11,7 +11,8 @@
     "subtitle": "Добавляй снаряжение — мы считаем объём. Сразу понятно, какие сумки нужны."
   },
   "search": {
-    "placeholder": "Например: спальник, Ortlieb Seat-Pack, дождевик...",
+    "placeholder": "Например: Thermarest NeoAir XLite, Ortlieb Seat-Pack 16L...",
+    "search_hint": "Ищи конкретные модели — AI найдёт точный объём по данным производителя.",
     "add": "Добавить",
     "searching_db": "Ищем в базе данных...",
     "searching_ai": "AI ищет в интернете...",

@@ -11,7 +11,8 @@
     "subtitle": "Füge deine Ausrüstung hinzu, wir berechnen das Volumen. Sofort wissen, welche Taschen du brauchst."
   },
   "search": {
-    "placeholder": "Z.B. Schlafsack, Ortlieb Seat-Pack, Regenjacke...",
+    "placeholder": "Z.B. Thermarest NeoAir XLite, Ortlieb Seat-Pack 16L...",
+    "search_hint": "Suche nach konkreten Produkten — KI findet das genaue Packmaß aus Herstellerangaben.",
     "add": "Hinzufügen",
     "searching_db": "Datenbank wird durchsucht...",
     "searching_ai": "KI durchsucht das Web...",

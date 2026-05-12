@@ -11,7 +11,8 @@
     "subtitle": "Add your gear, we calculate the volume. Instantly know which bags you need."
   },
   "search": {
-    "placeholder": "E.g. sleeping bag, Ortlieb Seat-Pack, rain jacket...",
+    "placeholder": "E.g. Thermarest NeoAir XLite, Ortlieb Seat-Pack 16L...",
+    "search_hint": "Search for specific products — AI finds exact packed volumes from manufacturer specs.",
     "add": "Add",
     "searching_db": "Searching database...",
     "searching_ai": "Searching the web with AI...",

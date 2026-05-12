@@ -205,6 +205,10 @@ export function SearchBar({ onAdd }: Props) {
         </button>
       </div>
 
+      {!candidate && state === 'idle' && (
+        <p className="text-xs text-text-muted">{t('search_hint')}</p>
+      )}
+
       {statusText && (
         <div className={`flex items-center gap-2 text-sm animate-fade-in ${state === 'not_found' ? 'text-danger' : 'text-text-secondary'}`}>
           {state === 'not_found' ? <AlertCircle size={14} /> : <Loader2 size={14} className="animate-spin" />}
