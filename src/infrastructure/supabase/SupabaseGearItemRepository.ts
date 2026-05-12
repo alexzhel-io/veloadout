@@ -51,7 +51,11 @@ export class SupabaseGearItemRepository implements IGearItemRepository {
       .ilike('search_text', `%${norm}%`)
       .limit(20);
 
-    if (error || !data || data.length === 0) return null;
+    if (error) {
+      console.error('[gear_items findByQuery]', error.message);
+      return null;
+    }
+    if (!data || data.length === 0) return null;
 
     // Re-rank locally: exact match > substring
     const rows = data as GearItemRow[];
@@ -75,11 +79,15 @@ export class SupabaseGearItemRepository implements IGearItemRepository {
   }
 
   async findById(id: string): Promise<GearItem | null> {
-    const { data } = await this.supabase
+    const { data, error } = await this.supabase
       .from('gear_items')
       .select('id,names_json,aliases_json,volume_liters,weight_grams,category,source_url,verified_at,created_at,variants_json')
       .eq('id', id)
       .maybeSingle();
+    if (error) {
+      console.error('[gear_items findById]', error.message);
+      return null;
+    }
     return data ? rowToGearItem(data as GearItemRow) : null;
   }
 
@@ -100,10 +108,14 @@ export class SupabaseGearItemRepository implements IGearItemRepository {
   }
 
   async listAll(): Promise<GearItem[]> {
-    const { data } = await this.supabase
+    const { data, error } = await this.supabase
       .from('gear_items')
       .select('id,names_json,aliases_json,volume_liters,weight_grams,category,source_url,verified_at,created_at,variants_json')
       .order('created_at', { ascending: false });
+    if (error) {
+      console.error('[gear_items listAll]', error.message);
+      return [];
+    }
     return ((data ?? []) as GearItemRow[]).map(rowToGearItem);
   }
 }
