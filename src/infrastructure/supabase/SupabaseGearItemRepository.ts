@@ -17,6 +17,11 @@ interface GearItemRow {
   variants_json: GearVariant[];
 }
 
+// Module-level cache: load all items once, refresh every 5 minutes
+let cachedRows: GearItemRow[] | null = null;
+let cacheExpiry = 0;
+const CACHE_TTL_MS = 5 * 60 * 1000;
+
 function rowToGearItem(row: GearItemRow): GearItem {
   return GearItem.create({
     id: row.id,
@@ -39,32 +44,29 @@ function normalize(s: string): string {
 export class SupabaseGearItemRepository implements IGearItemRepository {
   constructor(private readonly supabase: SupabaseClient) {}
 
+  private async getAllRows(): Promise<GearItemRow[]> {
+    if (cachedRows && Date.now() < cacheExpiry) return cachedRows;
+    const { data } = await this.supabase.from('gear_items').select('*');
+    cachedRows = (data ?? []) as GearItemRow[];
+    cacheExpiry = Date.now() + CACHE_TTL_MS;
+    return cachedRows;
+  }
+
   async findByQuery(query: string): Promise<GearItem | null> {
     const norm = normalize(query);
     if (!norm) return null;
 
-    // Use trigram search via Postgres for substring matching on names/aliases
-    const { data, error } = await this.supabase
-      .from('gear_items')
-      .select('*')
-      .or(`names_json.ilike.%${norm}%,aliases_json.ilike.%${norm}%`)
-      .limit(50);
+    const rows = await this.getAllRows();
 
-    if (error || !data) return null;
-
-    // Re-rank locally: exact alias > exact name > substring
     let exactMatch: GearItemRow | null = null;
     let substringMatch: GearItemRow | null = null;
 
-    for (const row of data as GearItemRow[]) {
+    for (const row of rows) {
       const aliases = row.aliases_json ?? [];
       const names = row.names_json ?? {};
       const candidates = [...aliases, ...Object.values(names)].map(normalize);
 
-      if (candidates.some(c => c === norm)) {
-        exactMatch = row;
-        break;
-      }
+      if (candidates.some(c => c === norm)) { exactMatch = row; break; }
       if (!substringMatch && candidates.some(c => c.includes(norm) || norm.includes(c))) {
         substringMatch = row;
       }
@@ -75,13 +77,14 @@ export class SupabaseGearItemRepository implements IGearItemRepository {
   }
 
   async findById(id: string): Promise<GearItem | null> {
-    const { data } = await this.supabase.from('gear_items').select('*').eq('id', id).maybeSingle();
-    return data ? rowToGearItem(data as GearItemRow) : null;
+    const rows = await this.getAllRows();
+    const row = rows.find(r => r.id === id);
+    return row ? rowToGearItem(row) : null;
   }
 
   async save(item: GearItem): Promise<void> {
     const props = item.toPlain();
-    await this.supabase.from('gear_items').upsert({
+    const row = {
       id: props.id,
       names_json: props.names,
       aliases_json: props.aliases,
@@ -91,11 +94,19 @@ export class SupabaseGearItemRepository implements IGearItemRepository {
       source_url: props.sourceUrl ?? null,
       verified_at: props.verifiedAt?.toISOString() ?? null,
       variants_json: props.variants ?? [],
-    });
+    };
+    await this.supabase.from('gear_items').upsert(row);
+    // Update local cache immediately
+    if (cachedRows) {
+      const idx = cachedRows.findIndex(r => r.id === props.id);
+      const newRow: GearItemRow = { ...row, created_at: new Date().toISOString() };
+      if (idx >= 0) cachedRows[idx] = newRow;
+      else cachedRows.push(newRow);
+    }
   }
 
   async listAll(): Promise<GearItem[]> {
-    const { data } = await this.supabase.from('gear_items').select('*').order('created_at', { ascending: false });
-    return ((data ?? []) as GearItemRow[]).map(rowToGearItem);
+    const rows = await this.getAllRows();
+    return rows.map(rowToGearItem);
   }
 }

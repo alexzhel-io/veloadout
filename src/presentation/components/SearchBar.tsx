@@ -13,17 +13,20 @@ type SearchState = 'idle' | 'searching_db' | 'searching_ai' | 'not_found';
 
 interface Variant { sizeLabel: string; volumeLiters: number; weightGrams?: number }
 
-interface AiCandidate {
+interface Candidate {
   query: string;
+  source: 'db' | 'ai';
   item: {
+    id: string;
     names: Record<string, string>;
+    aliases?: string[];
     volumeLiters: number;
     weightGrams?: number;
     category: string;
     sourceUrl?: string;
     variants: Variant[];
   };
-  confidence: string;
+  confidence?: string;
   volumeNote?: string;
 }
 
@@ -36,7 +39,7 @@ export function SearchBar({ onAdd }: Props) {
   const locale = useLocale();
   const [query, setQuery] = useState('');
   const [state, setState] = useState<SearchState>('idle');
-  const [candidate, setCandidate] = useState<AiCandidate | null>(null);
+  const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const isLoading = state === 'searching_db' || state === 'searching_ai';
@@ -51,7 +54,17 @@ export function SearchBar({ onAdd }: Props) {
       const res = await fetch(`/api/lookup?q=${encodeURIComponent(q)}&db_only=1`);
       const data = await res.json();
       if (data.status !== 'not_found') {
-        addItem(data, q, 'db');
+        const variants: Variant[] = data.item.variants ?? [];
+        if (variants.length > 1) {
+          // Show variant picker even for DB hits
+          const matched = matchVariantByQuery(variants, q);
+          const idx = matched ? variants.indexOf(matched) : 0;
+          setSelectedVariantIdx(idx);
+          setCandidate({ query: q, source: 'db', item: data.item });
+          setState('idle');
+        } else {
+          addItem(data.item, q, 'db', variants[0]);
+        }
         return;
       }
     } catch { /* fall through */ }
@@ -66,11 +79,10 @@ export function SearchBar({ onAdd }: Props) {
         return;
       }
       const variants: Variant[] = data.item.variants ?? [];
-      // auto-select variant if size keyword in query
       const matched = matchVariantByQuery(variants, q);
       const idx = matched ? variants.indexOf(matched) : 0;
       setSelectedVariantIdx(idx);
-      setCandidate({ query: q, item: data.item, confidence: data.confidence, volumeNote: data.volumeNote });
+      setCandidate({ query: q, source: 'ai', item: data.item, confidence: data.confidence, volumeNote: data.volumeNote });
       setState('idle');
     } catch {
       setState('not_found');
@@ -78,20 +90,20 @@ export function SearchBar({ onAdd }: Props) {
     }
   }
 
-  function addItem(data: { item: AiCandidate['item']; confidence?: string }, q: string, source: 'db' | 'ai', variant?: Variant) {
-    const vol = variant?.volumeLiters ?? data.item.volumeLiters;
-    const wgt = variant?.weightGrams ?? data.item.weightGrams;
-    const name = data.item.names[locale] ?? data.item.names['en'];
+  function addItem(item: Candidate['item'], q: string, source: 'db' | 'ai', variant?: Variant, confidence?: string) {
+    const vol = variant?.volumeLiters ?? item.volumeLiters;
+    const wgt = variant?.weightGrams ?? item.weightGrams;
+    const name = item.names[locale] ?? item.names['en'];
     onAdd({
       id: uuidv4(),
       name,
       volumeLiters: vol,
       weightGrams: wgt,
-      category: data.item.category,
+      category: item.category,
       quantity: 1,
       source,
-      confidence: data.confidence,
-      sourceUrl: data.item.sourceUrl,
+      confidence,
+      sourceUrl: item.sourceUrl,
       sizeLabel: variant?.sizeLabel,
     });
     setQuery('');
@@ -104,12 +116,15 @@ export function SearchBar({ onAdd }: Props) {
     if (!candidate) return;
     const variants = candidate.item.variants ?? [];
     const variant = variants[variantIdx];
-    fetch('/api/lookup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: candidate.query }),
-    }).catch(() => {});
-    addItem({ item: candidate.item, confidence: candidate.confidence }, candidate.query, 'ai', variant);
+    // Save to shared catalog only for AI-found items
+    if (candidate.source === 'ai') {
+      fetch('/api/lookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item: candidate.item }),
+      }).catch(() => {});
+    }
+    addItem(candidate.item, candidate.query, candidate.source, variant, candidate.confidence);
   }
 
   function rejectCandidate() {
@@ -170,7 +185,7 @@ export function SearchBar({ onAdd }: Props) {
 }
 
 function ConfirmCard({ candidate, locale, selectedIdx, onSelectIdx, onConfirm, onReject }: {
-  candidate: AiCandidate;
+  candidate: Candidate;
   locale: string;
   selectedIdx: number;
   onSelectIdx: (i: number) => void;
@@ -189,7 +204,9 @@ function ConfirmCard({ candidate, locale, selectedIdx, onSelectIdx, onConfirm, o
 
   return (
     <div className="rounded-xl border border-accent/30 bg-accent/5 p-4 animate-slide-up space-y-3">
-      <p className="text-xs text-accent font-medium uppercase tracking-wider">{t('found_ai_badge')}</p>
+      <p className="text-xs text-accent font-medium uppercase tracking-wider">
+        {candidate.source === 'db' ? t('found_db_badge') : t('found_ai_badge')}
+      </p>
 
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">

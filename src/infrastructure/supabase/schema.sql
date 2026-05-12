@@ -24,11 +24,13 @@ drop policy if exists "Anyone can read gear items" on gear_items;
 create policy "Anyone can read gear items"
   on gear_items for select using (true);
 drop policy if exists "Authenticated users can insert gear items" on gear_items;
-create policy "Authenticated users can insert gear items"
-  on gear_items for insert to authenticated with check (true);
+drop policy if exists "Anyone can insert gear items" on gear_items;
+create policy "Anyone can insert gear items"
+  on gear_items for insert with check (true);
 drop policy if exists "Authenticated users can update gear items" on gear_items;
-create policy "Authenticated users can update gear items"
-  on gear_items for update to authenticated using (true);
+drop policy if exists "Anyone can update gear items" on gear_items;
+create policy "Anyone can update gear items"
+  on gear_items for update using (true);
 
 -- User gear lists
 create table if not exists gear_lists (
