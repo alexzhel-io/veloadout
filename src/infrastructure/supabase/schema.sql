@@ -1,6 +1,7 @@
 -- Run this in Supabase SQL Editor
+-- Idempotent: safe to run multiple times
 
--- Global gear catalog (read by all, written by service role)
+-- Global gear catalog
 create table if not exists gear_items (
   id            text primary key,
   names_json    jsonb not null,
@@ -14,24 +15,22 @@ create table if not exists gear_items (
   variants_json jsonb not null default '[]'::jsonb
 );
 create index if not exists idx_gear_items_category on gear_items(category);
--- Trigram index for fast substring search
 create extension if not exists pg_trgm;
 create index if not exists idx_gear_items_names_gin on gear_items using gin ((names_json::text) gin_trgm_ops);
 create index if not exists idx_gear_items_aliases_gin on gear_items using gin ((aliases_json::text) gin_trgm_ops);
 
 alter table gear_items enable row level security;
+drop policy if exists "Anyone can read gear items" on gear_items;
 create policy "Anyone can read gear items"
-  on gear_items for select
-  using (true);
+  on gear_items for select using (true);
+drop policy if exists "Authenticated users can insert gear items" on gear_items;
 create policy "Authenticated users can insert gear items"
-  on gear_items for insert
-  to authenticated
-  with check (true);
+  on gear_items for insert to authenticated with check (true);
+drop policy if exists "Authenticated users can update gear items" on gear_items;
 create policy "Authenticated users can update gear items"
-  on gear_items for update
-  to authenticated
-  using (true);
+  on gear_items for update to authenticated using (true);
 
+-- User gear lists
 create table if not exists gear_lists (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null references auth.users(id) on delete cascade,
@@ -54,19 +53,17 @@ create table if not exists gear_list_items (
   created_at    timestamptz not null default now()
 );
 
--- Row Level Security
 alter table gear_lists enable row level security;
 alter table gear_list_items enable row level security;
 
+drop policy if exists "Users see own lists" on gear_lists;
 create policy "Users see own lists"
-  on gear_lists for all
-  using (auth.uid() = user_id);
+  on gear_lists for all using (auth.uid() = user_id);
 
+drop policy if exists "Users see own list items" on gear_list_items;
 create policy "Users see own list items"
   on gear_list_items for all
-  using (
-    list_id in (select id from gear_lists where user_id = auth.uid())
-  );
+  using (list_id in (select id from gear_lists where user_id = auth.uid()));
 
 -- Auto-update updated_at
 create or replace function update_updated_at()
@@ -74,6 +71,7 @@ returns trigger as $$
 begin new.updated_at = now(); return new; end;
 $$ language plpgsql;
 
+drop trigger if exists gear_lists_updated_at on gear_lists;
 create trigger gear_lists_updated_at
   before update on gear_lists
   for each row execute function update_updated_at();
