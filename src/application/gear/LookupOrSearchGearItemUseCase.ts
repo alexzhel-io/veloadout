@@ -4,7 +4,7 @@ import { IGearSearchService } from '@/domain/gear/IGearSearchService';
 
 export type LookupResult =
   | { status: 'found_db'; item: GearItem }
-  | { status: 'found_ai'; item: GearItem; confidence: string; sourceUrl?: string }
+  | { status: 'found_ai'; item: GearItem; confidence: string; sourceUrl?: string; volumeNote?: string }
   | { status: 'not_found' };
 
 export class LookupOrSearchGearItemUseCase {
@@ -13,7 +13,7 @@ export class LookupOrSearchGearItemUseCase {
     private readonly searchService: IGearSearchService,
   ) {}
 
-  async execute(query: string): Promise<LookupResult> {
+  async execute(query: string, saveOnFind = false): Promise<LookupResult> {
     const normalized = query.trim().toLowerCase();
 
     const fromDb = await this.repository.findByQuery(normalized);
@@ -22,13 +22,17 @@ export class LookupOrSearchGearItemUseCase {
     const searchResult = await this.searchService.search(query);
     if (!searchResult) return { status: 'not_found' };
 
-    await this.repository.save(searchResult.item);
+    // Only save to DB if explicitly confirmed (saveOnFind = true)
+    if (saveOnFind) {
+      await this.repository.save(searchResult.item);
+    }
 
     return {
       status: 'found_ai',
       item: searchResult.item,
       confidence: searchResult.confidence,
       sourceUrl: searchResult.sourceUrl,
+      volumeNote: searchResult.volumeNote,
     };
   }
 }

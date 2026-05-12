@@ -17,7 +17,10 @@
     "searching_ai": "KI durchsucht das Web...",
     "not_found": "Keine Volumendaten für diesen Artikel gefunden.",
     "found_ai_badge": "Per KI gefunden",
-    "found_db_badge": "Aus Datenbank"
+    "found_db_badge": "Aus Datenbank",
+    "confirm": "Zur Liste",
+    "reject": "Nicht das",
+    "select_size": "Größe wählen"
   },
   "presets": {
     "title": "Schnell hinzufügen",
@@ -31,7 +34,9 @@
     "qty_col": "Anz.",
     "total_col": "Gesamt",
     "remove": "Entfernen",
-    "total_label": "Gesamtvolumen"
+    "total_label": "Gesamtvolumen",
+    "weight_col": "Gewicht",
+    "total_weight": "Gesamtgewicht"
   },
   "bags": {
     "title": "Taschenempfehlung",
@@ -57,6 +62,29 @@
     "other": "Sonstiges"
   },
   "footer": {
-    "text": "Volumendaten sind community-basiert und KI-unterstützt. Bitte überprüfe kritische Angaben selbst."
+    "text": "Volumendaten sind community-basiert und KI-unterstützt. Bitte überprüfe kritische Angaben selbst.",
+    "privacy": "Datenschutz",
+    "terms": "AGB"
+  },
+  "errors": {
+    "load_failed": "Liste konnte nicht geladen werden. Bitte aktualisieren.",
+    "save_failed": "Liste konnte nicht gespeichert werden. Bitte erneut versuchen."
+  },
+  "cookies": {
+    "title": "Cookies & Datenschutz",
+    "description": "Wir verwenden nur essentielle Cookies für die Anmeldung. Kein Tracking, keine Werbung.",
+    "accept": "Verstanden",
+    "decline": "Ablehnen"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "login_subtitle": "E-Mail eingeben — wir senden einen Magic Link, kein Passwort nötig.",
+    "send_link": "Magic Link senden",
+    "check_email": "E-Mail überprüfen",
+    "magic_link_sent": "Wir haben einen Link gesendet an",
+    "save_list": "Liste speichern",
+    "list_saved": "Gespeichert",
+    "sign_in_to_save": "Anmelden um Liste zu speichern"
   }
 }

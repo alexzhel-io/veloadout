@@ -2,11 +2,30 @@
 
 import { useState, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Search, Plus, Loader2, AlertCircle, Sparkles, Database } from 'lucide-react';
+import { Search, Plus, Loader2, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { categoryIcon } from '@/domain/gear/GearCategoryIcon';
+import { CATEGORY_LABELS } from '@/domain/gear/GearCategory';
+import { matchVariantByQuery } from '@/domain/gear/GearVariant';
 import type { GearEntry } from './GearCalculator';
 
 type SearchState = 'idle' | 'searching_db' | 'searching_ai' | 'not_found';
+
+interface Variant { sizeLabel: string; volumeLiters: number; weightGrams?: number }
+
+interface AiCandidate {
+  query: string;
+  item: {
+    names: Record<string, string>;
+    volumeLiters: number;
+    weightGrams?: number;
+    category: string;
+    sourceUrl?: string;
+    variants: Variant[];
+  };
+  confidence: string;
+  volumeNote?: string;
+}
 
 interface Props {
   onAdd: (entry: GearEntry) => void;
@@ -17,69 +36,87 @@ export function SearchBar({ onAdd }: Props) {
   const locale = useLocale();
   const [query, setQuery] = useState('');
   const [state, setState] = useState<SearchState>('idle');
-  const [lastSource, setLastSource] = useState<'db' | 'ai' | null>(null);
+  const [candidate, setCandidate] = useState<AiCandidate | null>(null);
+  const [selectedVariantIdx, setSelectedVariantIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isLoading = state === 'searching_db' || state === 'searching_ai';
 
   async function handleSearch() {
     const q = query.trim();
-    if (!q || state !== 'idle') return;
+    if (!q || isLoading) return;
+    setCandidate(null);
 
     setState('searching_db');
-    setLastSource(null);
+    try {
+      const res = await fetch(`/api/lookup?q=${encodeURIComponent(q)}&db_only=1`);
+      const data = await res.json();
+      if (data.status !== 'not_found') {
+        addItem(data, q, 'db');
+        return;
+      }
+    } catch { /* fall through */ }
 
+    setState('searching_ai');
     try {
       const res = await fetch(`/api/lookup?q=${encodeURIComponent(q)}`);
       const data = await res.json();
-
       if (data.status === 'not_found') {
-        setState('searching_ai');
-
-        const res2 = await fetch(`/api/lookup?q=${encodeURIComponent(q)}&force_ai=1`);
-        const data2 = await res2.json();
-
-        if (data2.status === 'not_found') {
-          setState('not_found');
-          setTimeout(() => setState('idle'), 3000);
-          return;
-        }
-
-        const entry: GearEntry = {
-          id: uuidv4(),
-          name: data2.item.names[locale] ?? data2.item.names['en'],
-          volumeLiters: data2.item.volumeLiters,
-          weightGrams: data2.item.weightGrams,
-          category: data2.item.category,
-          quantity: 1,
-          source: 'ai',
-          confidence: data2.confidence,
-          sourceUrl: data2.item.sourceUrl,
-        };
-        onAdd(entry);
-        setLastSource('ai');
-      } else {
-        const entry: GearEntry = {
-          id: uuidv4(),
-          name: data.item.names[locale] ?? data.item.names['en'],
-          volumeLiters: data.item.volumeLiters,
-          weightGrams: data.item.weightGrams,
-          category: data.item.category,
-          quantity: 1,
-          source: 'db',
-        };
-        onAdd(entry);
-        setLastSource('db');
+        setState('not_found');
+        setTimeout(() => setState('idle'), 3500);
+        return;
       }
-
-      setQuery('');
+      const variants: Variant[] = data.item.variants ?? [];
+      // auto-select variant if size keyword in query
+      const matched = matchVariantByQuery(variants, q);
+      const idx = matched ? variants.indexOf(matched) : 0;
+      setSelectedVariantIdx(idx);
+      setCandidate({ query: q, item: data.item, confidence: data.confidence, volumeNote: data.volumeNote });
       setState('idle');
-      inputRef.current?.focus();
     } catch {
       setState('not_found');
-      setTimeout(() => setState('idle'), 3000);
+      setTimeout(() => setState('idle'), 3500);
     }
   }
 
-  const isLoading = state === 'searching_db' || state === 'searching_ai';
+  function addItem(data: { item: AiCandidate['item']; confidence?: string }, q: string, source: 'db' | 'ai', variant?: Variant) {
+    const vol = variant?.volumeLiters ?? data.item.volumeLiters;
+    const wgt = variant?.weightGrams ?? data.item.weightGrams;
+    const name = data.item.names[locale] ?? data.item.names['en'];
+    onAdd({
+      id: uuidv4(),
+      name,
+      volumeLiters: vol,
+      weightGrams: wgt,
+      category: data.item.category,
+      quantity: 1,
+      source,
+      confidence: data.confidence,
+      sourceUrl: data.item.sourceUrl,
+      sizeLabel: variant?.sizeLabel,
+    });
+    setQuery('');
+    setState('idle');
+    setCandidate(null);
+    inputRef.current?.focus();
+  }
+
+  async function confirmCandidate(variantIdx: number) {
+    if (!candidate) return;
+    const variants = candidate.item.variants ?? [];
+    const variant = variants[variantIdx];
+    fetch('/api/lookup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: candidate.query }),
+    }).catch(() => {});
+    addItem({ item: candidate.item, confidence: candidate.confidence }, candidate.query, 'ai', variant);
+  }
+
+  function rejectCandidate() {
+    setCandidate(null);
+    setQuery('');
+    inputRef.current?.focus();
+  }
 
   const statusText =
     state === 'searching_db' ? t('searching_db') :
@@ -87,7 +124,7 @@ export function SearchBar({ onAdd }: Props) {
     state === 'not_found' ? t('not_found') : null;
 
   return (
-    <div className="rounded-2xl border border-white/[0.07] bg-[#1c1a2e] p-5 shadow-card">
+    <div className="rounded-2xl border border-white/[0.07] bg-[#1c1a2e] p-5 shadow-card space-y-4">
       <div className="flex gap-3">
         <div className="relative flex-1">
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
@@ -112,23 +149,108 @@ export function SearchBar({ onAdd }: Props) {
       </div>
 
       {statusText && (
-        <div className={`mt-3 flex items-center gap-2 text-sm animate-fade-in ${state === 'not_found' ? 'text-danger' : 'text-text-secondary'}`}>
-          {state === 'not_found'
-            ? <AlertCircle size={14} />
-            : <Loader2 size={14} className="animate-spin" />
-          }
+        <div className={`flex items-center gap-2 text-sm animate-fade-in ${state === 'not_found' ? 'text-danger' : 'text-text-secondary'}`}>
+          {state === 'not_found' ? <AlertCircle size={14} /> : <Loader2 size={14} className="animate-spin" />}
           {statusText}
         </div>
       )}
 
-      {lastSource && state === 'idle' && (
-        <div className="mt-3 flex items-center gap-2 text-xs text-text-muted animate-fade-in">
-          {lastSource === 'ai'
-            ? <><Sparkles size={12} className="text-accent" /> {t('found_ai_badge')}</>
-            : <><Database size={12} className="text-success" /> {t('found_db_badge')}</>
-          }
+      {candidate && (
+        <ConfirmCard
+          candidate={candidate}
+          locale={locale}
+          selectedIdx={selectedVariantIdx}
+          onSelectIdx={setSelectedVariantIdx}
+          onConfirm={confirmCandidate}
+          onReject={rejectCandidate}
+        />
+      )}
+    </div>
+  );
+}
+
+function ConfirmCard({ candidate, locale, selectedIdx, onSelectIdx, onConfirm, onReject }: {
+  candidate: AiCandidate;
+  locale: string;
+  selectedIdx: number;
+  onSelectIdx: (i: number) => void;
+  onConfirm: (variantIdx: number) => void;
+  onReject: () => void;
+}) {
+  const t = useTranslations('search');
+  const name = candidate.item.names[locale] ?? candidate.item.names['en'];
+  const icon = categoryIcon(candidate.item.category);
+  const catLabels = CATEGORY_LABELS[candidate.item.category as keyof typeof CATEGORY_LABELS];
+  const catLabel = catLabels ? (catLabels[locale] ?? catLabels['en']) : candidate.item.category;
+  const variants = candidate.item.variants ?? [];
+  const selected = variants[selectedIdx] ?? { volumeLiters: candidate.item.volumeLiters, weightGrams: candidate.item.weightGrams };
+  const confidenceColor = candidate.confidence === 'high' ? 'text-success' : candidate.confidence === 'low' ? 'text-warning' : 'text-text-secondary';
+  const hasVariants = variants.length > 1;
+
+  return (
+    <div className="rounded-xl border border-accent/30 bg-accent/5 p-4 animate-slide-up space-y-3">
+      <p className="text-xs text-accent font-medium uppercase tracking-wider">{t('found_ai_badge')}</p>
+
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-text-muted text-xs mb-0.5">{icon} {catLabel}</p>
+          <p className="text-white font-medium truncate">{name}</p>
+          {candidate.volumeNote && (
+            <p className="text-text-muted text-xs mt-1 italic">{candidate.volumeNote}</p>
+          )}
+        </div>
+        <div className="text-right shrink-0">
+          <p className="text-white font-bold text-xl">{selected.volumeLiters}L</p>
+          {selected.weightGrams && <p className="text-text-muted text-xs">{selected.weightGrams}g</p>}
+          <p className={`text-xs mt-0.5 ${confidenceColor}`}>{candidate.confidence}</p>
+        </div>
+      </div>
+
+      {/* Variant selector */}
+      {hasVariants && (
+        <div>
+          <p className="text-text-muted text-xs mb-2">{t('select_size')}</p>
+          <div className="flex flex-wrap gap-2">
+            {variants.map((v, i) => (
+              <button
+                key={i}
+                onClick={() => onSelectIdx(i)}
+                className={`px-3 py-1.5 rounded-lg border text-sm transition-all ${
+                  i === selectedIdx
+                    ? 'border-accent bg-accent/20 text-white'
+                    : 'border-white/[0.07] text-text-secondary hover:border-white/20 hover:text-white'
+                }`}
+              >
+                {v.sizeLabel}
+                <span className="text-xs ml-1.5 opacity-60">{v.volumeLiters}L{v.weightGrams ? ` · ${v.weightGrams}g` : ''}</span>
+              </button>
+            ))}
+          </div>
         </div>
       )}
+
+      {candidate.item.sourceUrl && (
+        <a href={candidate.item.sourceUrl} target="_blank" rel="noopener noreferrer"
+          className="text-xs text-accent/70 hover:text-accent underline truncate block">
+          {candidate.item.sourceUrl.replace(/^https?:\/\//, '').split('/')[0]}
+        </a>
+      )}
+
+      <div className="flex gap-2 pt-1">
+        <button
+          onClick={() => onConfirm(selectedIdx)}
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-accent hover:bg-accent-hover rounded-lg text-white text-sm font-medium transition-colors"
+        >
+          <CheckCircle size={14} />
+          {hasVariants ? `${t('confirm')} · ${variants[selectedIdx]?.sizeLabel}` : t('confirm')}
+        </button>
+        <button
+          onClick={onReject}
+          className="flex items-center justify-center gap-2 px-4 py-2 border border-white/[0.07] hover:border-white/20 rounded-lg text-text-secondary hover:text-white text-sm transition-colors"
+        >
+          <XCircle size={14} /> {t('reject')}
+        </button>
+      </div>
     </div>
   );
 }

@@ -17,7 +17,10 @@
     "searching_ai": "Searching the web with AI...",
     "not_found": "Could not find volume data for this item.",
     "found_ai_badge": "Found via AI",
-    "found_db_badge": "From database"
+    "found_db_badge": "From database",
+    "confirm": "Add to list",
+    "reject": "Not this",
+    "select_size": "Select size"
   },
   "presets": {
     "title": "Quick add presets",
@@ -31,7 +34,9 @@
     "qty_col": "Qty",
     "total_col": "Total",
     "remove": "Remove",
-    "total_label": "Total volume"
+    "total_label": "Total volume",
+    "weight_col": "Weight",
+    "total_weight": "Total weight"
   },
   "bags": {
     "title": "Bag recommendation",
@@ -57,6 +62,29 @@
     "other": "Other"
   },
   "footer": {
-    "text": "Volume data is crowd-sourced and AI-assisted. Always verify critical gear specs."
+    "text": "Volume data is crowd-sourced and AI-assisted. Always verify critical gear specs.",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  },
+  "errors": {
+    "load_failed": "Could not load your list. Please refresh.",
+    "save_failed": "Could not save your list. Please try again."
+  },
+  "cookies": {
+    "title": "Cookies & privacy",
+    "description": "We use only essential cookies for authentication. No tracking, no ads.",
+    "accept": "Got it",
+    "decline": "Decline"
+  },
+  "auth": {
+    "login": "Sign in",
+    "logout": "Sign out",
+    "login_subtitle": "Enter your email — we send a magic link, no password needed.",
+    "send_link": "Send magic link",
+    "check_email": "Check your email",
+    "magic_link_sent": "We sent a sign-in link to",
+    "save_list": "Save list",
+    "list_saved": "Saved",
+    "sign_in_to_save": "Sign in to save your list"
   }
 }

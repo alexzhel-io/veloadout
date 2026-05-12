@@ -1,0 +1,28 @@
+# Veloadout
+
+> Bikepacking gear volume calculator — plan your bike touring setup with confidence.
+
+Veloadout helps cyclists calculate the total volume and weight of their bikepacking gear so they can choose the right bags before hitting the trail.
+
+## What it does
+
+- Search for specific gear items (tents, sleeping bags, pads, clothing, tools) by name
+- AI-powered lookup: if an item isn't in the database, Claude searches the web and returns packed volume and weight for all size variants
+- Add preset "standard" gear bundles with one click
+- See real-time total volume and bag recommendation (frame bag, handlebar roll, seat pack, etc.)
+- Save your gear list (requires free account via magic link)
+
+## Who it's for
+
+Bikepacking and bike touring cyclists planning multi-day or long-distance rides.
+
+## Languages
+
+English, German, Russian.
+
+## Key URLs
+
+- Homepage / calculator: https://veloadout.com
+- English: https://veloadout.com/en
+- German: https://veloadout.com/de
+- Russian: https://veloadout.com/ru

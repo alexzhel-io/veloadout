@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { v4 as uuidv4 } from 'uuid';
-import { Bike } from 'lucide-react';
+import { Bike, Save, CheckCircle, Loader2 } from 'lucide-react';
 import { SearchBar } from './SearchBar';
 import { PresetPanel } from './PresetPanel';
 import { GearList } from './GearList';
 import { BagRecommendationPanel } from './BagRecommendationPanel';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { AuthButton } from './AuthButton';
+import { useToast } from './Toast';
 import { computeBagRecommendation } from '@/domain/gear/BagRecommendation';
 import type { GearPreset } from '@/domain/gear/GearPreset';
 
@@ -22,21 +24,94 @@ export interface GearEntry {
   source: 'db' | 'ai' | 'preset';
   confidence?: string;
   sourceUrl?: string;
+  sizeLabel?: string;
 }
 
-export function GearCalculator() {
+interface Props {
+  user: { id: string; email?: string } | null;
+}
+
+export function GearCalculator({ user }: Props) {
   const t = useTranslations();
   const locale = useLocale();
+  const toast = useToast();
   const [entries, setEntries] = useState<GearEntry[]>([]);
+  const [listId, setListId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveAbort = useRef<AbortController | null>(null);
+  const initialized = useRef(false);
 
-  const addEntry = useCallback((entry: GearEntry) => {
-    setEntries(prev => [...prev, entry]);
-  }, []);
+  useEffect(() => {
+    if (!user) return;
+    fetch('/api/lists')
+      .then(async r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(({ list }) => {
+        if (!list) return;
+        setListId(list.id);
+        if (list.items?.length > 0) {
+          setEntries(list.items.map((item: { id: string; name: string; volumeLiters: number; weightGrams?: number; category: string; quantity: number; sizeLabel?: string; source: GearEntry['source']; sourceUrl?: string }) => ({
+            id: item.id ?? uuidv4(),
+            name: item.name,
+            volumeLiters: item.volumeLiters,
+            weightGrams: item.weightGrams,
+            category: item.category,
+            quantity: item.quantity,
+            sizeLabel: item.sizeLabel,
+            source: item.source ?? 'db',
+            sourceUrl: item.sourceUrl,
+          })));
+        }
+        initialized.current = true;
+      })
+      .catch(() => toast.show('error', t('errors.load_failed')));
+  }, [user, toast, t]);
 
-  const removeEntry = useCallback((id: string) => {
-    setEntries(prev => prev.filter(e => e.id !== id));
-  }, []);
+  const saveList = useCallback(async () => {
+    if (!listId) return;
+    saveAbort.current?.abort();
+    const controller = new AbortController();
+    saveAbort.current = controller;
+    setSaving(true);
+    try {
+      const res = await fetch('/api/lists', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          listId,
+          items: entries.map(e => ({
+            name: e.name, category: e.category, volumeLiters: e.volumeLiters,
+            weightGrams: e.weightGrams, quantity: e.quantity, sizeLabel: e.sizeLabel,
+            source: e.source, sourceUrl: e.sourceUrl,
+          })),
+        }),
+        signal: controller.signal,
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        toast.show('error', t('errors.save_failed'));
+      }
+    } finally {
+      setSaving(false);
+    }
+  }, [listId, entries, toast, t]);
 
+  useEffect(() => {
+    if (!user || !listId || !initialized.current) return;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => { void saveList(); }, 2000);
+    return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
+  }, [entries, listId, user, saveList]);
+
+  const addEntry = useCallback((entry: GearEntry) => setEntries(prev => [...prev, entry]), []);
+  const removeEntry = useCallback((id: string) => setEntries(prev => prev.filter(e => e.id !== id)), []);
   const updateQuantity = useCallback((id: string, quantity: number) => {
     setEntries(prev => prev.map(e => e.id === id ? { ...e, quantity: Math.max(1, quantity) } : e));
   }, []);
@@ -44,16 +119,8 @@ export function GearCalculator() {
   const addPreset = useCallback((preset: GearPreset) => {
     const name = preset.names[locale] ?? preset.names['en'];
     setEntries(prev => {
-      const exists = prev.find(e => e.id === preset.id);
-      if (exists) return prev.filter(e => e.id !== preset.id);
-      return [...prev, {
-        id: preset.id,
-        name,
-        volumeLiters: preset.volumeLiters,
-        category: preset.category,
-        quantity: 1,
-        source: 'preset',
-      }];
+      if (prev.find(e => e.id === preset.id)) return prev.filter(e => e.id !== preset.id);
+      return [...prev, { id: preset.id, name, volumeLiters: preset.volumeLiters, category: preset.category, quantity: 1, source: 'preset' }];
     });
   }, [locale]);
 
@@ -64,21 +131,35 @@ export function GearCalculator() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#13111c' }}>
-      {/* Header */}
       <header className="border-b border-white/[0.07] px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 shrink-0">
             <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
               <Bike size={16} className="text-white" />
             </div>
             <span className="font-semibold text-white tracking-tight">Veloadout</span>
             <span className="hidden sm:block text-text-secondary text-sm">— {t('nav.tagline')}</span>
           </div>
-          <LanguageSwitcher />
+          <div className="flex items-center gap-3">
+            {user && entries.length > 0 && (
+              <button
+                onClick={saveList}
+                disabled={saving}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/[0.07] text-text-secondary hover:text-white hover:border-white/20 text-xs transition-colors"
+              >
+                {saving ? <Loader2 size={12} className="animate-spin" /> : saved ? <CheckCircle size={12} className="text-success" /> : <Save size={12} />}
+                {saved ? t('auth.list_saved') : t('auth.save_list')}
+              </button>
+            )}
+            {!user && entries.length > 0 && (
+              <span className="text-text-muted text-xs hidden sm:block">{t('auth.sign_in_to_save')}</span>
+            )}
+            <LanguageSwitcher />
+            <AuthButton user={user} />
+          </div>
         </div>
       </header>
 
-      {/* Hero */}
       <section className="px-6 pt-14 pb-10 text-center">
         <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">
           {t('hero.title')}
@@ -88,25 +169,15 @@ export function GearCalculator() {
         </p>
       </section>
 
-      {/* Main */}
       <main className="flex-1 px-4 sm:px-6 pb-16">
         <div className="max-w-6xl mx-auto space-y-6">
-          {/* Search */}
           <SearchBar onAdd={addEntry} />
-
-          {/* Presets */}
           <PresetPanel onToggle={addPreset} isActive={isPresetActive} />
 
-          {/* Results grid */}
-          {entries.length > 0 && (
+          {entries.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
-                <GearList
-                  entries={entries}
-                  onRemove={removeEntry}
-                  onQuantityChange={updateQuantity}
-                  totalVolume={totalVolume}
-                />
+                <GearList entries={entries} onRemove={removeEntry} onQuantityChange={updateQuantity} totalVolume={totalVolume} />
               </div>
               {bagRec && (
                 <div>
@@ -114,17 +185,21 @@ export function GearCalculator() {
                 </div>
               )}
             </div>
-          )}
-
-          {entries.length === 0 && (
+          ) : (
             <p className="text-center text-text-muted py-8">{t('list.empty')}</p>
           )}
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/[0.07] px-6 py-5 text-center">
-        <p className="text-text-muted text-sm">{t('footer.text')}</p>
+      <footer className="border-t border-white/[0.07] px-6 py-5 text-center text-text-muted text-sm space-y-1">
+        <p>{t('footer.text')}</p>
+        <p className="space-x-3">
+          <a href={`/${locale}/privacy`} className="hover:text-white transition-colors">{t('footer.privacy')}</a>
+          <span>·</span>
+          <a href={`/${locale}/terms`} className="hover:text-white transition-colors">{t('footer.terms')}</a>
+          <span>·</span>
+          <a href={`/${locale}/impressum`} className="hover:text-white transition-colors">Impressum</a>
+        </p>
       </footer>
     </div>
   );

@@ -1,4 +1,5 @@
 import { GearCategory } from './GearCategory';
+import type { GearVariant } from './GearVariant';
 
 export interface GearItemProps {
   id: string;
@@ -10,6 +11,7 @@ export interface GearItemProps {
   sourceUrl?: string;
   verifiedAt?: Date;
   createdAt: Date;
+  variants: GearVariant[];
 }
 
 export class GearItem {
@@ -31,6 +33,7 @@ export class GearItem {
   get sourceUrl() { return this.props.sourceUrl; }
   get verifiedAt() { return this.props.verifiedAt; }
   get createdAt() { return this.props.createdAt; }
+  get variants() { return this.props.variants; }
 
   getName(locale: string): string {
     return this.props.names[locale] ?? this.props.names['en'];
