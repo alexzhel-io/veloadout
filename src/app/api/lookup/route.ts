@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createServerSupabaseClient } from '@/infrastructure/supabase/server';
-import { getAnonClient } from '@/infrastructure/supabase/anonClient';
 import { SupabaseGearItemRepository } from '@/infrastructure/supabase/SupabaseGearItemRepository';
 import { ClaudeGearSearchService } from '@/infrastructure/ai/ClaudeGearSearchService';
 import { LookupOrSearchGearItemUseCase } from '@/application/gear/LookupOrSearchGearItemUseCase';
@@ -56,10 +55,6 @@ function clientIp(req: NextRequest): string {
 async function buildRepo() {
   const supabase = await createServerSupabaseClient();
   return new SupabaseGearItemRepository(supabase);
-}
-
-function buildAnonRepo() {
-  return new SupabaseGearItemRepository(getAnonClient());
 }
 
 export async function GET(req: NextRequest) {
@@ -121,7 +116,8 @@ export async function POST(req: NextRequest) {
   });
 
   try {
-    await buildAnonRepo().save(gearItem);
+    const repo = await buildRepo();
+    await repo.save(gearItem);
   } catch (err) {
     console.error('[lookup POST] save failed:', err);
     return NextResponse.json({ error: String(err) }, { status: 500 });
