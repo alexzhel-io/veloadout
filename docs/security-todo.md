@@ -6,26 +6,12 @@ real userbase, paid tier).
 
 ---
 
-## 🟡 #11 — Magic-link rate limit is bypassable via cold start
+## ~~#11~~ — DONE: distributed rate limit via Upstash Redis
 
-**File:** `src/infrastructure/security/rateLimit.ts`, `src/app/api/auth/route.ts`
-
-The in-memory rate limit (3 magic links / email / 10 min) lives in a JS `Map`
-inside one serverless function instance. Vercel spins up new instances under
-load — each gets a fresh, empty Map, so an attacker hitting different cold
-instances multiplies the quota by N.
-
-**Mitigation in place:** Supabase Auth itself enforces 30 magic-links /
-email / hour, so the worst-case is bounded.
-
-**Proper fix:**
-1. Sign up at [upstash.com](https://upstash.com) → create free Redis DB
-2. Add env vars to Vercel: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
-3. Replace the in-memory `Map` in `rateLimit.ts` with `INCR key EX window`
-   via the Upstash REST API
-4. Apply to both `/api/auth` and `/api/lookup`
-
-Free tier: 10 000 req/day — more than enough at current scale.
+Fixed in commit `9238e2f`. `rateLimit.ts` now uses Upstash Redis with a
+graceful fallback to in-memory when Redis is unconfigured/unreachable.
+Applies to `/api/auth` and `/api/lookup`. Cold starts no longer reset
+counters.
 
 ---
 
