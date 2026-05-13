@@ -16,17 +16,29 @@ export function AuthButton({ user }: Props) {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleLogin() {
     if (!email.trim()) return;
     setLoading(true);
-    await fetch('/api/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.trim(), locale }),
-    });
-    setLoading(false);
-    setSent(true);
+    setError(null);
+    try {
+      const r = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), locale }),
+      });
+      if (r.ok) {
+        setSent(true);
+      } else {
+        const data = await r.json().catch(() => ({}));
+        setError(data.error ?? `Error ${r.status}`);
+      }
+    } catch {
+      setError(t('network_error'));
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleLogout() {
@@ -91,6 +103,9 @@ export function AuthButton({ user }: Props) {
                   {loading ? <Loader2 size={16} className="animate-spin" /> : <LogIn size={16} />}
                   {t('send_link')}
                 </button>
+                {error && (
+                  <p className="text-danger text-sm mt-3 text-center">{error}</p>
+                )}
               </>
             )}
           </div>

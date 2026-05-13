@@ -113,6 +113,7 @@
     "magic_link_sent": "Wir haben einen Link gesendet an",
     "save_list": "Liste speichern",
     "list_saved": "Gespeichert",
-    "sign_in_to_save": "Anmelden um Liste zu speichern"
+    "sign_in_to_save": "Anmelden um Liste zu speichern",
+    "network_error": "Netzwerkfehler, bitte erneut versuchen"
   }
 }

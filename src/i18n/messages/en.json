@@ -113,6 +113,7 @@
     "magic_link_sent": "We sent a sign-in link to",
     "save_list": "Save list",
     "list_saved": "Saved",
-    "sign_in_to_save": "Sign in to save your list"
+    "sign_in_to_save": "Sign in to save your list",
+    "network_error": "Network error, please try again"
   }
 }

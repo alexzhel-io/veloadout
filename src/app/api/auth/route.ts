@@ -31,8 +31,8 @@ export async function POST(req: NextRequest) {
 
   // Rate-limit by IP and email to prevent magic-link spam
   const ip = clientIp(req);
-  const ipLimit = await checkRateLimit(`auth:ip:${ip}`, 5, 600);
-  const emailLimit = await checkRateLimit(`auth:email:${body.data.email}`, 3, 600);
+  const ipLimit = await checkRateLimit(`auth:ip:${ip}`, 10, 600);
+  const emailLimit = await checkRateLimit(`auth:email:${body.data.email}`, 5, 600);
   if (!ipLimit.allowed || !emailLimit.allowed) {
     return NextResponse.json({ error: 'Too many requests. Try again in a few minutes.' }, { status: 429 });
   }
