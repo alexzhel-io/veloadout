@@ -1,0 +1,42 @@
+Veloadout — Proprietary Software License
+
+Copyright (c) 2026 Yevgen Zhelichowski.
+All rights reserved.
+
+This source code, including the database schema, AI prompts,
+documentation, and accompanying assets in this repository, is the
+proprietary work of Yevgen Zhelichowski. The repository is
+intentionally not open source.
+
+No grant of license is provided to use, copy, modify, merge, publish,
+distribute, sublicense, or sell copies of this software, in whole or in
+part, without prior written permission from the copyright holder.
+
+Permitted with no further authorisation:
+  * Reading the source code on GitHub for the purpose of evaluating
+    the project (e.g. potential acquisition diligence).
+  * Submitting issues or pull requests for the project author's
+    consideration. Accepted contributions imply assignment of
+    copyright to the project author unless explicitly agreed
+    otherwise in writing.
+
+Not permitted without written permission:
+  * Running this code on any production or commercial deployment
+    other than the official deployment at veloadout.com.
+  * Redistributing the code, schema, or AI prompts, in original or
+    modified form, in any medium.
+  * Using the name "Veloadout", the wordmark, or any associated
+    branding for any product or service.
+  * Training machine-learning models on the contents of this
+    repository.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+For licensing inquiries, including evaluation for acquisition:
+  support@veloadout.com
