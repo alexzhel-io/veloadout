@@ -213,7 +213,7 @@ src/
 │       └── presets/route.ts
 │
 └── i18n/
-    ├── routing.ts                       ← locales: ['en', 'de', 'ru']
+    ├── routing.ts                       ← locales: ['en', 'de', 'uk', 'ru']
     ├── request.ts                       ← locale resolution per request
     └── messages/{en,de,ru}.json         ← string tables
 ```
@@ -331,6 +331,32 @@ stable.
 
 ---
 
+## Outbound product links — affiliate-ready from day one
+
+Every product `sourceUrl` is rendered as a link to our own
+`/r?to=<encoded-url>&item=<id>` redirect instead of going straight to
+the manufacturer. The redirect:
+
+- Validates `to` is a real http(s) URL (rejects `javascript:` etc. at
+  the boundary)
+- Increments two Upstash counters: `clicks:total:<date>` and
+  `clicks:item:<id>:<date>`. We get per-day total clicks and per-item
+  popularity without a third-party analytics tracker.
+- Passes the URL through `buildAffiliateUrl()` — currently identity,
+  but the hook point for adding partner tags (REI `ic_id=`, Amazon
+  `tag=`, Backcountry `CMP_ID=`, etc.).
+- 302-redirects to the final URL.
+
+Why this matters even before any affiliate partner is signed: every
+product link in the catalog already routes through this codepath. The
+day we sign with REI, we change one file (`buildAffiliateUrl.ts`) and
+all 256 product links become affiliate-tagged automatically — no DB
+migration, no per-row rewrite. Combined with `rel="sponsored"` on the
+anchor tag (already in the SearchBar), we're aligned with Google's
+guidelines for affiliate links from day one.
+
+---
+
 ## Why the shared catalog is risky, and how we defend it
 
 The catalog is **shared globally**. Anyone signed in can write to it.
@@ -354,19 +380,29 @@ The defence layers, top down:
    mostly non-alphanumeric, long tokens with no vowels (random
    keymashing). Conservative — false negatives are cheap (one wasted AI
    call), false positives block legitimate searches.
-3. **Per-user rate limit** via Upstash. 20 AI calls / user / hour. The
+3. **Bag blocklist** (`looksLikeBikepackingBag`). Bags are excluded
+   from the catalog by design — the app recommends bags based on the
+   user's gear volume, so adding bags themselves would be circular.
+   The check matches brand keywords (Ortlieb, Apidura, Restrap, etc.)
+   and bag-phrase patterns (seat pack, frame bag, panniers) with
+   whole-word boundaries to avoid false positives like "sleeping bag".
+4. **Per-user rate limit** via Upstash. 20 AI calls / user / hour. The
    key includes the Supabase user ID, not the IP — auth makes this
    stable across browser/network changes.
-4. **Negative cache** in Postgres. If a query returned `not_found`,
+5. **Negative cache** in Postgres. If a query returned `not_found`,
    we write its normalised form to `ai_search_misses` with a 24h TTL.
    Repeat queries skip AI entirely. The miss cache is read-public,
    write-authenticated, with RLS — same model as `gear_items`.
-5. **Global daily budget** via Upstash. The key is
+6. **Global daily budget** via Upstash. The key is
    `budget:ai_lookup:<UTC-date>`. The first call of the day creates
    the key and sets a 24h+1h TTL. We allow up to 500 incrementations
    per day project-wide; the 501st call gets a 503 with a translated
    "service temporarily unavailable, try tomorrow" message. This is
    the cost ceiling.
+
+The bag blocklist is also enforced on the AI **response** side — even
+if Claude ignores the prompt and returns a bag, we reject it before
+saving to the catalog or showing the ConfirmCard.
 
 If Upstash itself is unreachable, layers 3 and 5 degrade differently:
 layer 3 falls back to per-instance in-memory counters (weaker but not
@@ -754,7 +790,7 @@ Three things to call out:
 
 ---
 
-## i18n — three locales, URL-routed
+## i18n — four locales, URL-routed
 
 ```mermaid
 graph LR
@@ -762,28 +798,41 @@ graph LR
     MW["⚙️ middleware.ts<br>next-intl + Supabase session refresh"]
     EN["🇬🇧 /en"]
     DE["🇩🇪 /de"]
+    UK["🇺🇦 /uk"]
     RU["🇷🇺 /ru"]
-    MSG["📝 messages/<br>en.json · de.json · ru.json"]
+    MSG["📝 messages/<br>en · de · uk · ru .json"]
 
     REQ -->|detect locale| MW
     MW --> EN
     MW --> DE
+    MW --> UK
     MW --> RU
-    EN & DE & RU -->|getMessages| MSG
+    EN & DE & UK & RU -->|getMessages| MSG
 
     style REQ fill:#f3f4f6,stroke:#9ca3af,color:#111827
     style MW fill:#e0e7ff,stroke:#6366f1,color:#1e1b4b
     style EN fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
     style DE fill:#d1fae5,stroke:#059669,color:#064e3b
+    style UK fill:#fef9c3,stroke:#ca8a04,color:#422006
     style RU fill:#fce7f3,stroke:#db2777,color:#500724
     style MSG fill:#fef3c7,stroke:#d97706,color:#451a03
 ```
 
-**Why three locales specifically?** EN is the default (largest audience
-for bikepacking content online). DE because Germany is the original
-target user. RU because the author speaks Russian and Russian-speaking
-bikepacking communities are underserved. Adding more is a matter of a
-JSON file and a routing entry — there's no per-locale code branching.
+**Why these four locales?** EN is the default (largest audience for
+bikepacking content online). DE because Germany is the original target
+user. UK (Ukrainian, ISO 639-1) and RU because the author speaks both
+and these communities are underserved by English-only outdoor tools.
+The Ukrainian chip is labelled `UA` in the language switcher (more
+recognisable to native speakers) even though the URL stays `/uk`
+because that's what HTML `lang` and search engines expect. Adding
+more is a matter of a JSON file and a routing entry — there's no
+per-locale code branching.
+
+**Product names are English-only** regardless of UI locale. Translating
+brand names like "Thermarest NeoAir XLite" into Russian or German
+produced odd transliterations nobody searches for. The translation
+covers UI strings, presets, categories, and error messages — not
+catalog product names.
 
 **Why locale in the URL path?** Three reasons:
 - Shareable URLs preserve language (`https://veloadout.com/de/help`

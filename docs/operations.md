@@ -216,6 +216,23 @@ why we picked it, and what to do if it falls over.
   legitimate users through than block them all during a Redis
   outage.
 
+### 2.8 Vercel Analytics — usage metrics
+
+- **What:** First-party visitor analytics. Tracks page views, unique
+  visitors, top pages, top referrers, device/country breakdowns.
+- **Where wired:** `src/app/[locale]/layout.tsx` renders the
+  `<Analytics />` component from `@vercel/analytics/next`.
+- **Plan:** Free on Hobby (≤2 500 events/month). Production
+  events ship to `vitals.vercel-insights.com`; CSP whitelists both
+  that and the `va.vercel-scripts.com` script host.
+- **Why this and not Plausible:** zero setup, no cookie banner
+  needed, lives in the same dashboard as deployments. Plausible is
+  queued in `security-todo.md #17` for when richer event tracking
+  (funnels, custom events, API export) becomes useful.
+- **Where to look:** Vercel Dashboard → Project → Analytics tab.
+  First data appears within minutes after a deployment receives
+  real traffic.
+
 ---
 
 ## 3. Domain & DNS — concrete records on `veloadout.com`
@@ -325,33 +342,39 @@ specific reason to Vercel function logs.
 | `/api/auth` | POST | none | 10/IP/10min + 5/email/10min | Send magic link |
 | `/api/auth` | DELETE | required | none | Sign out (browser also calls `supabase.auth.signOut()`) |
 | `/api/presets` | GET | none | none | Static preset list |
+| `/r?to=<url>&item=<id>` | GET | none | none | Outbound product-link redirect with click tracking (Upstash counters) and `buildAffiliateUrl()` hook |
 
 The route catalog matches the user-facing flows. Each route name says
 what it does; the auth & rate limit columns are the audit trail.
 
 ---
 
-## 7. The 5-layer AI defence in detail
+## 7. The 6-layer AI defence in detail
 
 When a request hits `/api/lookup` with a query (and not `db_only=1`),
-five gates run in order. Each gate is allowed to short-circuit with
-either a 4xx response or a "not_found" success. The order is
-intentional — cheap gates first.
+six gates run in order. Each gate is allowed to short-circuit with
+either a 4xx response or a "not_found" / "bag_excluded" success. The
+order is intentional — cheap gates first.
 
 1. **Auth.** `supabase.auth.getUser()`. If no user → 401, status
    `auth_required`. Cost: one Supabase call.
 2. **Heuristic.** `looksLikeGarbage(query)` runs in-process, no I/O.
    Rejects "asdf", "111", strings with too few unique chars, etc. If
    garbage → return `not_found` immediately. Cost: ~0.
-3. **Per-user rate limit.** Upstash `INCR rl:lookup:user:<uuid>`,
+3. **Bag blocklist.** `looksLikeBikepackingBag(query)` in-process.
+   Matches Ortlieb / Apidura / Restrap / Revelate / Tailfin etc. and
+   bag-phrase patterns (seat pack, frame bag, panniers) with whole-word
+   boundaries. If matched → return `bag_excluded`. Also runs on the
+   AI response as defence in depth.
+4. **Per-user rate limit.** Upstash `INCR rl:lookup:user:<uuid>`,
    20/hour. If exceeded → 429 with `resetIn` seconds.
-4. **Negative cache.** Postgres `SELECT FROM ai_search_misses WHERE
+5. **Negative cache.** Postgres `SELECT FROM ai_search_misses WHERE
    query_norm = ? AND expires_at > now()`. If hit → `not_found`. Cost:
    one indexed Postgres call.
-5. **Daily budget.** Upstash `INCR budget:ai_lookup:<UTC-date>`,
+6. **Daily budget.** Upstash `INCR budget:ai_lookup:<UTC-date>`,
    500/day. If exceeded → 503 with translated "try tomorrow" message.
 
-Only after all five pass does the request reach
+Only after all six pass does the request reach
 `ClaudeGearSearchService`. If the result is `not_found`, we write
 the query to `ai_search_misses` (TTL 24h) so the same query is cheap
 next time.

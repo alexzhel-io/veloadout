@@ -25,6 +25,8 @@ A web application for bikepacking riders: the user enters their gear, the system
 | FR-1.11 | Refining an existing DB record preserves its id so upsert updates the row in place | ✅ |
 | FR-1.12 | If DB search returns multiple matches a PickList is shown; user picks the exact product, then sees ConfirmCard with variant selector | ✅ |
 | FR-1.13 | If "Dig deeper" AI search returns not_found, the previous result card is restored instead of showing an error | ✅ |
+| FR-1.14 | Catalog product names are English-only — translating brand/model names produced unreadable transliterations | ✅ |
+| FR-1.15 | Bikepacking bags (Ortlieb, Apidura, Restrap, etc.) are excluded from the catalog and rejected on both search and save | ✅ |
 
 ### FR-2: Gear list
 
@@ -74,17 +76,26 @@ A web application for bikepacking riders: the user enters their gear, the system
 | # | Requirement | Status |
 |---|---|---|
 | FR-7.1 | Dismissible welcome banner for first-time visitors (localStorage) | ✅ |
-| FR-7.2 | `/[locale]/help` page with quick-start guide in EN / DE / RU | ✅ |
+| FR-7.2 | `/[locale]/help` page with quick-start guide in EN / DE / UK / RU | ✅ |
 | FR-7.3 | Help link in the footer alongside Privacy / Terms / Impressum | ✅ |
+
+### FR-8: Outbound link tracking & monetisation readiness
+
+| # | Requirement | Status |
+|---|---|---|
+| FR-8.1 | All product source links route through `/r?to=...&item=...` redirect for click tracking | ✅ |
+| FR-8.2 | Click counters (`clicks:total:<date>`, `clicks:item:<id>:<date>`) stored in Upstash | ✅ |
+| FR-8.3 | Centralised `buildAffiliateUrl()` hook lets future partner tags activate without DB migration | ✅ |
+| FR-8.4 | Outbound links carry `rel="sponsored noopener noreferrer"` to comply with Google guidelines | ✅ |
 
 ### FR-6: Internationalisation
 
 | # | Requirement | Status |
 |---|---|---|
-| FR-6.1 | Support EN / DE / RU | ✅ |
+| FR-6.1 | Support EN / DE / UK / RU (Ukrainian uses ISO `uk`, displayed as `UA` in UI) | ✅ |
 | FR-6.2 | Language switcher in the header | ✅ |
-| FR-6.3 | Localised category names, UI strings, bag recommendation copy | ✅ |
-| FR-6.4 | Locale in URL: `/en`, `/de`, `/ru` | ✅ |
+| FR-6.3 | Localised category names, UI strings, bag recommendation copy, error states | ✅ |
+| FR-6.4 | Locale in URL: `/en`, `/de`, `/uk`, `/ru` | ✅ |
 
 ---
 
@@ -157,7 +168,8 @@ A web application for bikepacking riders: the user enters their gear, the system
 | NFR-5.5 | OG image | Dynamic per-locale ImageResponse |
 | NFR-5.6 | llms.txt | `/llms.txt` for AI agents |
 | NFR-5.7 | Favicon + PWA manifest | SVG icon + manifest.ts |
-| NFR-5.8 | hreflang | alternates in metadata |
+| NFR-5.8 | hreflang | alternates in metadata (en, de, uk, ru) |
+| NFR-5.9 | Production analytics | Vercel Analytics (`@vercel/analytics/next`) — DAU/MAU + top pages. Plausible queued in `security-todo.md` #17 for richer events |
 
 ### NFR-6: Hosting and deployment
 
