@@ -227,6 +227,8 @@ export function GearCalculator({ user }: Props) {
       <footer className="border-t border-white/[0.07] px-6 py-5 text-center text-text-muted text-sm space-y-1">
         <p>{t('footer.text')}</p>
         <p className="space-x-3">
+          <a href={`/${locale}/help`} className="hover:text-white transition-colors">{t('footer.help')}</a>
+          <span>·</span>
           <a href={`/${locale}/privacy`} className="hover:text-white transition-colors">{t('footer.privacy')}</a>
           <span>·</span>
           <a href={`/${locale}/terms`} className="hover:text-white transition-colors">{t('footer.terms')}</a>

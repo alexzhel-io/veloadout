@@ -66,8 +66,26 @@
     "water": "Water",
     "other": "Other"
   },
+  "help": {
+    "title": "How to use Veloadout",
+    "intro": "Veloadout helps you calculate how much packed volume your bikepacking gear takes up — so you know exactly which bags fit your setup before you start packing.",
+    "steps_title": "Quick start",
+    "step_1": "Add gear by typing a product name in the search bar (e.g. \"Thermarest NeoAir XLite\"). The app finds it in the database or asks Claude AI to look up the packed volume from the web.",
+    "step_2": "For products with multiple sizes (Regular / Long / Wide), pick the size you own before adding it to your list.",
+    "step_3": "Don't know an exact product? Use the preset panel — quick-add buttons for typical items like sleeping bags, tents, jackets, with realistic average volumes.",
+    "step_4": "Check the bag recommendation panel — it suggests how to distribute your total volume across handlebar, frame, and seat packs.",
+    "search_title": "Search tips",
+    "search_body": "Search works best with specific product names, not generic terms. \"MSR Hubba Hubba 2P\" gives a precise volume; \"tent\" doesn't. If the AI didn't find all sizes, click \"Search the web more thoroughly\" to dig deeper.",
+    "account_title": "Account & saving",
+    "account_body": "Sign in via magic link (email, no password) to save your gear list across devices. Without an account, your list lives only in this browser tab.",
+    "tips_title": "Good to know",
+    "tip_1": "Volumes are packed/compressed sizes, not unpacked. A sleeping bag in its stuff sack, not lofted out.",
+    "tip_2": "All numbers are estimates. For trip-critical gear, verify against manufacturer specs.",
+    "tip_3": "Found something missing? Sign in and search — confirmed AI results are saved to the shared catalog for everyone."
+  },
   "footer": {
     "text": "Volume data is crowd-sourced and AI-assisted. Always verify critical gear specs.",
+    "help": "Help",
     "privacy": "Privacy",
     "terms": "Terms"
   },

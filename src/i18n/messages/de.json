@@ -66,8 +66,26 @@
     "water": "Wasser",
     "other": "Sonstiges"
   },
+  "help": {
+    "title": "So funktioniert Veloadout",
+    "intro": "Veloadout berechnet, wie viel Packvolumen deine Bikepacking-Ausrüstung einnimmt — damit du vor dem Packen weißt, welche Taschen zu deinem Setup passen.",
+    "steps_title": "Schnellstart",
+    "step_1": "Tippe einen Produktnamen ins Suchfeld (z.B. \"Thermarest NeoAir XLite\"). Die App findet ihn in der Datenbank oder fragt Claude AI, das Packmaß aus dem Web zu ermitteln.",
+    "step_2": "Bei Produkten mit mehreren Größen (Regular / Long / Wide) wähle deine Größe, bevor du es zur Liste hinzufügst.",
+    "step_3": "Kein konkretes Produkt? Nutze das Preset-Panel — Schnellauswahl für typische Sachen wie Schlafsack, Zelt, Jacke mit realistischen Durchschnittsvolumen.",
+    "step_4": "Sieh dir die Taschenempfehlung an — sie schlägt vor, wie du das Gesamtvolumen auf Lenker-, Rahmen- und Satteltasche verteilst.",
+    "search_title": "Such-Tipps",
+    "search_body": "Die Suche funktioniert am besten mit konkreten Produktnamen, nicht mit Oberbegriffen. \"MSR Hubba Hubba 2P\" liefert ein präzises Volumen; \"Zelt\" nicht. Wenn die KI nicht alle Größen findet, klicke auf \"Im Web gründlicher suchen\".",
+    "account_title": "Account & Speichern",
+    "account_body": "Melde dich per Magic Link an (E-Mail, kein Passwort), um deine Liste geräteübergreifend zu speichern. Ohne Account bleibt die Liste nur in diesem Browser-Tab.",
+    "tips_title": "Gut zu wissen",
+    "tip_1": "Volumen sind Packmaße (komprimiert), nicht ausgepackt. Schlafsack im Packsack, nicht ausgebreitet.",
+    "tip_2": "Alle Zahlen sind Schätzwerte. Bei tour-kritischer Ausrüstung mit Herstellerangaben abgleichen.",
+    "tip_3": "Etwas fehlt? Melde dich an und suche — bestätigte KI-Ergebnisse landen im gemeinsamen Katalog für alle."
+  },
   "footer": {
     "text": "Volumendaten sind community-basiert und KI-unterstützt. Bitte überprüfe kritische Angaben selbst.",
+    "help": "Hilfe",
     "privacy": "Datenschutz",
     "terms": "AGB"
   },
