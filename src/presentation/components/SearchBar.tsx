@@ -72,7 +72,10 @@ export function SearchBar({ onAdd }: Props) {
         setState('idle');
         return;
       }
-    } catch { /* fall through */ }
+    } catch (err) {
+      // Network/parse error on the DB lookup — log and fall through to AI search
+      console.warn('[SearchBar] DB lookup failed, falling back to AI:', err);
+    }
 
     await runAiSearch(q, 1);
   }

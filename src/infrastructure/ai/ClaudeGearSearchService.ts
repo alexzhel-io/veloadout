@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { v4 as uuidv4 } from 'uuid';
+import { z } from 'zod';
 import { GearItem } from '@/domain/gear/GearItem';
 import { GearCategory } from '@/domain/gear/GearCategory';
 import { IGearSearchService, GearSearchResult } from '@/domain/gear/IGearSearchService';
@@ -65,27 +66,56 @@ If genuinely not found or not identifiable as a physical item: {"found": false}
 Set confidence="low" if you are estimating without finding official specs.`;
 }
 
-interface ClaudeNotFound { found: false }
-interface ClaudeVariant { sizeLabel: string; volumeLiters: number; weightGrams?: number }
-interface ClaudeFound {
-  found: true;
-  names: Record<string, string>;
-  aliases: string[];
-  variants: ClaudeVariant[];
-  category: string;
-  sourceUrl?: string;
-  confidence: 'high' | 'medium' | 'low';
-  volumeNote?: string;
-}
+const variantSchema = z.object({
+  sizeLabel: z.string().min(1).max(100),
+  volumeLiters: z.number().min(0).max(500),
+  weightGrams: z.number().min(0).max(100000).optional(),
+});
 
-function extractJson(text: string): ClaudeNotFound | ClaudeFound | null {
+const foundSchema = z.object({
+  found: z.literal(true),
+  names: z.record(z.string().min(1).max(200)).refine(
+    (v) => typeof v['en'] === 'string' && v['en'].length > 0,
+    { message: 'AI response missing English name' },
+  ),
+  aliases: z.array(z.string().max(200)).max(30).default([]),
+  variants: z.array(variantSchema).min(1).max(20),
+  category: z.nativeEnum(GearCategory),
+  sourceUrl: z.string().url().max(2000).optional(),
+  confidence: z.enum(['high', 'medium', 'low']).default('medium'),
+  volumeNote: z.string().max(500).optional(),
+});
+
+const notFoundSchema = z.object({ found: z.literal(false) });
+const responseSchema = z.union([foundSchema, notFoundSchema]);
+
+type ClaudeFound = z.infer<typeof foundSchema>;
+type ClaudeResponse = z.infer<typeof responseSchema>;
+
+function extractJson(text: string): ClaudeResponse | null {
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) return null;
+  let parsed: unknown;
   try {
-    return JSON.parse(match[0]);
+    parsed = JSON.parse(match[0]);
   } catch {
     return null;
   }
+  const result = responseSchema.safeParse(parsed);
+  if (!result.success) {
+    // Coerce common AI mistakes: unknown category → 'other'
+    if (parsed && typeof parsed === 'object' && 'found' in parsed && (parsed as { found: unknown }).found === true) {
+      const fixed = { ...parsed, category: 'other' };
+      const retry = foundSchema.safeParse(fixed);
+      if (retry.success) {
+        console.warn('[ClaudeGearSearchService] coerced invalid category to "other"');
+        return retry.data;
+      }
+    }
+    console.warn('[ClaudeGearSearchService] AI response failed validation:', result.error.flatten());
+    return null;
+  }
+  return result.data;
 }
 
 export class ClaudeGearSearchService implements IGearSearchService {
@@ -140,8 +170,8 @@ export class ClaudeGearSearchService implements IGearSearchService {
         if (textBlocks.length > 0) {
           const fullText = textBlocks.map(b => (b as Anthropic.TextBlock).text).join('');
           const parsed = extractJson(fullText);
-          if (parsed?.found) return parsed as ClaudeFound;
-          if (parsed && !parsed.found) return null;
+          if (parsed?.found === true) return parsed;
+          if (parsed?.found === false) return null;
         }
 
         if (response.stop_reason !== 'tool_use') break;
@@ -181,26 +211,24 @@ export class ClaudeGearSearchService implements IGearSearchService {
       .join('');
 
     const parsed = extractJson(text);
-    if (parsed?.found) return parsed as ClaudeFound;
+    if (parsed?.found === true) return parsed;
     return null;
   }
 
   private toResult(query: string, data: ClaudeFound): GearSearchResult {
-    const variants = data.variants ?? [];
-    // compute average volume/weight from variants
-    const avgVol = variants.length > 0
-      ? Math.round((variants.reduce((s, v) => s + v.volumeLiters, 0) / variants.length) * 10) / 10
-      : 0;
+    const { variants } = data;
+    // Compute average volume/weight from variants (Zod guarantees variants.length >= 1)
+    const avgVol = Math.round((variants.reduce((s, v) => s + v.volumeLiters, 0) / variants.length) * 10) / 10;
     const weights = variants.filter(v => v.weightGrams != null).map(v => v.weightGrams!);
     const avgWgt = weights.length > 0 ? Math.round(weights.reduce((s, w) => s + w, 0) / weights.length) : undefined;
 
     const item = GearItem.create({
       id: uuidv4(),
       names: data.names,
-      aliases: [query.toLowerCase(), ...(data.aliases ?? [])],
+      aliases: [query.toLowerCase(), ...data.aliases],
       volumeLiters: avgVol,
       weightGrams: avgWgt,
-      category: (data.category as GearCategory) ?? GearCategory.OTHER,
+      category: data.category,
       sourceUrl: data.sourceUrl,
       verifiedAt: new Date(),
       createdAt: new Date(),
@@ -209,7 +237,7 @@ export class ClaudeGearSearchService implements IGearSearchService {
 
     return {
       item,
-      confidence: data.confidence ?? 'medium',
+      confidence: data.confidence,
       sourceUrl: data.sourceUrl,
       volumeNote: data.volumeNote,
     };
