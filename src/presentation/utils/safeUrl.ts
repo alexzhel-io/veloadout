@@ -12,3 +12,17 @@ export function safeHttpUrl(raw: string | undefined | null): string | undefined 
     return undefined;
   }
 }
+
+/**
+ * Wraps an outbound product URL in our /r tracking redirect.
+ * Click goes through our serverless function, gets counted, and is
+ * affiliate-rewritten before the user lands on the manufacturer page.
+ * Returns undefined for non-http(s) inputs.
+ */
+export function trackedOutboundUrl(rawUrl: string | undefined | null, itemId?: string): string | undefined {
+  const safe = safeHttpUrl(rawUrl);
+  if (!safe) return undefined;
+  const params = new URLSearchParams({ to: safe });
+  if (itemId) params.set('item', itemId);
+  return `/r?${params.toString()}`;
+}

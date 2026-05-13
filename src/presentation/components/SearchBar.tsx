@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { categoryIcon } from '@/domain/gear/GearCategoryIcon';
 import { CATEGORY_LABELS } from '@/domain/gear/GearCategory';
 import { matchVariantByQuery } from '@/domain/gear/GearVariant';
-import { safeHttpUrl } from '@/presentation/utils/safeUrl';
+import { trackedOutboundUrl } from '@/presentation/utils/safeUrl';
 import type { GearEntry } from './GearCalculator';
 
 type SearchState = 'idle' | 'searching_db' | 'searching_ai' | 'not_found' | 'picking' | 'auth_required' | 'rate_limited' | 'budget_exceeded';
@@ -386,13 +386,16 @@ function ConfirmCard({ candidate, locale, selectedIdx, onSelectIdx, onConfirm, o
       )}
 
       {(() => {
-        const safeUrl = safeHttpUrl(candidate.item.sourceUrl);
-        return safeUrl ? (
-          <a href={safeUrl} target="_blank" rel="noopener noreferrer"
+        const trackedUrl = trackedOutboundUrl(candidate.item.sourceUrl, candidate.item.id);
+        if (!trackedUrl) return null;
+        // Display only the bare hostname; the actual click goes through our /r redirect
+        const hostname = candidate.item.sourceUrl!.replace(/^https?:\/\//, '').split('/')[0];
+        return (
+          <a href={trackedUrl} target="_blank" rel="noopener noreferrer sponsored"
             className="text-xs text-accent/70 hover:text-accent underline truncate block">
-            {safeUrl.replace(/^https?:\/\//, '').split('/')[0]}
+            {hostname}
           </a>
-        ) : null;
+        );
       })()}
 
       <div className="flex gap-2 pt-1">
