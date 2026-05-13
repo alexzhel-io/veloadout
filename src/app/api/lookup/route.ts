@@ -8,6 +8,7 @@ import { GearItem } from '@/domain/gear/GearItem';
 import { GearCategory } from '@/domain/gear/GearCategory';
 import { checkRateLimit, checkDailyBudget } from '@/infrastructure/security/rateLimit';
 import { looksLikeGarbage } from '@/infrastructure/security/queryHeuristics';
+import { looksLikeBikepackingBag } from '@/infrastructure/security/bagBlocklist';
 import { isCachedMiss, recordMiss } from '@/infrastructure/supabase/aiSearchMissCache';
 
 export const runtime = 'nodejs';
@@ -112,6 +113,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ status: 'not_found' });
   }
 
+  // Bags are deliberately not in the catalog — the app recommends bags
+  // based on gear volume; including bags would be circular.
+  if (looksLikeBikepackingBag(query)) {
+    return NextResponse.json({ status: 'bag_excluded' });
+  }
+
   // Layer 3: per-user rate limit (replaces per-IP — auth makes this stable)
   const limit = await checkRateLimit(`lookup:user:${user.id}`, 20, 3600);
   if (!limit.allowed) {
@@ -142,6 +149,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ status: 'not_found' });
   }
 
+  // Defence in depth: AI sometimes returns bags despite the prompt asking
+  // for gear only. Reject here so they never reach the user or the DB.
+  if (result.status === 'found_ai' && looksLikeBikepackingBag(result.item.names.en)) {
+    await recordMiss(supabase, query);
+    return NextResponse.json({ status: 'bag_excluded' });
+  }
+
   return NextResponse.json({
     status: result.status,
     item: itemPayload(result.item),
@@ -168,6 +182,12 @@ export async function POST(req: NextRequest) {
   }
 
   const { item: d } = body.data;
+
+  // Bikepacking bags are deliberately excluded from the shared catalog.
+  if (looksLikeBikepackingBag(d.names.en)) {
+    return NextResponse.json({ error: 'Bikepacking bags are not part of the gear catalog' }, { status: 400 });
+  }
+
   // Server-derived id from the English name. This both prevents clients from
   // hijacking arbitrary catalog rows and keeps dig-deeper updates in place.
   const serverId = slugifyName(d.names.en);

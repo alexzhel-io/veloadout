@@ -10,7 +10,7 @@ import { matchVariantByQuery } from '@/domain/gear/GearVariant';
 import { trackedOutboundUrl } from '@/presentation/utils/safeUrl';
 import type { GearEntry } from './GearCalculator';
 
-type SearchState = 'idle' | 'searching_db' | 'searching_ai' | 'not_found' | 'picking' | 'auth_required' | 'rate_limited' | 'budget_exceeded';
+type SearchState = 'idle' | 'searching_db' | 'searching_ai' | 'not_found' | 'picking' | 'auth_required' | 'rate_limited' | 'budget_exceeded' | 'bag_excluded';
 
 interface Variant { sizeLabel: string; volumeLiters: number; weightGrams?: number }
 
@@ -127,6 +127,11 @@ export function SearchBar({ onAdd }: Props) {
         }
         return;
       }
+      if (data.status === 'bag_excluded') {
+        if (fallback) { setCandidate(fallback); setState('idle'); }
+        else { setState('bag_excluded'); setTimeout(() => setState('idle'), 5000); }
+        return;
+      }
       // If refining an existing DB record, keep its id so upsert updates the row
       if (preserveId) data.item.id = preserveId;
       const variants: Variant[] = data.item.variants ?? [];
@@ -210,8 +215,9 @@ export function SearchBar({ onAdd }: Props) {
     state === 'not_found' ? t('not_found') :
     state === 'auth_required' ? t('auth_required') :
     state === 'rate_limited' ? t('rate_limited') :
-    state === 'budget_exceeded' ? t('budget_exceeded') : null;
-  const isErrorState = state === 'not_found' || state === 'auth_required' || state === 'rate_limited' || state === 'budget_exceeded';
+    state === 'budget_exceeded' ? t('budget_exceeded') :
+    state === 'bag_excluded' ? t('bag_excluded') : null;
+  const isErrorState = state === 'not_found' || state === 'auth_required' || state === 'rate_limited' || state === 'budget_exceeded' || state === 'bag_excluded';
 
   return (
     <div className="rounded-2xl border border-white/[0.07] bg-[#1c1a2e] p-5 shadow-card space-y-4">

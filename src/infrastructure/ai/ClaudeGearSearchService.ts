@@ -20,13 +20,20 @@ Your task: find the PACKED/COMPRESSED volume in liters AND all available size va
 
 Use web search to find exact product specs. Search for "<product name> packed size" or "<product name> stuff sack dimensions" or "<product name> sizes".${depthGuidance}
 
+EXCLUDED CATEGORIES — return {"found": false} for these, do NOT enumerate variants:
+- Bikepacking bags (seat packs, frame bags, handlebar bags, top tube bags, fork bags,
+  panniers, rack bags, etc.). The app already recommends bags based on gear volume —
+  treating bags themselves as gear would be incoherent.
+- Brand examples to refuse: Ortlieb, Apidura, Restrap, Revelate Designs, Tailfin,
+  Rockgeist, Bedrock Bags, Wizard Works, Roswheel, Rhinowalk, Acepac, etc.
+- If unsure whether something is a bag, refuse rather than guess.
+
 CRITICAL VOLUME RULES — read carefully:
 - volumeLiters = the physical space the item takes up when packed/compressed for transport
 - For sleeping bags: stuff sack volume, NOT loft volume. A 3-season bag typically packs to 4–8L
 - For tents: packed volume including poles and stuff sack. A 1P tent ≈ 3–5L, a 2P ≈ 5–9L
 - For down jackets: stuffed into their pocket ≈ 1–3L
 - For inflatable pads: rolled/folded ≈ 2–4L
-- For bikepacking bags (seat packs, frame bags, handlebar bags): use their RATED CAPACITY (what fits inside)
 - Sanity check your answer: if a tent packs to >15L or a sleeping bag to >15L, you are WRONG
 
 REALISTIC RANGES (packed volume):
@@ -34,7 +41,6 @@ REALISTIC RANGES (packed volume):
 - Tent 1P: 3–5L | Tent 2P: 5–9L | Bivy: 1–2L
 - Down jacket: 1–3L | Rain jacket: 0.5–2L
 - Inflatable pad: 2–4L | Foam pad: 3–5L
-- Bikepacking seat pack: 8–16L | Frame bag: 3–12L | Handlebar: 5–15L
 
 VARIANT RULES — this is the most common source of incomplete results:
 - A product line almost ALWAYS has multiple sizes. Default assumption: enumerate them ALL.
@@ -42,7 +48,6 @@ VARIANT RULES — this is the most common source of incomplete results:
 - Sleeping pads: typically come in Short, Regular, Long, Regular Wide, Long Wide
 - Sleeping bags: typically Short/Regular/Long, sometimes Wide variants
 - Tents: typically 1P / 2P / 3P — each is a separate product, but variants of one product (e.g. Hubba Hubba) come in different person counts
-- Bikepacking bags: often S/M/L or 4L/8L/14L volume options
 - Only return a single "Standard" variant if you are CERTAIN the product has no size options at all
 - Each variant must have accurate volumeLiters (packed) and weightGrams
 - sizeLabel should match official product naming exactly (e.g. "Regular Wide", "Long", "2P")
