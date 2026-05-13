@@ -45,9 +45,19 @@
     "total_weight": "Gesamtgewicht"
   },
   "bags": {
-    "title": "Taschenempfehlung",
-    "subtitle": "Basierend auf deinem Gesamtvolumen — so verteilst du deine Ausrüstung.",
-    "fill": "Füllstand"
+    "title": "Deine Taschen",
+    "subtitle": "Stelle die Kapazität jeder Tasche ein und sieh, wie deine Ausrüstung hineinpasst.",
+    "fill": "Füllstand",
+    "typical": "typisch",
+    "capacity": "Kapazität",
+    "gear_total": "Ausrüstung gesamt",
+    "overflow": "Überlauf",
+    "overflow_total": "Ausrüstung überschreitet die Taschenkapazität",
+    "mode_label": "Volumenverteilung",
+    "mode_cumulative": "Verteilt",
+    "mode_each": "Alles in jeder",
+    "mode_cumulative_hint": "Die Gesamtausrüstung wird proportional zur Größe auf die Taschen verteilt.",
+    "mode_each_hint": "Jede Tasche wird gegen das Gesamtvolumen geprüft — passt alles in eine einzige Tasche?"
   },
   "confidence": {
     "high": "Hohe Zuverlässigkeit",

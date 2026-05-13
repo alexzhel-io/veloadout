@@ -45,9 +45,19 @@
     "total_weight": "Total weight"
   },
   "bags": {
-    "title": "Bag recommendation",
-    "subtitle": "Based on your total, here's how to distribute across your setup.",
-    "fill": "fill"
+    "title": "Your bags",
+    "subtitle": "Set the capacity of each bag you own and see how your gear fits.",
+    "fill": "fill",
+    "typical": "typical",
+    "capacity": "Capacity",
+    "gear_total": "Gear total",
+    "overflow": "overflow",
+    "overflow_total": "Total gear exceeds your bag capacity",
+    "mode_label": "Volume distribution",
+    "mode_cumulative": "Distributed",
+    "mode_each": "All in each",
+    "mode_cumulative_hint": "Total gear is split across bags proportionally to their size.",
+    "mode_each_hint": "Each bag is checked against the full gear volume — can a single bag fit everything?"
   },
   "confidence": {
     "high": "High confidence",

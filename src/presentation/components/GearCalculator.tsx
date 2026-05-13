@@ -12,7 +12,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import { AuthButton } from './AuthButton';
 import { WelcomeHint } from './WelcomeHint';
 import { useToast } from './Toast';
-import { computeBagRecommendation } from '@/domain/gear/BagRecommendation';
+import { computeBagRecommendation, DEFAULT_BAG_CAPACITIES, type BagCapacities, type BagDistributionMode } from '@/domain/gear/BagRecommendation';
 import type { GearPreset } from '@/domain/gear/GearPreset';
 
 export interface GearEntry {
@@ -161,7 +161,41 @@ export function GearCalculator({ user }: Props) {
   const isPresetActive = useCallback((id: string) => entries.some(e => e.id === id), [entries]);
 
   const totalVolume = entries.reduce((sum, e) => sum + e.volumeLiters * e.quantity, 0);
-  const bagRec = totalVolume > 0 ? computeBagRecommendation(totalVolume) : null;
+
+  // Bag setup is per-browser (localStorage), not per-user — it reflects the
+  // physical bike, not the account.
+  const [bagCapacities, setBagCapacities] = useState<BagCapacities>(DEFAULT_BAG_CAPACITIES);
+  const [bagMode, setBagMode] = useState<BagDistributionMode>('cumulative');
+  const bagSetupLoaded = useRef(false);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('veloadout:bagSetup');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.capacities && typeof parsed.capacities.handlebar === 'number') {
+          setBagCapacities(parsed.capacities);
+        }
+        if (parsed.mode === 'cumulative' || parsed.mode === 'each') {
+          setBagMode(parsed.mode);
+        }
+      }
+    } catch { /* ignore malformed storage */ }
+    bagSetupLoaded.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!bagSetupLoaded.current) return;
+    try {
+      localStorage.setItem('veloadout:bagSetup', JSON.stringify({ capacities: bagCapacities, mode: bagMode }));
+    } catch { /* localStorage full / unavailable */ }
+  }, [bagCapacities, bagMode]);
+
+  const updateBagCapacity = useCallback((key: keyof BagCapacities, value: number) => {
+    setBagCapacities(prev => ({ ...prev, [key]: Math.max(0, Math.min(50, value)) }));
+  }, []);
+
+  const bagRec = totalVolume > 0 ? computeBagRecommendation(totalVolume, bagCapacities, bagMode) : null;
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#13111c' }}>
@@ -216,7 +250,13 @@ export function GearCalculator({ user }: Props) {
               </div>
               {bagRec && (
                 <div>
-                  <BagRecommendationPanel recommendation={bagRec} />
+                  <BagRecommendationPanel
+                    recommendation={bagRec}
+                    mode={bagMode}
+                    onModeChange={setBagMode}
+                    capacities={bagCapacities}
+                    onCapacityChange={updateBagCapacity}
+                  />
                 </div>
               )}
             </div>
