@@ -66,6 +66,11 @@
     "water": "Wasser",
     "other": "Sonstiges"
   },
+  "welcome": {
+    "title": "Neu hier? Willkommen",
+    "body": "Suche nach konkreten Produkten (z.B. \"Thermarest NeoAir XLite\"), wähle eine Größe und wir empfehlen die passenden Taschen für dein Gesamtvolumen.",
+    "cta": "Zur Kurzanleitung"
+  },
   "help": {
     "title": "So funktioniert Veloadout",
     "intro": "Veloadout berechnet, wie viel Packvolumen deine Bikepacking-Ausrüstung einnimmt — damit du vor dem Packen weißt, welche Taschen zu deinem Setup passen.",

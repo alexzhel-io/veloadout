@@ -10,6 +10,7 @@ import { GearList } from './GearList';
 import { BagRecommendationPanel } from './BagRecommendationPanel';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { AuthButton } from './AuthButton';
+import { WelcomeHint } from './WelcomeHint';
 import { useToast } from './Toast';
 import { computeBagRecommendation } from '@/domain/gear/BagRecommendation';
 import type { GearPreset } from '@/domain/gear/GearPreset';
@@ -204,6 +205,7 @@ export function GearCalculator({ user }: Props) {
 
       <main className="flex-1 px-4 sm:px-6 pb-16">
         <div className="max-w-6xl mx-auto space-y-6">
+          <WelcomeHint />
           <SearchBar onAdd={addEntry} />
           <PresetPanel onToggle={addPreset} isActive={isPresetActive} />
 
