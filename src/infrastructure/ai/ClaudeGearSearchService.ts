@@ -50,7 +50,7 @@ VARIANT RULES — this is the most common source of incomplete results:
 You MUST respond ONLY with valid JSON — no markdown, no explanation, no code fences:
 {
   "found": true,
-  "names": { "en": "English name", "de": "German name", "ru": "Russian name" },
+  "names": { "en": "Product name in English — keep brand and model names verbatim, do not translate" },
   "aliases": ["alias1", "alias2"],
   "variants": [
     { "sizeLabel": "Regular", "volumeLiters": 4.5, "weightGrams": 820 },
@@ -74,10 +74,9 @@ const variantSchema = z.object({
 
 const foundSchema = z.object({
   found: z.literal(true),
-  names: z.record(z.string().min(1).max(200)).refine(
-    (v) => typeof v['en'] === 'string' && v['en'].length > 0,
-    { message: 'AI response missing English name' },
-  ),
+  names: z.object({
+    en: z.string().min(1).max(200),
+  }).passthrough().transform(v => ({ en: v.en })), // strip any other-language names
   aliases: z.array(z.string().max(200)).max(30).default([]),
   variants: z.array(variantSchema).min(1).max(20),
   category: z.nativeEnum(GearCategory),

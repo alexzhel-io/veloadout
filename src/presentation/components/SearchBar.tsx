@@ -154,7 +154,7 @@ export function SearchBar({ onAdd }: Props) {
   function addItem(item: Candidate['item'], q: string, source: 'db' | 'ai', variant?: Variant, confidence?: string) {
     const vol = variant?.volumeLiters ?? item.volumeLiters;
     const wgt = variant?.weightGrams ?? item.weightGrams;
-    const name = item.names[locale] ?? item.names['en'];
+    const name = item.names['en'];
     onAdd({
       id: uuidv4(),
       name,
@@ -291,7 +291,7 @@ function PickList({ items, locale, onPick, onCancel }: {
       </div>
       <div className="space-y-1">
         {items.map(item => {
-          const name = item.names[locale] ?? item.names['en'];
+          const name = item.names['en'];
           const icon = categoryIcon(item.category);
           const catLabels = CATEGORY_LABELS[item.category as keyof typeof CATEGORY_LABELS];
           const catLabel = catLabels ? (catLabels[locale] ?? catLabels['en']) : item.category;
@@ -331,7 +331,7 @@ function ConfirmCard({ candidate, locale, selectedIdx, onSelectIdx, onConfirm, o
   isLoading: boolean;
 }) {
   const t = useTranslations('search');
-  const name = candidate.item.names[locale] ?? candidate.item.names['en'];
+  const name = candidate.item.names['en'];
   const icon = categoryIcon(candidate.item.category);
   const catLabels = CATEGORY_LABELS[candidate.item.category as keyof typeof CATEGORY_LABELS];
   const catLabel = catLabels ? (catLabels[locale] ?? catLabels['en']) : candidate.item.category;

@@ -25,10 +25,11 @@ const variantSchema = z.object({
 const saveItemSchema = z.object({
   // id is ignored — server derives a deterministic slug from the English name
   id: z.string().optional(),
-  names: z.record(z.string().min(1).max(200)).refine(
-    (v) => typeof v['en'] === 'string' && v['en'].length > 0,
-    { message: 'English name is required' },
-  ),
+  // English-only naming for catalog items. Translations belong to UI (categories,
+  // presets), not to product brand names which should be left verbatim.
+  names: z.object({
+    en: z.string().min(1).max(200),
+  }).passthrough().transform(v => ({ en: v.en })),
   volumeLiters: z.number().min(0).max(500),
   weightGrams: z.number().min(0).max(100000).optional(),
   category: z.nativeEnum(GearCategory),
