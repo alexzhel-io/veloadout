@@ -6,51 +6,51 @@ export class SupabaseGearListRepository {
 
   async getOrCreateList(userId: string): Promise<UserGearList> {
     // Get most recent list
-    const { data: lists } = await this.supabase
+    const { data: lists, error: selectError } = await this.supabase
       .from('gear_lists')
       .select('*, gear_list_items(*)')
       .eq('user_id', userId)
       .order('updated_at', { ascending: false })
       .limit(1);
 
+    if (selectError) throw new Error(`Failed to load list: ${selectError.message}`);
+
     if (lists && lists.length > 0) {
       return this.mapList(lists[0]);
     }
 
     // Create default list
-    const { data: newList } = await this.supabase
+    const { data: newList, error: insertError } = await this.supabase
       .from('gear_lists')
       .insert({ user_id: userId, name: 'My Gear List' })
       .select('*, gear_list_items(*)')
       .single();
 
+    if (insertError || !newList) throw new Error(`Failed to create list: ${insertError?.message ?? 'unknown'}`);
+
     return this.mapList(newList);
   }
 
   async saveItems(listId: string, items: Omit<GearListItem, 'id' | 'listId'>[]): Promise<void> {
-    // Replace all items
-    await this.supabase.from('gear_list_items').delete().eq('list_id', listId);
+    // Atomic replace via Postgres RPC — delete + insert + bump in a single
+    // transaction. If anything fails, the user's previous list is preserved.
+    const payload = items.map(item => ({
+      name: item.name,
+      category: item.category,
+      volume_liters: item.volumeLiters,
+      weight_grams: item.weightGrams ?? null,
+      quantity: item.quantity,
+      size_label: item.sizeLabel ?? null,
+      source: item.source,
+      source_url: item.sourceUrl ?? null,
+    }));
 
-    if (items.length === 0) return;
+    const { error } = await this.supabase.rpc('replace_gear_list_items', {
+      p_list_id: listId,
+      p_items: payload,
+    });
 
-    await this.supabase.from('gear_list_items').insert(
-      items.map(item => ({
-        list_id: listId,
-        name: item.name,
-        category: item.category,
-        volume_liters: item.volumeLiters,
-        weight_grams: item.weightGrams ?? null,
-        quantity: item.quantity,
-        size_label: item.sizeLabel ?? null,
-        source: item.source,
-        source_url: item.sourceUrl ?? null,
-      })),
-    );
-
-    await this.supabase
-      .from('gear_lists')
-      .update({ updated_at: new Date().toISOString() })
-      .eq('id', listId);
+    if (error) throw new Error(`Failed to save list: ${error.message}`);
   }
 
   private mapList(raw: Record<string, unknown>): UserGearList {

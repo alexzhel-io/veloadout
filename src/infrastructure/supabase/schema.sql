@@ -104,3 +104,31 @@ drop trigger if exists gear_lists_updated_at on gear_lists;
 create trigger gear_lists_updated_at
   before update on gear_lists
   for each row execute function update_updated_at();
+
+-- Atomic list replacement: delete old items, insert new ones, bump updated_at.
+-- Runs inside a single Postgres transaction so a partial failure rolls back.
+-- security invoker: respects RLS, so users can only replace their own lists.
+create or replace function replace_gear_list_items(p_list_id uuid, p_items jsonb)
+returns void
+language plpgsql
+security invoker
+as $$
+begin
+  delete from gear_list_items where list_id = p_list_id;
+  if p_items is not null and jsonb_array_length(p_items) > 0 then
+    insert into gear_list_items (list_id, name, category, volume_liters, weight_grams, quantity, size_label, source, source_url)
+    select
+      p_list_id,
+      x->>'name',
+      x->>'category',
+      (x->>'volume_liters')::numeric,
+      nullif(x->>'weight_grams', '')::numeric,
+      (x->>'quantity')::int,
+      nullif(x->>'size_label', ''),
+      x->>'source',
+      nullif(x->>'source_url', '')
+    from jsonb_array_elements(p_items) x;
+  end if;
+  update gear_lists set updated_at = now() where id = p_list_id;
+end;
+$$;

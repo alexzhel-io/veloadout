@@ -29,8 +29,13 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const repo = new SupabaseGearListRepository(supabase);
-  const list = await repo.getOrCreateList(user.id);
-  return NextResponse.json({ list });
+  try {
+    const list = await repo.getOrCreateList(user.id);
+    return NextResponse.json({ list });
+  } catch (err) {
+    console.error('[lists GET] load failed:', err);
+    return NextResponse.json({ error: 'Failed to load list' }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -42,7 +47,12 @@ export async function POST(req: NextRequest) {
   if (!body.success) return NextResponse.json({ error: 'Invalid body', details: body.error.flatten() }, { status: 400 });
 
   const repo = new SupabaseGearListRepository(supabase);
-  await repo.saveItems(body.data.listId, body.data.items);
+  try {
+    await repo.saveItems(body.data.listId, body.data.items);
+  } catch (err) {
+    console.error('[lists POST] save failed:', err);
+    return NextResponse.json({ error: 'Failed to save list' }, { status: 500 });
+  }
   return NextResponse.json({ ok: true });
 }
 
