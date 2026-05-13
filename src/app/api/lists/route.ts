@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createServerSupabaseClient } from '@/infrastructure/supabase/server';
 import { SupabaseGearListRepository } from '@/infrastructure/supabase/SupabaseGearListRepository';
+import { GearCategory } from '@/domain/gear/GearCategory';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const itemSchema = z.object({
   name: z.string().min(1).max(200),
-  category: z.string().min(1).max(50),
+  category: z.nativeEnum(GearCategory),
   volumeLiters: z.number().min(0).max(500),
   weightGrams: z.number().min(0).max(100000).optional(),
   quantity: z.number().int().min(1).max(99),
