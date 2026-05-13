@@ -116,9 +116,51 @@ Component (the `import 'server-only'` line above prevents this at build time).
 
 ---
 
+## 🟡 #16 — Magic-link-only auth is bottlenecked by Supabase built-in SMTP
+
+**File:** `src/app/api/auth/route.ts`, Supabase Auth Settings
+
+The whole project supports passwordless magic-link sign-in only (FR-5.1).
+Supabase's built-in SMTP is **rate-limited to 2 emails per hour for the
+entire project** on the free tier — explicitly marked "for development
+only" in the docs. That caps real-world sign-ups + re-logins at ~50/day
+across the whole user base.
+
+**Two ways forward, can be combined:**
+
+### A. Custom SMTP via Resend (~5 min)
+1. Sign up at [resend.com](https://resend.com) (free: 100 emails/day, 3000/month)
+2. Verify a domain you own (or use their `onboarding@resend.dev` for testing)
+3. Create an API key
+4. Supabase Dashboard → **Project Settings → Auth → SMTP Settings**:
+   - Host: `smtp.resend.com`, Port: `587`
+   - User: `resend`, Password: the API key
+   - Sender email: an address on your verified domain
+5. Save. Test with a fresh sign-in.
+
+### B. Add password auth alongside magic link
+Supabase Auth supports both methods on the same project. Pros: instant
+login without depending on email. Cons: still need SMTP for password
+reset, plus more legal surface (GDPR Art. 32 — but Supabase handles
+bcrypt + storage correctly out of the box).
+
+**Implementation outline:**
+1. Add `signInWithPassword` / `signUp` routes alongside the existing magic-link route
+2. Update the auth UI (`AuthModal` / similar) with email + password fields and a "or use magic link" toggle
+3. Supabase Auth Settings → enable email/password provider (already enabled by default)
+4. Set minimum password length to 8+ in Supabase Auth settings
+5. Reuse the same callback flow for "forgot password" emails (which still go through SMTP — so do A first)
+
+**Order:** A is a quick unblock; B is a bigger UX change to consider for
+public launch.
+
+---
+
 ## Suggested order when picking these up
 
-1. **#13 + #15** — UX bugs around list loading/saving, tackle together
-2. **#14 enforce** — flip CSP from Report-Only to enforcing after a week of clean reports
-3. **#11** — only when traffic justifies Upstash setup
-4. **#7a** — only if/when GDPR requests become frequent
+1. **#16A** — connect Resend SMTP, this is the most impactful single change for any kind of public usage
+2. **#13 + #15** — UX bugs around list loading/saving, tackle together
+3. **#14 enforce** — flip CSP from Report-Only to enforcing after a week of clean reports
+4. **#16B** — optional password auth if magic-link UX still feels heavy after SMTP fix
+5. **#11** — only when traffic justifies Upstash setup
+6. **#7a** — only if/when GDPR requests become frequent
