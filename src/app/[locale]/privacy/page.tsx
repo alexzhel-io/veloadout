@@ -33,7 +33,7 @@ export default function PrivacyPage() {
         </li>
         <li>Object to processing</li>
       </ul>
-      <p>Contact: [deine E-Mail hier eintragen]</p>
+      <p>Contact: <a href="mailto:support@veloadout.com">support@veloadout.com</a></p>
 
       <h2>5. Cookies</h2>
       <p>We use only essential cookies for session/authentication. No analytics or advertising cookies.</p>

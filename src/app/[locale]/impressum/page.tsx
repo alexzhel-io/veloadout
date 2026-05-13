@@ -12,7 +12,7 @@ export default function ImpressumPage() {
       </p>
 
       <h2>Kontakt</h2>
-      <p>E-Mail: [deine E-Mail hier eintragen]</p>
+      <p>E-Mail: <a href="mailto:support@veloadout.com">support@veloadout.com</a></p>
 
       <h2>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
       <p>Eugene Z. (Anschrift wie oben)</p>
