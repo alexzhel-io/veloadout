@@ -96,6 +96,13 @@ A web application for bikepacking riders: the user enters their gear, the system
 | NFR-2.4 | Security headers | HSTS, X-Frame-Options, Referrer-Policy, Permissions-Policy |
 | NFR-2.5 | No open debug endpoints | `/api/debug-env` removed |
 | NFR-2.6 | User data isolation | Supabase RLS |
+| NFR-2.7 | Shared catalog writes require authentication | `auth.uid() is not null` RLS on `gear_items` + `getUser()` check in `POST /api/lookup` |
+| NFR-2.8 | Clients cannot hijack catalog rows by passing chosen ids | Server derives item id from a slug of the English name |
+| NFR-2.9 | Category strings cannot break UI rendering | `z.nativeEnum(GearCategory)` on every API boundary |
+| NFR-2.10 | Locale params in redirects cannot be arbitrary strings | Auth callback validates locale against `routing.locales`, falls back to default |
+| NFR-2.11 | AI responses cannot inject malformed data | Zod schema validates the parsed JSON; invalid responses become `not_found` |
+| NFR-2.12 | `sourceUrl` rendered as a link is always safe | `safeHttpUrl()` helper rejects anything but `http(s)` at render time |
+| NFR-2.13 | Deferred security TODOs are tracked | [`docs/security-todo.md`](./security-todo.md) — #11 Upstash rate limit, #12–15, full Art.17 erasure |
 
 ### NFR-3: Reliability
 
@@ -106,6 +113,8 @@ A web application for bikepacking riders: the user enters their gear, the system
 | NFR-3.3 | Render errors don't crash the whole UI | Error boundary + global-error |
 | NFR-3.4 | 404 page | Custom not-found |
 | NFR-3.5 | Tests for domain logic | 11 Vitest tests |
+| NFR-3.6 | Gear list save is atomic — partial failure cannot wipe the user's list | Postgres RPC `replace_gear_list_items(p_list_id, p_items jsonb)` runs delete+insert+bump in a single transaction |
+| NFR-3.7 | Repository errors surface as 500s, not silent `{ok:true}` | Every Supabase `{ error }` is checked and thrown; API routes catch and return 500 |
 
 ### NFR-4: GDPR / Legal
 
@@ -115,7 +124,8 @@ A web application for bikepacking riders: the user enters their gear, the system
 | NFR-4.2 | Terms of Service | `/terms` page |
 | NFR-4.3 | Impressum (DE) | `/impressum` page |
 | NFR-4.4 | Cookie banner | Essential cookies only, no tracking |
-| NFR-4.5 | User data deletion | DELETE `/api/lists` |
+| NFR-4.5 | User can clear their gear data and sign out | DELETE `/api/lists` — wipes `gear_lists`, signs out |
+| NFR-4.6 | Full account erasure (GDPR Art. 17) | Contact-based: user emails the operator, deletion within 30 days. Automated path documented in `docs/security-todo.md#7a` |
 
 ### NFR-5: SEO and discoverability
 
