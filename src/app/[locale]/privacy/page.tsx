@@ -26,7 +26,11 @@ export default function PrivacyPage() {
       <p>You can:</p>
       <ul>
         <li>Request a copy of your data</li>
-        <li>Delete your account and all associated data at any time (sign in → request deletion via email)</li>
+        <li>
+          Request deletion of your account and all associated data —
+          send an email from the address you registered with. Deletion
+          is performed within 30 days, in line with GDPR Article 17.
+        </li>
         <li>Object to processing</li>
       </ul>
       <p>Contact: [deine E-Mail hier eintragen]</p>

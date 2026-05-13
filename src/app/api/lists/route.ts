@@ -56,16 +56,21 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ok: true });
 }
 
-// GDPR: full account + data deletion
+// Self-service partial erasure: clears the user's gear lists and signs them
+// out. Does NOT delete the auth.users row — that requires the service-role
+// key, which we deliberately keep off this deployment. For full GDPR-Art.17
+// erasure (account row + all data), users must email the contact address in
+// the privacy policy; the operator deletes via Supabase dashboard.
 export async function DELETE() {
   const supabase = await createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  // Cascades will remove gear_lists + gear_list_items via FK
+  const { error: delError } = await supabase.from('gear_lists').delete().eq('user_id', user.id);
+  if (delError) {
+    console.error('[lists DELETE] failed:', delError.message);
+    return NextResponse.json({ error: 'Failed to clear lists' }, { status: 500 });
+  }
   await supabase.auth.signOut();
-  // Note: actual user deletion requires service_role key on the server.
-  // For now we sign out + clear lists; full auth.users delete needs admin client.
-  await supabase.from('gear_lists').delete().eq('user_id', user.id);
   return NextResponse.json({ ok: true });
 }
