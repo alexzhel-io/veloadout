@@ -29,23 +29,10 @@ Free tier: 10 000 req/day — more than enough at current scale.
 
 ---
 
-## 🟢 #12 — `category` in `api/lists` is `z.string()`, not the enum
+## ~~#12~~ — DONE: `category` in `api/lists` now uses `nativeEnum`
 
-**File:** `src/app/api/lists/route.ts:11`
-
-```ts
-category: z.string().min(1).max(50),  // ← should be z.nativeEnum(GearCategory)
-```
-
-Impact is limited (only that user's own list can break for them on reload),
-but still allows storing garbage that breaks `categoryIcon()` /
-`CATEGORY_LABELS` rendering.
-
-**Fix:** Same pattern as `saveItemSchema` in `lookup/route.ts`:
-```ts
-import { GearCategory } from '@/domain/gear/GearCategory';
-category: z.nativeEnum(GearCategory),
-```
+Fixed in commit `9ddf4d9`. `src/app/api/lists/route.ts` validates
+`category` against the `GearCategory` enum.
 
 ---
 
@@ -66,33 +53,15 @@ tracked, so it leaks if the component unmounts.
 
 ---
 
-## 🟢 #14 — Content-Security-Policy header missing
+## ~~#14~~ — DONE (in Report-Only): Content-Security-Policy header added
 
-**File:** `next.config.ts`
+Fixed in commit `9ddf4d9`. `next.config.mjs` sets a
+`Content-Security-Policy-Report-Only` header. Violations are logged in
+the browser console without breaking the page.
 
-HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy and
-Permissions-Policy are set. No CSP. Given the inline JSON-LD
-(`dangerouslySetInnerHTML`) and any third-party scripts, a CSP would
-meaningfully reduce XSS blast radius.
-
-**Fix:** Start in report-only mode to avoid breaking anything:
-```ts
-{
-  key: 'Content-Security-Policy-Report-Only',
-  value: [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-inline'", // tighten with nonces later
-    "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: https:",
-    "font-src 'self' data:",
-    "connect-src 'self' https://*.supabase.co https://api.anthropic.com",
-    "frame-ancestors 'none'",
-  ].join('; '),
-}
-```
-
-After a week of report-only with no violations, switch to enforcing
-(`Content-Security-Policy`).
+**Remaining step:** after ~1 week with no real-traffic violations,
+rename the header key from `Content-Security-Policy-Report-Only` to
+`Content-Security-Policy` to enforce.
 
 ---
 
@@ -149,8 +118,7 @@ Component (the `import 'server-only'` line above prevents this at build time).
 
 ## Suggested order when picking these up
 
-1. **#12** — trivial, 2-line change
-2. **#14** — easy win, deploy in report-only first
-3. **#13 + #15** — UX bugs around list loading/saving, tackle together
-4. **#11** — only when traffic justifies Upstash setup
-5. **#7a** — only if/when GDPR requests become frequent
+1. **#13 + #15** — UX bugs around list loading/saving, tackle together
+2. **#14 enforce** — flip CSP from Report-Only to enforcing after a week of clean reports
+3. **#11** — only when traffic justifies Upstash setup
+4. **#7a** — only if/when GDPR requests become frequent
