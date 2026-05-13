@@ -10,9 +10,21 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ loca
   const locale = (routing.locales as readonly string[]).includes(raw) ? raw : routing.defaultLocale;
 
   const code = req.nextUrl.searchParams.get('code');
+  const errorParam = req.nextUrl.searchParams.get('error');
+  const errorDescription = req.nextUrl.searchParams.get('error_description');
+
+  if (errorParam) {
+    console.error('[auth callback] provider error:', errorParam, errorDescription);
+    return NextResponse.redirect(new URL(`/${locale}?auth_error=${encodeURIComponent(errorParam)}`, req.url));
+  }
+
   if (code) {
     const supabase = await createServerSupabaseClient();
-    await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) {
+      console.error('[auth callback] exchange failed:', error.message);
+      return NextResponse.redirect(new URL(`/${locale}?auth_error=exchange_failed`, req.url));
+    }
   }
 
   return NextResponse.redirect(new URL(`/${locale}`, req.url));
