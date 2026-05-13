@@ -64,6 +64,18 @@ A web application for bikepacking riders: the user enters their gear, the system
 | FR-5.4 | Manual save button in the header | ✅ |
 | FR-5.5 | After sign-in the list is loaded automatically | ✅ |
 | FR-5.6 | Guest sees a "Sign in to save" prompt | ✅ |
+| FR-5.7 | Magic-link emails sent via custom SMTP (Resend) from `noreply@veloadout.com` | ✅ |
+| FR-5.8 | Auth callback surfaces exchange errors via `?auth_error=` query param | ✅ |
+| FR-5.9 | Auto-save survives navigation: pending debounce is flushed on unmount with `keepalive` | ✅ |
+| FR-5.10 | Initial list load merges with local edits instead of clobbering them | ✅ |
+
+### FR-7: Onboarding
+
+| # | Requirement | Status |
+|---|---|---|
+| FR-7.1 | Dismissible welcome banner for first-time visitors (localStorage) | ✅ |
+| FR-7.2 | `/[locale]/help` page with quick-start guide in EN / DE / RU | ✅ |
+| FR-7.3 | Help link in the footer alongside Privacy / Terms / Impressum | ✅ |
 
 ### FR-6: Internationalisation
 
@@ -102,7 +114,14 @@ A web application for bikepacking riders: the user enters their gear, the system
 | NFR-2.10 | Locale params in redirects cannot be arbitrary strings | Auth callback validates locale against `routing.locales`, falls back to default |
 | NFR-2.11 | AI responses cannot inject malformed data | Zod schema validates the parsed JSON; invalid responses become `not_found` |
 | NFR-2.12 | `sourceUrl` rendered as a link is always safe | `safeHttpUrl()` helper rejects anything but `http(s)` at render time |
-| NFR-2.13 | Deferred security TODOs are tracked | [`docs/security-todo.md`](./security-todo.md) — #11 Upstash rate limit, #12–15, full Art.17 erasure |
+| NFR-2.13 | Deferred security TODOs are tracked | [`docs/security-todo.md`](./security-todo.md) |
+| NFR-2.14 | AI search requires authentication | `auth.getUser()` check in POST `/api/lookup` — anonymous traffic can't burn Anthropic quota |
+| NFR-2.15 | Heuristic pre-filter rejects obvious garbage queries before AI call | `looksLikeGarbage()` — length, alphabetic content, repeated chars, vowel test |
+| NFR-2.16 | Distributed rate limit survives serverless cold starts | Upstash Redis `INCR + EXPIRE`, falls back to in-memory if unconfigured |
+| NFR-2.17 | Repeat `not_found` queries short-circuit AI | `ai_search_misses` table cached for 24h with RLS |
+| NFR-2.18 | Global daily AI budget cap | 500 calls / day / project in Redis; 503 when exhausted |
+| NFR-2.19 | Email sending decoupled from Supabase built-in SMTP | Custom SMTP via Resend (100/day free, 3000/month) for magic-link emails |
+| NFR-2.20 | CSP enforced (not report-only) | `Content-Security-Policy` header in `next.config.mjs` |
 
 ### NFR-3: Reliability
 
@@ -147,6 +166,9 @@ A web application for bikepacking riders: the user enters their gear, the system
 | NFR-6.1 | Works on serverless (no local file storage) | SQLite → Supabase Postgres |
 | NFR-6.2 | Preview deployments for every PR | VERCEL_URL in redirect URL |
 | NFR-6.3 | Portable away from Vercel | `output: 'standalone'` |
+| NFR-6.4 | Custom production domain | `veloadout.com` (Cloudflare DNS, Vercel-issued TLS) |
+| NFR-6.5 | AI route timeout fits a multi-turn web search | `maxDuration = 60` in `/api/lookup` |
+| NFR-6.6 | Required env vars on production | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `VELOADOUT_API_KEY`, `NEXT_PUBLIC_SITE_URL`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
 
 ---
 

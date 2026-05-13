@@ -1,52 +1,22 @@
 # Security & Stability TODO
 
-Findings from the security/stability review that were intentionally deferred.
-Pick these up before promoting the project beyond pet-scale (HN front page,
-real userbase, paid tier).
+Tracking deferred work from the security/stability review and ongoing
+hardening. Pick these up before promoting the project beyond pet-scale
+(HN front page, real userbase, paid tier).
 
 ---
 
-## ~~#11~~ — DONE: distributed rate limit via Upstash Redis
+## Done
 
-Fixed in commit `9238e2f`. `rateLimit.ts` now uses Upstash Redis with a
-graceful fallback to in-memory when Redis is unconfigured/unreachable.
-Applies to `/api/auth` and `/api/lookup`. Cold starts no longer reset
-counters.
-
----
-
-## ~~#12~~ — DONE: `category` in `api/lists` now uses `nativeEnum`
-
-Fixed in commit `9ddf4d9`. `src/app/api/lists/route.ts` validates
-`category` against the `GearCategory` enum.
-
----
-
-## ~~#13~~ — DONE: auto-save flushes on unmount, toast timer tracked
-
-Fixed in commit `dfb3dbf`. The unmount cleanup now calls the latest
-`saveList()` via a ref (with `keepalive: true` so the fetch survives
-navigation) and clears the `savedTimer` ref.
-
----
-
-## ~~#14~~ — DONE (in Report-Only): Content-Security-Policy header added
-
-Fixed in commit `9ddf4d9`. `next.config.mjs` sets a
-`Content-Security-Policy-Report-Only` header. Violations are logged in
-the browser console without breaking the page.
-
-**Remaining step:** after ~1 week with no real-traffic violations,
-rename the header key from `Content-Security-Policy-Report-Only` to
-`Content-Security-Policy` to enforce.
-
----
-
-## ~~#15~~ — DONE: list load no longer clobbers local edits
-
-Fixed in commit `dfb3dbf`. The `.then` now uses the functional
-`setEntries(current => current.length === 0 ? fetched : current)` form,
-so additions made while the fetch was in flight are preserved.
+- ~~**#11**~~ Distributed rate limit via Upstash Redis (commit `9238e2f`).
+- ~~**#12**~~ `category` in `api/lists` uses `nativeEnum` (commit `9ddf4d9`).
+- ~~**#13**~~ Auto-save flushes on unmount, toast timer tracked (commit `dfb3dbf`).
+- ~~**#14**~~ Content-Security-Policy header enforced (commit `4a69f6b`).
+- ~~**#15**~~ List load no longer clobbers local edits (commit `dfb3dbf`).
+- ~~**#16A**~~ Resend SMTP wired up. Magic-link emails now sent from
+  `noreply@veloadout.com` via Resend (100/day free). Supabase built-in
+  SMTP 2/hour limit no longer applies. Domain on Cloudflare with SPF /
+  DKIM / DMARC verified.
 
 ---
 
@@ -85,50 +55,22 @@ Component (the `import 'server-only'` line above prevents this at build time).
 
 ---
 
-## 🟡 #16 — Magic-link-only auth is bottlenecked by Supabase built-in SMTP
+## 🟡 #16B — Optional password auth alongside magic link
 
-**File:** `src/app/api/auth/route.ts`, Supabase Auth Settings
-
-The whole project supports passwordless magic-link sign-in only (FR-5.1).
-Supabase's built-in SMTP is **rate-limited to 2 emails per hour for the
-entire project** on the free tier — explicitly marked "for development
-only" in the docs. That caps real-world sign-ups + re-logins at ~50/day
-across the whole user base.
-
-**Two ways forward, can be combined:**
-
-### A. Custom SMTP via Resend (~5 min)
-1. Sign up at [resend.com](https://resend.com) (free: 100 emails/day, 3000/month)
-2. Verify a domain you own (or use their `onboarding@resend.dev` for testing)
-3. Create an API key
-4. Supabase Dashboard → **Project Settings → Auth → SMTP Settings**:
-   - Host: `smtp.resend.com`, Port: `587`
-   - User: `resend`, Password: the API key
-   - Sender email: an address on your verified domain
-5. Save. Test with a fresh sign-in.
-
-### B. Add password auth alongside magic link
-Supabase Auth supports both methods on the same project. Pros: instant
-login without depending on email. Cons: still need SMTP for password
-reset, plus more legal surface (GDPR Art. 32 — but Supabase handles
-bcrypt + storage correctly out of the box).
+Magic-link works great now that Resend is in place, so this is no longer
+blocking. Keep as a UX upgrade for users who don't want to leave the
+page to check email.
 
 **Implementation outline:**
 1. Add `signInWithPassword` / `signUp` routes alongside the existing magic-link route
 2. Update the auth UI (`AuthModal` / similar) with email + password fields and a "or use magic link" toggle
 3. Supabase Auth Settings → enable email/password provider (already enabled by default)
 4. Set minimum password length to 8+ in Supabase Auth settings
-5. Reuse the same callback flow for "forgot password" emails (which still go through SMTP — so do A first)
-
-**Order:** A is a quick unblock; B is a bigger UX change to consider for
-public launch.
+5. Reuse the existing callback flow for "forgot password" emails
 
 ---
 
 ## Suggested order when picking these up
 
-1. **#16A** — connect Resend SMTP, this is the most impactful single change for any kind of public usage
-2. **#14 enforce** — flip CSP from Report-Only to enforcing after a week of clean reports
-3. **#16B** — optional password auth if magic-link UX still feels heavy after SMTP fix
-4. **#11** — only when traffic justifies Upstash setup
-5. **#7a** — only if/when GDPR requests become frequent
+1. **#16B** — UX nice-to-have, instant login without email round-trip
+2. **#7a** — only if/when GDPR erasure requests become frequent
