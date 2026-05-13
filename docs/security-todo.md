@@ -36,20 +36,11 @@ Fixed in commit `9ddf4d9`. `src/app/api/lists/route.ts` validates
 
 ---
 
-## 🟢 #13 — Auto-save debounce doesn't flush on unmount
+## ~~#13~~ — DONE: auto-save flushes on unmount, toast timer tracked
 
-**File:** `src/presentation/components/GearCalculator.tsx:106-111`
-
-The debounced auto-save (2 s after edit) is cleared on cleanup but never
-fired. If the user navigates away within the 2 s window, the last edit
-is lost. Separate issue: the "Saved" toast `setTimeout` on line 96 isn't
-tracked, so it leaks if the component unmounts.
-
-**Fix:**
-- On cleanup, if a pending save timer is set, call `saveList()` immediately
-  before clearing — accept the trade-off that the in-flight fetch may not
-  complete, OR use `navigator.sendBeacon` for true fire-and-forget on unload.
-- Track the toast `setTimeout` in a `useRef` and clear it on unmount.
+Fixed in commit `dfb3dbf`. The unmount cleanup now calls the latest
+`saveList()` via a ref (with `keepalive: true` so the fetch survives
+navigation) and clears the `savedTimer` ref.
 
 ---
 
@@ -65,19 +56,11 @@ rename the header key from `Content-Security-Policy-Report-Only` to
 
 ---
 
-## 🟢 #15 — Initial list load races with local edits
+## ~~#15~~ — DONE: list load no longer clobbers local edits
 
-**File:** `src/presentation/components/GearCalculator.tsx:46-72`
-
-If the user adds an item before `/api/lists` resolves, `setEntries(...)`
-in the `.then` overwrites the local addition. `initialized.current` guards
-the auto-save effect from firing pre-init, but the local edit is still
-clobbered.
-
-**Fix options:**
-- Disable the search bar and preset buttons until `initialized.current === true`
-- Or merge the fetched list with local edits by id (more permissive UX)
-- Show a small "Loading your list…" spinner during the fetch
+Fixed in commit `dfb3dbf`. The `.then` now uses the functional
+`setEntries(current => current.length === 0 ? fetched : current)` form,
+so additions made while the fetch was in flight are preserved.
 
 ---
 
@@ -159,8 +142,7 @@ public launch.
 ## Suggested order when picking these up
 
 1. **#16A** — connect Resend SMTP, this is the most impactful single change for any kind of public usage
-2. **#13 + #15** — UX bugs around list loading/saving, tackle together
-3. **#14 enforce** — flip CSP from Report-Only to enforcing after a week of clean reports
-4. **#16B** — optional password auth if magic-link UX still feels heavy after SMTP fix
-5. **#11** — only when traffic justifies Upstash setup
-6. **#7a** — only if/when GDPR requests become frequent
+2. **#14 enforce** — flip CSP from Report-Only to enforcing after a week of clean reports
+3. **#16B** — optional password auth if magic-link UX still feels heavy after SMTP fix
+4. **#11** — only when traffic justifies Upstash setup
+5. **#7a** — only if/when GDPR requests become frequent
