@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import { AlertTriangle } from 'lucide-react';
-import type { BagRecommendation, BagSlot, BagDistributionMode, BagCapacities } from '@/domain/gear/BagRecommendation';
+import type { BagRecommendation, BagSlot, BagDistributionMode, BagCapacities, BagActive } from '@/domain/gear/BagRecommendation';
 
 interface Props {
   recommendation: BagRecommendation;
@@ -10,39 +10,57 @@ interface Props {
   onModeChange: (m: BagDistributionMode) => void;
   capacities: BagCapacities;
   onCapacityChange: (key: keyof BagCapacities, value: number) => void;
+  active: BagActive;
+  onActiveChange: (key: keyof BagActive, value: boolean) => void;
 }
 
 function SlotCard({
   slot,
   onCapacityChange,
+  onActiveToggle,
 }: {
   slot: BagSlot;
   onCapacityChange: (value: number) => void;
+  onActiveToggle: (next: boolean) => void;
 }) {
   const t = useTranslations('bags');
   const locale = useLocale();
   const name = slot.name[locale] ?? slot.name['en'];
   const fillColor =
+    !slot.active ? '#3a3650' :
     slot.overflow ? '#f03d3d' :
     slot.fillPercent >= 90 ? '#f0a400' :
     '#6d4aff';
 
   return (
-    <div className="rounded-xl border border-white/[0.07] bg-white/[0.03] p-4">
+    <div className={`rounded-xl border p-4 transition-opacity ${
+      slot.active
+        ? 'border-white/[0.07] bg-white/[0.03]'
+        : 'border-white/[0.04] bg-white/[0.02] opacity-50'
+    }`}>
       <div className="flex items-start justify-between mb-3 gap-3">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
-            <p className="text-white text-sm font-medium truncate">{name}</p>
-            {slot.paired && (
-              <span className="shrink-0 text-[10px] font-semibold text-accent bg-accent/15 rounded px-1.5 py-0.5">
-                ×2
-              </span>
-            )}
+        <div className="min-w-0 flex-1 flex items-start gap-2">
+          <input
+            type="checkbox"
+            checked={slot.active}
+            onChange={e => onActiveToggle(e.target.checked)}
+            className="mt-0.5 w-4 h-4 rounded border-white/20 bg-[#252340] text-accent focus:ring-accent/40 cursor-pointer accent-accent"
+            aria-label={`${slot.active ? 'Disable' : 'Enable'} ${name}`}
+          />
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5">
+              <p className="text-white text-sm font-medium truncate">{name}</p>
+              {slot.paired && (
+                <span className="shrink-0 text-[10px] font-semibold text-accent bg-accent/15 rounded px-1.5 py-0.5">
+                  ×2
+                </span>
+              )}
+            </div>
+            <p className="text-text-muted text-xs mt-0.5">
+              {slot.typicalRangeL[0]}–{slot.typicalRangeL[1]}L {t('typical')}
+              {slot.paired && ` · ${t('per_bag_hint')}`}
+            </p>
           </div>
-          <p className="text-text-muted text-xs mt-0.5">
-            {slot.typicalRangeL[0]}–{slot.typicalRangeL[1]}L {t('typical')}
-            {slot.paired && ` · ${t('pair_total_hint')}`}
-          </p>
         </div>
         <div className="shrink-0 flex items-center gap-1">
           <input
@@ -50,9 +68,10 @@ function SlotCard({
             min={0}
             max={50}
             step={0.5}
-            value={slot.capacityL}
+            value={slot.capacityPerBagL}
             onChange={e => onCapacityChange(parseFloat(e.target.value) || 0)}
-            className="w-16 bg-[#252340] border border-white/[0.07] rounded-md px-2 py-1 text-white text-sm text-right focus:outline-none focus:border-accent/60"
+            disabled={!slot.active}
+            className="w-16 bg-[#252340] border border-white/[0.07] rounded-md px-2 py-1 text-white text-sm text-right focus:outline-none focus:border-accent/60 disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label={`${name} capacity in litres`}
           />
           <span className="text-text-muted text-xs">L</span>
@@ -61,13 +80,18 @@ function SlotCard({
       <div className="h-1.5 rounded-full bg-white/[0.07] overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${slot.fillPercent}%`, backgroundColor: fillColor }}
+          style={{ width: `${slot.active ? slot.fillPercent : 0}%`, backgroundColor: fillColor }}
         />
       </div>
       <div className="flex items-center justify-between mt-1.5">
-        <p className="text-text-muted text-xs">
-          {slot.assignedL.toFixed(1)} / {slot.capacityL.toFixed(1)}L · {slot.fillPercent}%
-        </p>
+        {slot.active ? (
+          <p className="text-text-muted text-xs">
+            {slot.assignedL.toFixed(1)} / {slot.capacityL.toFixed(1)}L · {slot.fillPercent}%
+            {slot.paired && ` (${slot.capacityPerBagL.toFixed(1)}L ${t('per_bag')})`}
+          </p>
+        ) : (
+          <p className="text-text-muted text-xs italic">{t('inactive')}</p>
+        )}
         {slot.overflow && (
           <span className="flex items-center gap-1 text-danger text-xs">
             <AlertTriangle size={12} /> {t('overflow')}
@@ -82,8 +106,8 @@ export function BagRecommendationPanel({
   recommendation,
   mode,
   onModeChange,
-  capacities,
   onCapacityChange,
+  onActiveChange,
 }: Props) {
   const t = useTranslations('bags');
   const overCapacity = mode === 'cumulative' && recommendation.total > recommendation.totalCapacity;
@@ -125,10 +149,26 @@ export function BagRecommendationPanel({
       </div>
 
       <div className="p-4 space-y-3">
-        <SlotCard slot={recommendation.handlebar} onCapacityChange={v => onCapacityChange('handlebar', v)} />
-        <SlotCard slot={recommendation.frame} onCapacityChange={v => onCapacityChange('frame', v)} />
-        <SlotCard slot={recommendation.seatpack} onCapacityChange={v => onCapacityChange('seatpack', v)} />
-        <SlotCard slot={recommendation.fork} onCapacityChange={v => onCapacityChange('fork', v)} />
+        <SlotCard
+          slot={recommendation.handlebar}
+          onCapacityChange={v => onCapacityChange('handlebar', v)}
+          onActiveToggle={v => onActiveChange('handlebar', v)}
+        />
+        <SlotCard
+          slot={recommendation.frame}
+          onCapacityChange={v => onCapacityChange('frame', v)}
+          onActiveToggle={v => onActiveChange('frame', v)}
+        />
+        <SlotCard
+          slot={recommendation.seatpack}
+          onCapacityChange={v => onCapacityChange('seatpack', v)}
+          onActiveToggle={v => onActiveChange('seatpack', v)}
+        />
+        <SlotCard
+          slot={recommendation.fork}
+          onCapacityChange={v => onCapacityChange('fork', v)}
+          onActiveToggle={v => onActiveChange('fork', v)}
+        />
       </div>
 
       <div className="px-5 py-4 border-t border-white/[0.07] flex justify-between items-center bg-white/[0.02]">

@@ -12,7 +12,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import { AuthButton } from './AuthButton';
 import { WelcomeHint } from './WelcomeHint';
 import { useToast } from './Toast';
-import { computeBagRecommendation, DEFAULT_BAG_CAPACITIES, type BagCapacities, type BagDistributionMode } from '@/domain/gear/BagRecommendation';
+import { computeBagRecommendation, DEFAULT_BAG_CAPACITIES, DEFAULT_BAG_ACTIVE, type BagCapacities, type BagActive, type BagDistributionMode } from '@/domain/gear/BagRecommendation';
 import { GearCategory } from '@/domain/gear/GearCategory';
 
 const VALID_CATEGORIES = new Set<string>(Object.values(GearCategory));
@@ -190,6 +190,7 @@ export function GearCalculator({ user }: Props) {
   // Bag setup is per-browser (localStorage), not per-user — it reflects the
   // physical bike, not the account.
   const [bagCapacities, setBagCapacities] = useState<BagCapacities>(DEFAULT_BAG_CAPACITIES);
+  const [bagActive, setBagActive] = useState<BagActive>(DEFAULT_BAG_ACTIVE);
   const [bagMode, setBagMode] = useState<BagDistributionMode>('cumulative');
   const bagSetupLoaded = useRef(false);
 
@@ -203,6 +204,9 @@ export function GearCalculator({ user }: Props) {
           // value for users who saved a setup before the slot existed.
           setBagCapacities({ ...DEFAULT_BAG_CAPACITIES, ...parsed.capacities });
         }
+        if (parsed.active && typeof parsed.active.handlebar === 'boolean') {
+          setBagActive({ ...DEFAULT_BAG_ACTIVE, ...parsed.active });
+        }
         if (parsed.mode === 'cumulative' || parsed.mode === 'each') {
           setBagMode(parsed.mode);
         }
@@ -214,15 +218,23 @@ export function GearCalculator({ user }: Props) {
   useEffect(() => {
     if (!bagSetupLoaded.current) return;
     try {
-      localStorage.setItem('veloadout:bagSetup', JSON.stringify({ capacities: bagCapacities, mode: bagMode }));
+      localStorage.setItem('veloadout:bagSetup', JSON.stringify({
+        capacities: bagCapacities,
+        active: bagActive,
+        mode: bagMode,
+      }));
     } catch { /* localStorage full / unavailable */ }
-  }, [bagCapacities, bagMode]);
+  }, [bagCapacities, bagActive, bagMode]);
 
   const updateBagCapacity = useCallback((key: keyof BagCapacities, value: number) => {
     setBagCapacities(prev => ({ ...prev, [key]: Math.max(0, Math.min(50, value)) }));
   }, []);
 
-  const bagRec = totalVolume > 0 ? computeBagRecommendation(totalVolume, bagCapacities, bagMode) : null;
+  const updateBagActive = useCallback((key: keyof BagActive, value: boolean) => {
+    setBagActive(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+  const bagRec = totalVolume > 0 ? computeBagRecommendation(totalVolume, bagCapacities, bagActive, bagMode) : null;
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#13111c' }}>
@@ -283,6 +295,8 @@ export function GearCalculator({ user }: Props) {
                     onModeChange={setBagMode}
                     capacities={bagCapacities}
                     onCapacityChange={updateBagCapacity}
+                    active={bagActive}
+                    onActiveChange={updateBagActive}
                   />
                 </div>
               )}
