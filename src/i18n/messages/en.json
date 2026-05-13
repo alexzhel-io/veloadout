@@ -49,6 +49,7 @@
     "subtitle": "Set the capacity of each bag you own and see how your gear fits.",
     "fill": "fill",
     "typical": "typical",
+    "pair_total_hint": "total of the pair",
     "capacity": "Capacity",
     "gear_total": "Gear total",
     "overflow": "overflow",

@@ -49,6 +49,7 @@
     "subtitle": "Stelle die Kapazität jeder Tasche ein und sieh, wie deine Ausrüstung hineinpasst.",
     "fill": "Füllstand",
     "typical": "typisch",
+    "pair_total_hint": "Summe des Paars",
     "capacity": "Kapazität",
     "gear_total": "Ausrüstung gesamt",
     "overflow": "Überlauf",

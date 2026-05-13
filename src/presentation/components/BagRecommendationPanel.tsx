@@ -31,9 +31,17 @@ function SlotCard({
     <div className="rounded-xl border border-white/[0.07] bg-white/[0.03] p-4">
       <div className="flex items-start justify-between mb-3 gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-white text-sm font-medium truncate">{name}</p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-white text-sm font-medium truncate">{name}</p>
+            {slot.paired && (
+              <span className="shrink-0 text-[10px] font-semibold text-accent bg-accent/15 rounded px-1.5 py-0.5">
+                ×2
+              </span>
+            )}
+          </div>
           <p className="text-text-muted text-xs mt-0.5">
             {slot.typicalRangeL[0]}–{slot.typicalRangeL[1]}L {t('typical')}
+            {slot.paired && ` · ${t('pair_total_hint')}`}
           </p>
         </div>
         <div className="shrink-0 flex items-center gap-1">
@@ -120,6 +128,7 @@ export function BagRecommendationPanel({
         <SlotCard slot={recommendation.handlebar} onCapacityChange={v => onCapacityChange('handlebar', v)} />
         <SlotCard slot={recommendation.frame} onCapacityChange={v => onCapacityChange('frame', v)} />
         <SlotCard slot={recommendation.seatpack} onCapacityChange={v => onCapacityChange('seatpack', v)} />
+        <SlotCard slot={recommendation.fork} onCapacityChange={v => onCapacityChange('fork', v)} />
       </div>
 
       <div className="px-5 py-4 border-t border-white/[0.07] flex justify-between items-center bg-white/[0.02]">

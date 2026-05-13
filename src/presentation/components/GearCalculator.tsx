@@ -174,7 +174,9 @@ export function GearCalculator({ user }: Props) {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed.capacities && typeof parsed.capacities.handlebar === 'number') {
-          setBagCapacities(parsed.capacities);
+          // Merge with defaults so newly added slots (e.g. fork) get a default
+          // value for users who saved a setup before the slot existed.
+          setBagCapacities({ ...DEFAULT_BAG_CAPACITIES, ...parsed.capacities });
         }
         if (parsed.mode === 'cumulative' || parsed.mode === 'each') {
           setBagMode(parsed.mode);
