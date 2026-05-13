@@ -13,6 +13,9 @@ import { AuthButton } from './AuthButton';
 import { WelcomeHint } from './WelcomeHint';
 import { useToast } from './Toast';
 import { computeBagRecommendation, DEFAULT_BAG_CAPACITIES, type BagCapacities, type BagDistributionMode } from '@/domain/gear/BagRecommendation';
+import { GearCategory } from '@/domain/gear/GearCategory';
+
+const VALID_CATEGORIES = new Set<string>(Object.values(GearCategory));
 import type { GearPreset } from '@/domain/gear/GearPreset';
 
 export interface GearEntry {
@@ -92,26 +95,42 @@ export function GearCalculator({ user }: Props) {
     saveAbort.current = controller;
     setSaving(true);
     try {
+      // Sanitise each item so optional fields are either valid or absent —
+      // Zod's `.optional()` rejects `null` / empty strings, which can sneak
+      // in from old DB rows (Supabase returns SQL NULL as JS null).
+      const items = entries.map(e => {
+        const item: Record<string, unknown> = {
+          name: e.name,
+          category: VALID_CATEGORIES.has(e.category) ? e.category : 'other',
+          volumeLiters: e.volumeLiters,
+          quantity: e.quantity,
+          source: e.source,
+        };
+        if (typeof e.weightGrams === 'number' && Number.isFinite(e.weightGrams) && e.weightGrams > 0) {
+          item.weightGrams = e.weightGrams;
+        }
+        if (e.sizeLabel) item.sizeLabel = e.sizeLabel;
+        if (e.sourceUrl && /^https?:\/\//.test(e.sourceUrl)) item.sourceUrl = e.sourceUrl;
+        return item;
+      });
+
       const res = await fetch('/api/lists', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          listId,
-          items: entries.map(e => ({
-            name: e.name, category: e.category, volumeLiters: e.volumeLiters,
-            weightGrams: e.weightGrams, quantity: e.quantity, sizeLabel: e.sizeLabel,
-            source: e.source, sourceUrl: e.sourceUrl,
-          })),
-        }),
+        body: JSON.stringify({ listId, items }),
         signal: controller.signal,
         keepalive: true, // let the request complete even if the page is unloaded
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(`HTTP ${res.status} ${JSON.stringify(body)}`);
+      }
       setSaved(true);
       if (savedTimer.current) clearTimeout(savedTimer.current);
       savedTimer.current = setTimeout(() => setSaved(false), 2000);
     } catch (err) {
       if ((err as Error).name !== 'AbortError') {
+        console.error('[GearCalculator] save failed:', err);
         toast.show('error', t('errors.save_failed'));
       }
     } finally {
@@ -122,12 +141,18 @@ export function GearCalculator({ user }: Props) {
   // Keep the unmount-flush effect pointed at the freshest saveList
   useEffect(() => { saveListRef.current = saveList; }, [saveList]);
 
+  // Auto-save trigger. Depends ONLY on real triggers (entries/listId/user),
+  // not on saveList itself — saveList captures `t` and `toast` which are
+  // not referentially stable across renders, so depending on it directly
+  // caused the effect to re-run on every render and produced a 2-second
+  // retry loop whenever saves failed. We call the latest saveList via
+  // the ref instead.
   useEffect(() => {
     if (!user || !listId || !initialized.current) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => { void saveList(); }, 2000);
+    saveTimer.current = setTimeout(() => { void saveListRef.current(); }, 2000);
     return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
-  }, [entries, listId, user, saveList]);
+  }, [entries, listId, user]);
 
   // On unmount: flush any pending save and clear the "Saved" toast timer.
   useEffect(() => {
