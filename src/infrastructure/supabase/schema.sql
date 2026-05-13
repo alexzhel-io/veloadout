@@ -105,6 +105,28 @@ create trigger gear_lists_updated_at
   before update on gear_lists
   for each row execute function update_updated_at();
 
+-- AI search miss cache. When the AI returns not_found for a query we write
+-- the normalised query here; future identical queries short-circuit without
+-- another AI call. Read-only for everyone, written by authenticated users only.
+create table if not exists ai_search_misses (
+  query_norm   text primary key,
+  expires_at   timestamptz not null,
+  created_at   timestamptz not null default now()
+);
+
+create index if not exists idx_ai_search_misses_expires on ai_search_misses(expires_at);
+
+alter table ai_search_misses enable row level security;
+drop policy if exists "Anyone can read ai_search_misses" on ai_search_misses;
+create policy "Anyone can read ai_search_misses"
+  on ai_search_misses for select using (true);
+drop policy if exists "Authenticated can insert ai_search_misses" on ai_search_misses;
+create policy "Authenticated can insert ai_search_misses"
+  on ai_search_misses for insert with check (auth.uid() is not null);
+drop policy if exists "Authenticated can update ai_search_misses" on ai_search_misses;
+create policy "Authenticated can update ai_search_misses"
+  on ai_search_misses for update using (auth.uid() is not null) with check (auth.uid() is not null);
+
 -- Atomic list replacement: delete old items, insert new ones, bump updated_at.
 -- Runs inside a single Postgres transaction so a partial failure rolls back.
 -- security invoker: respects RLS, so users can only replace their own lists.

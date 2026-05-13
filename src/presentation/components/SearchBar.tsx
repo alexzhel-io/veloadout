@@ -10,7 +10,7 @@ import { matchVariantByQuery } from '@/domain/gear/GearVariant';
 import { safeHttpUrl } from '@/presentation/utils/safeUrl';
 import type { GearEntry } from './GearCalculator';
 
-type SearchState = 'idle' | 'searching_db' | 'searching_ai' | 'not_found' | 'picking';
+type SearchState = 'idle' | 'searching_db' | 'searching_ai' | 'not_found' | 'picking' | 'auth_required' | 'rate_limited' | 'budget_exceeded';
 
 interface Variant { sizeLabel: string; volumeLiters: number; weightGrams?: number }
 
@@ -101,6 +101,21 @@ export function SearchBar({ onAdd }: Props) {
     setState('searching_ai');
     try {
       const res = await fetch(`/api/lookup?q=${encodeURIComponent(q)}&depth=${depth}`);
+      if (res.status === 401) {
+        if (fallback) { setCandidate(fallback); setState('idle'); }
+        else { setState('auth_required'); setTimeout(() => setState('idle'), 5000); }
+        return;
+      }
+      if (res.status === 429) {
+        if (fallback) { setCandidate(fallback); setState('idle'); }
+        else { setState('rate_limited'); setTimeout(() => setState('idle'), 5000); }
+        return;
+      }
+      if (res.status === 503) {
+        if (fallback) { setCandidate(fallback); setState('idle'); }
+        else { setState('budget_exceeded'); setTimeout(() => setState('idle'), 5000); }
+        return;
+      }
       const data = await res.json();
       if (data.status === 'not_found') {
         if (fallback) {
@@ -192,7 +207,11 @@ export function SearchBar({ onAdd }: Props) {
   const statusText =
     state === 'searching_db' ? t('searching_db') :
     state === 'searching_ai' ? t('searching_ai') :
-    state === 'not_found' ? t('not_found') : null;
+    state === 'not_found' ? t('not_found') :
+    state === 'auth_required' ? t('auth_required') :
+    state === 'rate_limited' ? t('rate_limited') :
+    state === 'budget_exceeded' ? t('budget_exceeded') : null;
+  const isErrorState = state === 'not_found' || state === 'auth_required' || state === 'rate_limited' || state === 'budget_exceeded';
 
   return (
     <div className="rounded-2xl border border-white/[0.07] bg-[#1c1a2e] p-5 shadow-card space-y-4">
@@ -224,8 +243,8 @@ export function SearchBar({ onAdd }: Props) {
       )}
 
       {statusText && (
-        <div className={`flex items-center gap-2 text-sm animate-fade-in ${state === 'not_found' ? 'text-danger' : 'text-text-secondary'}`}>
-          {state === 'not_found' ? <AlertCircle size={14} /> : <Loader2 size={14} className="animate-spin" />}
+        <div className={`flex items-center gap-2 text-sm animate-fade-in ${isErrorState ? 'text-danger' : 'text-text-secondary'}`}>
+          {isErrorState ? <AlertCircle size={14} /> : <Loader2 size={14} className="animate-spin" />}
           {statusText}
         </div>
       )}

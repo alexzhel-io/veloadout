@@ -6,7 +6,9 @@ import { ClaudeGearSearchService } from '@/infrastructure/ai/ClaudeGearSearchSer
 import { LookupOrSearchGearItemUseCase } from '@/application/gear/LookupOrSearchGearItemUseCase';
 import { GearItem } from '@/domain/gear/GearItem';
 import { GearCategory } from '@/domain/gear/GearCategory';
-import { checkRateLimit } from '@/infrastructure/security/rateLimit';
+import { checkRateLimit, checkDailyBudget } from '@/infrastructure/security/rateLimit';
+import { looksLikeGarbage } from '@/infrastructure/security/queryHeuristics';
+import { isCachedMiss, recordMiss } from '@/infrastructure/supabase/aiSearchMissCache';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -88,10 +90,43 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ status: 'found_many', items: items.map(itemPayload) });
   }
 
-  // Rate-limit AI calls
-  const limit = await checkRateLimit(`lookup:${clientIp(req)}`, 20, 3600);
+  // ------------------------------------------------------------------
+  // AI search path — guarded by 5 defence layers to prevent abuse:
+  // 1. Auth gate: anonymous users can't burn Anthropic quota
+  // 2. Heuristic filter: obvious garbage queries rejected before AI
+  // 3. Per-user rate limit: 20 AI searches / user / hour
+  // 4. Miss cache: same query that recently returned not_found short-circuits
+  // 5. Global daily budget cap: hard ceiling on AI spend per project
+  // ------------------------------------------------------------------
+
+  // Layer 1: auth gate
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Sign in to use AI search', status: 'auth_required' }, { status: 401 });
+  }
+
+  // Layer 2: heuristic filter
+  if (looksLikeGarbage(query)) {
+    return NextResponse.json({ status: 'not_found' });
+  }
+
+  // Layer 3: per-user rate limit (replaces per-IP — auth makes this stable)
+  const limit = await checkRateLimit(`lookup:user:${user.id}`, 20, 3600);
   if (!limit.allowed) {
-    return NextResponse.json({ error: 'Rate limit exceeded. Try again later.' }, { status: 429 });
+    return NextResponse.json({ error: 'Rate limit exceeded. Try again later.', resetIn: limit.resetIn }, { status: 429 });
+  }
+
+  // Layer 4: miss cache
+  if (await isCachedMiss(supabase, query)) {
+    return NextResponse.json({ status: 'not_found' });
+  }
+
+  // Layer 5: daily budget cap (project-wide)
+  const budget = await checkDailyBudget('ai_lookup', 500);
+  if (!budget.allowed) {
+    console.warn('[lookup] daily AI budget exhausted at', budget.used, 'calls');
+    return NextResponse.json({ error: 'AI search temporarily unavailable. Please try again tomorrow.' }, { status: 503 });
   }
 
   const depthRaw = parseInt(req.nextUrl.searchParams.get('depth') ?? '1', 10);
@@ -99,7 +134,12 @@ export async function GET(req: NextRequest) {
 
   const useCase = new LookupOrSearchGearItemUseCase(repo, new ClaudeGearSearchService());
   const result = await useCase.execute(query, false, depth); // don't auto-save — wait for user confirm
-  if (result.status === 'not_found') return NextResponse.json({ status: 'not_found' });
+
+  if (result.status === 'not_found') {
+    // Cache the miss so subsequent identical queries skip AI for 24h
+    await recordMiss(supabase, query);
+    return NextResponse.json({ status: 'not_found' });
+  }
 
   return NextResponse.json({
     status: result.status,
