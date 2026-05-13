@@ -49,7 +49,7 @@ graph TD
     Anthropic -->|web_search tool| Web
     Supabase -->|SMTP| Resend
     Resend -->|email| User
-    User -->|support@| Cloudflare
+    User -->|inbound mail| Cloudflare
 
     style User fill:#e0e7ff,stroke:#6366f1,color:#1e1b4b
     style Vercel fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
@@ -264,7 +264,7 @@ sequenceDiagram
         LLM-->>AI: tool_use: web_search(query)
         AI->>LLM: tool_result (server-fetched web content)
         LLM-->>AI: JSON with variants
-        Note over AI: Zod-validate response;<br>coerce category to 'other' if unknown
+        Note over AI: Zod-validate response<br>unknown category becomes other
         AI-->>API: GearSearchResult
         API-->>B: {status:"found_ai", item, variants, confidence}
     end
@@ -273,7 +273,7 @@ sequenceDiagram
         Note over B,LLM: Stage 3 — optional "dig deeper" retry (depth 2 or 3)
         Note over B: User clicks button on ConfirmCard
         B->>API: GET ?q=MSR Hubba&depth=2
-        Note over API,LLM: Skips DB cache; max_uses=6,<br>max_turns=8, stricter prompt
+        Note over API,LLM: Skips DB cache. max_uses=6<br>max_turns=8, stricter prompt
         API->>AI: search("MSR Hubba", depth=2)
         AI->>LLM: enumerate-all-sizes prompt
         LLM-->>AI: JSON with more variants
