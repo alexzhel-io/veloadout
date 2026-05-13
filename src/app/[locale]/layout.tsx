@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     metadataBase: new URL('https://veloadout.com'),
     alternates: {
       canonical: url,
-      languages: { en: '/en', de: '/de', ru: '/ru' },
+      languages: { en: '/en', de: '/de', uk: '/uk', ru: '/ru' },
     },
     openGraph: {
       title,
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       url,
       siteName: 'Veloadout',
       type: 'website',
-      locale: locale === 'ru' ? 'ru_RU' : locale === 'de' ? 'de_DE' : 'en_US',
+      locale: locale === 'ru' ? 'ru_RU' : locale === 'uk' ? 'uk_UA' : locale === 'de' ? 'de_DE' : 'en_US',
     },
     twitter: {
       card: 'summary',
@@ -53,7 +53,7 @@ export default async function LocaleLayout({
     description: 'Bikepacking gear volume calculator — plan your bike touring setup',
     applicationCategory: 'UtilitiesApplication',
     operatingSystem: 'Any',
-    inLanguage: ['en', 'de', 'ru'],
+    inLanguage: ['en', 'de', 'uk', 'ru'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 

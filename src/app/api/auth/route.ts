@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 const loginSchema = z.object({
   email: z.string().email().max(254),
-  locale: z.enum(['en', 'de', 'ru']),
+  locale: z.enum(['en', 'de', 'uk', 'ru']),
 });
 
 function clientIp(req: NextRequest): string {
