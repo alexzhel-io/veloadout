@@ -5,9 +5,9 @@ export default function ImpressumPage() {
     <LegalLayout title="Impressum">
       <p><strong>Angaben gemäß § 5 TMG:</strong></p>
       <p>
-        Eugene Z.<br />
-        [Straße + Hausnummer]<br />
-        [PLZ + Ort]<br />
+        Yevgen Zhelichowski<br />
+        Berlinerstr. 70<br />
+        80805 München<br />
         Deutschland
       </p>
 
@@ -15,14 +15,10 @@ export default function ImpressumPage() {
       <p>E-Mail: <a href="mailto:support@veloadout.com">support@veloadout.com</a></p>
 
       <h2>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
-      <p>Eugene Z. (Anschrift wie oben)</p>
+      <p>Yevgen Zhelichowski (Anschrift wie oben)</p>
 
       <h2>Haftungsausschluss</h2>
       <p>Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen.</p>
-
-      <p className="text-text-muted text-sm mt-8">
-        <em>Hinweis: Bitte vor dem Deployment vollständige Adresse einsetzen — Impressumspflicht in DE.</em>
-      </p>
     </LegalLayout>
   );
 }
