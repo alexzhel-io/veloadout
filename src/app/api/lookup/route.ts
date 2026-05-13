@@ -21,15 +21,29 @@ const variantSchema = z.object({
 });
 
 const saveItemSchema = z.object({
-  id: z.string(),
-  names: z.record(z.string()),
+  // id is ignored — server derives a deterministic slug from the English name
+  id: z.string().optional(),
+  names: z.record(z.string().min(1).max(200)).refine(
+    (v) => typeof v['en'] === 'string' && v['en'].length > 0,
+    { message: 'English name is required' },
+  ),
   volumeLiters: z.number().min(0).max(500),
-  weightGrams: z.number().optional(),
-  category: z.string(),
-  sourceUrl: z.string().optional(),
-  variants: z.array(variantSchema).default([]),
-  aliases: z.array(z.string()).default([]),
+  weightGrams: z.number().min(0).max(100000).optional(),
+  category: z.nativeEnum(GearCategory),
+  sourceUrl: z.string().url().max(2000).optional(),
+  variants: z.array(variantSchema).max(20).default([]),
+  aliases: z.array(z.string().max(200)).max(30).default([]),
 });
+
+function slugifyName(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '') // strip diacritics
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80);
+}
 
 const postSchema = z.object({
   item: saveItemSchema,
@@ -97,8 +111,13 @@ export async function GET(req: NextRequest) {
   });
 }
 
-// Called when user confirms an AI-found item — saves it to the shared catalog
+// Called when user confirms an AI-found item — saves it to the shared catalog.
+// Requires authentication: only signed-in users can contribute to the public catalog.
 export async function POST(req: NextRequest) {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   const body = postSchema.safeParse(await req.json().catch(() => null));
   if (!body.success) return NextResponse.json({ error: 'Invalid body', details: body.error.flatten() }, { status: 400 });
 
@@ -108,24 +127,29 @@ export async function POST(req: NextRequest) {
   }
 
   const { item: d } = body.data;
+  // Server-derived id from the English name. This both prevents clients from
+  // hijacking arbitrary catalog rows and keeps dig-deeper updates in place.
+  const serverId = slugifyName(d.names.en);
+  if (!serverId) return NextResponse.json({ error: 'Invalid name' }, { status: 400 });
+
   const gearItem = GearItem.create({
-    id: d.id,
+    id: serverId,
     names: d.names,
     aliases: d.aliases,
     volumeLiters: d.volumeLiters,
     weightGrams: d.weightGrams,
-    category: d.category as GearCategory,
+    category: d.category,
     sourceUrl: d.sourceUrl,
     variants: d.variants,
     createdAt: new Date(),
   });
 
   try {
-    const repo = await buildRepo();
+    const repo = new SupabaseGearItemRepository(supabase);
     await repo.save(gearItem);
   } catch (err) {
     console.error('[lookup POST] save failed:', err);
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, id: serverId });
 }

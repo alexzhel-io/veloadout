@@ -52,12 +52,12 @@ create policy "Anyone can read gear items"
   on gear_items for select using (true);
 drop policy if exists "Authenticated users can insert gear items" on gear_items;
 drop policy if exists "Anyone can insert gear items" on gear_items;
-create policy "Anyone can insert gear items"
-  on gear_items for insert with check (true);
+create policy "Authenticated can insert gear items"
+  on gear_items for insert with check (auth.uid() is not null);
 drop policy if exists "Authenticated users can update gear items" on gear_items;
 drop policy if exists "Anyone can update gear items" on gear_items;
-create policy "Anyone can update gear items"
-  on gear_items for update using (true);
+create policy "Authenticated can update gear items"
+  on gear_items for update using (auth.uid() is not null) with check (auth.uid() is not null);
 
 -- User gear lists
 create table if not exists gear_lists (

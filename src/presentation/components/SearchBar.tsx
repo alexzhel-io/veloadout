@@ -167,11 +167,10 @@ export function SearchBar({ onAdd }: Props) {
           body: JSON.stringify({ item: candidate.item }),
           keepalive: true,
         });
-        if (!r.ok) {
+        // 401 means guest — silently skip (item still goes to local list)
+        if (!r.ok && r.status !== 401) {
           const e = await r.json().catch(() => ({}));
           console.error('[lookup POST] save failed:', r.status, e);
-        } else {
-          console.log('[lookup POST] saved:', candidate.item.id);
         }
       } catch (err) {
         console.error('[lookup POST] network error:', err);
