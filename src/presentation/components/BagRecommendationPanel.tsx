@@ -110,13 +110,61 @@ export function BagRecommendationPanel({
   onActiveChange,
 }: Props) {
   const t = useTranslations('bags');
-  const overCapacity = mode === 'cumulative' && recommendation.total > recommendation.totalCapacity;
+  const gear = recommendation.total;
+  const capacity = recommendation.totalCapacity;
+  const overCapacity = mode === 'cumulative' && gear > capacity;
+  const usagePercent = capacity > 0 ? Math.min(Math.round((gear / capacity) * 100), 100) : 0;
+  const remaining = Math.max(capacity - gear, 0);
+  const summaryColor =
+    capacity === 0 ? '#3a3650' :
+    overCapacity ? '#f03d3d' :
+    usagePercent >= 90 ? '#f0a400' :
+    '#6d4aff';
 
   return (
     <div className="rounded-2xl border border-white/[0.07] bg-[#1c1a2e] shadow-card overflow-hidden h-fit">
       <div className="px-5 py-4 border-b border-white/[0.07]">
         <h2 className="text-white font-medium text-sm">{t('title')}</h2>
         <p className="text-text-muted text-xs mt-0.5">{t('subtitle')}</p>
+      </div>
+
+      {/* Summary stat — gear vs capacity, big numbers + progress bar */}
+      <div className="px-5 py-4 border-b border-white/[0.07] bg-gradient-to-br from-accent/[0.06] to-transparent">
+        <div className="flex items-end justify-between gap-4 mb-3">
+          <div className="min-w-0">
+            <p className="text-text-muted text-[10px] uppercase tracking-wider font-medium">{t('gear_total')}</p>
+            <p className="text-white text-2xl font-bold leading-none mt-1">{gear.toFixed(1)}<span className="text-text-secondary text-base ml-0.5">L</span></p>
+          </div>
+          <div className="text-right min-w-0">
+            <p className="text-text-muted text-[10px] uppercase tracking-wider font-medium">{t('total_capacity')}</p>
+            <p className="text-white text-2xl font-bold leading-none mt-1">{capacity.toFixed(1)}<span className="text-text-secondary text-base ml-0.5">L</span></p>
+          </div>
+        </div>
+
+        <div className="h-2 rounded-full bg-white/[0.07] overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{ width: `${usagePercent}%`, backgroundColor: summaryColor }}
+          />
+        </div>
+
+        <div className="flex items-center justify-between mt-2 text-xs">
+          {overCapacity ? (
+            <span className="flex items-center gap-1 text-danger font-medium">
+              <AlertTriangle size={12} />
+              {t('overflow_by', { liters: (gear - capacity).toFixed(1) })}
+            </span>
+          ) : capacity > 0 ? (
+            <span className="text-text-secondary">
+              {t('remaining', { liters: remaining.toFixed(1) })}
+            </span>
+          ) : (
+            <span className="text-text-muted italic">{t('no_active_bags')}</span>
+          )}
+          {capacity > 0 && (
+            <span className="text-text-muted font-medium">{usagePercent}%</span>
+          )}
+        </div>
       </div>
 
       <div className="px-5 py-3 border-b border-white/[0.07] bg-white/[0.02]">
@@ -171,22 +219,6 @@ export function BagRecommendationPanel({
         />
       </div>
 
-      <div className="px-5 py-4 border-t border-white/[0.07] flex justify-between items-center bg-white/[0.02]">
-        <div>
-          <span className="text-text-secondary text-sm">{t('gear_total')}</span>
-          {overCapacity && (
-            <p className="text-danger text-xs mt-0.5 flex items-center gap-1">
-              <AlertTriangle size={11} /> {t('overflow_total')}
-            </p>
-          )}
-        </div>
-        <div className="text-right">
-          <span className="text-white font-bold text-xl">{recommendation.total.toFixed(1)}L</span>
-          <p className="text-text-muted text-xs">
-            {t('capacity')}: {recommendation.totalCapacity.toFixed(1)}L
-          </p>
-        </div>
-      </div>
     </div>
   );
 }
