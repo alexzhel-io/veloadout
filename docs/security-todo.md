@@ -55,6 +55,50 @@ Component (the `import 'server-only'` line above prevents this at build time).
 
 ---
 
+## 🟢 #17 — Replace or supplement Vercel Analytics with Plausible
+
+Vercel Analytics is now wired up (`@vercel/analytics/next`) and gives
+DAU/MAU + top pages out of the box, free on Hobby tier. It's good
+enough for the first 6–12 months of accumulating traction data.
+
+When to revisit:
+- Need richer custom events (e.g. funnel from search → confirm → add to list)
+- Need data outside Vercel's dashboard (API export to a spreadsheet)
+- Want a public dashboard to show investors
+
+**Two paths to Plausible:**
+
+### A. Plausible Cloud — $9/month
+1. Sign up at [plausible.io](https://plausible.io), add domain
+   `veloadout.com`
+2. Set env var on Vercel: `NEXT_PUBLIC_PLAUSIBLE_DOMAIN=veloadout.com`
+3. The `<Script>` tag in `src/app/[locale]/layout.tsx` already
+   exists, gated on that env var. Adding the value activates it.
+4. Update CSP in `next.config.mjs`: add `https://plausible.io` to
+   `script-src` and `connect-src`.
+
+### B. Self-hosted on home server via Cloudflare Tunnel — free
+1. On home server: install Docker + `cloudflared`
+2. `docker run -d --name plausible plausible/community-edition` (with
+   docker-compose for the ClickHouse + Postgres deps)
+3. Authenticate `cloudflared` to your Cloudflare account
+4. Create a tunnel: `cloudflared tunnel create veloadout-analytics`
+5. Point `analytics.veloadout.com` to the tunnel in Cloudflare DNS
+6. `cloudflared` runs as a service, holds the outbound connection
+7. Same Vercel env + CSP changes as path A, but with
+   `NEXT_PUBLIC_PLAUSIBLE_DOMAIN=veloadout.com` and a custom
+   `data-api` URL pointing to `https://analytics.veloadout.com`.
+
+Cost: €4/year electricity, ~3 hours setup, ~30 min/month maintenance.
+Avoids the $9/month and keeps all analytics data on your hardware.
+
+**Important caveat:** historical Vercel Analytics data does NOT
+migrate to Plausible. If continuity matters (showing 12+ months of
+graphs to an investor), run both in parallel for some time before
+switching.
+
+---
+
 ## 🟡 #16B — Optional password auth alongside magic link
 
 Magic-link works great now that Resend is in place, so this is no longer

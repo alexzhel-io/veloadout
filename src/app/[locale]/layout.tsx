@@ -2,6 +2,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 import Script from 'next/script';
+import { Analytics } from '@vercel/analytics/next';
 import { ToastProvider } from '@/presentation/components/Toast';
 import { CookieBanner } from '@/presentation/components/CookieBanner';
 
@@ -78,6 +79,7 @@ export default async function LocaleLayout({
             <CookieBanner />
           </ToastProvider>
         </NextIntlClientProvider>
+        <Analytics />
       </body>
     </html>
   );
