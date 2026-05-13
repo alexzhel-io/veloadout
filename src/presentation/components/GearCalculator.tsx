@@ -40,35 +40,48 @@ export function GearCalculator({ user }: Props) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const saveAbort = useRef<AbortController | null>(null);
   const initialized = useRef(false);
+  // Keep a ref to the latest saveList so the unmount-flush effect (which runs
+  // with []-deps) calls the freshest version, not the one captured at mount.
+  const saveListRef = useRef<() => Promise<void>>(() => Promise.resolve());
 
   useEffect(() => {
     if (!user) return;
+    let cancelled = false;
     fetch('/api/lists')
       .then(async r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
       })
       .then(({ list }) => {
-        if (!list) return;
+        if (cancelled || !list) return;
         setListId(list.id);
-        if (list.items?.length > 0) {
-          setEntries(list.items.map((item: { id: string; name: string; volumeLiters: number; weightGrams?: number; category: string; quantity: number; sizeLabel?: string; source: GearEntry['source']; sourceUrl?: string }) => ({
-            id: item.id ?? uuidv4(),
-            name: item.name,
-            volumeLiters: item.volumeLiters,
-            weightGrams: item.weightGrams,
-            category: item.category,
-            quantity: item.quantity,
-            sizeLabel: item.sizeLabel,
-            source: item.source ?? 'db',
-            sourceUrl: item.sourceUrl,
-          })));
-        }
+        // Merge by id rather than clobbering. If the user already added entries
+        // while the fetch was in flight, keep them — the next auto-save will
+        // push them. Otherwise apply the fetched list as-is.
+        setEntries(current => {
+          if (current.length === 0) {
+            return (list.items ?? []).map((item: { id?: string; name: string; volumeLiters: number; weightGrams?: number; category: string; quantity: number; sizeLabel?: string; source: GearEntry['source']; sourceUrl?: string }) => ({
+              id: item.id ?? uuidv4(),
+              name: item.name,
+              volumeLiters: item.volumeLiters,
+              weightGrams: item.weightGrams,
+              category: item.category,
+              quantity: item.quantity,
+              sizeLabel: item.sizeLabel,
+              source: item.source ?? 'db',
+              sourceUrl: item.sourceUrl,
+            }));
+          }
+          return current;
+        });
         initialized.current = true;
       })
-      .catch(() => toast.show('error', t('errors.load_failed')));
+      .catch(() => { if (!cancelled) toast.show('error', t('errors.load_failed')); });
+
+    return () => { cancelled = true; };
   }, [user, toast, t]);
 
   const saveList = useCallback(async () => {
@@ -90,10 +103,12 @@ export function GearCalculator({ user }: Props) {
           })),
         }),
         signal: controller.signal,
+        keepalive: true, // let the request complete even if the page is unloaded
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      if (savedTimer.current) clearTimeout(savedTimer.current);
+      savedTimer.current = setTimeout(() => setSaved(false), 2000);
     } catch (err) {
       if ((err as Error).name !== 'AbortError') {
         toast.show('error', t('errors.save_failed'));
@@ -103,12 +118,30 @@ export function GearCalculator({ user }: Props) {
     }
   }, [listId, entries, toast, t]);
 
+  // Keep the unmount-flush effect pointed at the freshest saveList
+  useEffect(() => { saveListRef.current = saveList; }, [saveList]);
+
   useEffect(() => {
     if (!user || !listId || !initialized.current) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => { void saveList(); }, 2000);
     return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
   }, [entries, listId, user, saveList]);
+
+  // On unmount: flush any pending save and clear the "Saved" toast timer.
+  useEffect(() => {
+    return () => {
+      if (saveTimer.current) {
+        clearTimeout(saveTimer.current);
+        saveTimer.current = null;
+        void saveListRef.current();
+      }
+      if (savedTimer.current) {
+        clearTimeout(savedTimer.current);
+        savedTimer.current = null;
+      }
+    };
+  }, []);
 
   const addEntry = useCallback((entry: GearEntry) => setEntries(prev => [...prev, entry]), []);
   const removeEntry = useCallback((id: string) => setEntries(prev => prev.filter(e => e.id !== id)), []);
