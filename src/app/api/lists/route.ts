@@ -16,6 +16,7 @@ const itemSchema = z.object({
   sizeLabel: z.string().max(100).optional(),
   source: z.enum(['db', 'ai', 'preset', 'manual']),
   sourceUrl: z.string().url().max(2000).optional(),
+  active: z.boolean().optional().default(true),
 });
 
 const saveSchema = z.object({

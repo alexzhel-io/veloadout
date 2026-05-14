@@ -79,8 +79,12 @@ create table if not exists gear_list_items (
   size_label    text,
   source        text not null default 'manual',
   source_url    text,
+  active        boolean not null default true,
   created_at    timestamptz not null default now()
 );
+
+-- Migration-safe: add column for existing rows on already-deployed DBs.
+alter table gear_list_items add column if not exists active boolean not null default true;
 
 alter table gear_lists enable row level security;
 alter table gear_list_items enable row level security;
@@ -138,7 +142,7 @@ as $$
 begin
   delete from gear_list_items where list_id = p_list_id;
   if p_items is not null and jsonb_array_length(p_items) > 0 then
-    insert into gear_list_items (list_id, name, category, volume_liters, weight_grams, quantity, size_label, source, source_url)
+    insert into gear_list_items (list_id, name, category, volume_liters, weight_grams, quantity, size_label, source, source_url, active)
     select
       p_list_id,
       x->>'name',
@@ -148,7 +152,8 @@ begin
       (x->>'quantity')::int,
       nullif(x->>'size_label', ''),
       x->>'source',
-      nullif(x->>'source_url', '')
+      nullif(x->>'source_url', ''),
+      coalesce((x->>'active')::boolean, true)
     from jsonb_array_elements(p_items) x;
   end if;
   update gear_lists set updated_at = now() where id = p_list_id;

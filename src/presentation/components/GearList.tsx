@@ -10,6 +10,7 @@ interface Props {
   entries: GearEntry[];
   onRemove: (id: string) => void;
   onQuantityChange: (id: string, qty: number) => void;
+  onActiveChange: (id: string, active: boolean) => void;
   totalVolume: number;
 }
 
@@ -24,23 +25,32 @@ function fmt(g?: number) {
   return g >= 1000 ? `${(g / 1000).toFixed(2).replace(/\.?0+$/, '')}kg` : `${Math.round(g)}g`;
 }
 
-export function GearList({ entries, onRemove, onQuantityChange, totalVolume }: Props) {
+export function GearList({ entries, onRemove, onQuantityChange, onActiveChange, totalVolume }: Props) {
   const t = useTranslations('list');
   const locale = useLocale();
 
-  const totalWeight = entries.reduce((s, e) => s + (e.weightGrams ?? 0) * e.quantity, 0);
+  const totalWeight = entries.reduce(
+    (s, e) => (e.active === false ? s : s + (e.weightGrams ?? 0) * e.quantity),
+    0,
+  );
+  const activeCount = entries.filter(e => e.active !== false).length;
+  const inactiveCount = entries.length - activeCount;
 
   return (
     <div className="rounded-2xl border border-white/[0.07] bg-[#1c1a2e] shadow-card overflow-hidden">
-      <div className="px-5 py-4 border-b border-white/[0.07]">
+      <div className="px-5 py-4 border-b border-white/[0.07] flex items-center justify-between">
         <h2 className="text-white font-medium text-sm">{t('title')}</h2>
+        {inactiveCount > 0 && (
+          <p className="text-text-muted text-xs">{t('inactive_count', { count: inactiveCount })}</p>
+        )}
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-sm min-w-[540px]">
+        <table className="w-full text-sm min-w-[560px]">
           <thead>
             <tr className="border-b border-white/[0.05]">
-              <th className="px-5 py-2.5 text-left text-text-muted font-normal text-xs">{t('item_col')}</th>
+              <th className="w-8 px-3 py-2.5"></th>
+              <th className="px-3 py-2.5 text-left text-text-muted font-normal text-xs">{t('item_col')}</th>
               <th className="px-3 py-2.5 text-center text-text-muted font-normal text-xs">{t('qty_col')}</th>
               <th className="px-3 py-2.5 text-right text-text-muted font-normal text-xs">{t('weight_col')}</th>
               <th className="px-3 py-2.5 text-right text-text-muted font-normal text-xs">{t('volume_col')}</th>
@@ -50,37 +60,48 @@ export function GearList({ entries, onRemove, onQuantityChange, totalVolume }: P
           </thead>
           <tbody>
             {entries.map((entry, i) => {
+              const isActive = entry.active !== false;
               const lineVol = entry.volumeLiters * entry.quantity;
               const catLabels = CATEGORY_LABELS[entry.category as keyof typeof CATEGORY_LABELS];
               const catLabel = catLabels ? (catLabels[locale] ?? catLabels['en']) : entry.category;
               return (
                 <tr
                   key={entry.id}
-                  className={`border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors animate-slide-up ${i === entries.length - 1 ? 'border-b-0' : ''}`}
+                  className={`border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors animate-slide-up ${
+                    i === entries.length - 1 ? 'border-b-0' : ''
+                  } ${isActive ? '' : 'opacity-50'}`}
                 >
-                  <td className="px-5 py-3">
-                    <div className="flex items-start gap-1.5">
-                      <div>
-                        <p className="text-text-muted text-xs leading-none mb-1">
-                          {categoryIcon(entry.category)} {catLabel}
-                          {entry.sizeLabel && <span className="ml-1.5 text-accent/70">· {entry.sizeLabel}</span>}
-                          {' — '}
-                        </p>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-white">{entry.name}</span>
-                          {SOURCE_ICON[entry.source]}
-                        </div>
+                  <td className="px-3 py-3 align-top">
+                    <input
+                      type="checkbox"
+                      checked={isActive}
+                      onChange={e => onActiveChange(entry.id, e.target.checked)}
+                      className="mt-1 w-4 h-4 rounded border-white/20 bg-[#252340] text-accent focus:ring-accent/40 cursor-pointer accent-accent"
+                      aria-label={isActive ? `Exclude ${entry.name} from totals` : `Include ${entry.name} in totals`}
+                    />
+                  </td>
+                  <td className="px-3 py-3">
+                    <div>
+                      <p className="text-text-muted text-xs leading-none mb-1">
+                        {categoryIcon(entry.category)} {catLabel}
+                        {entry.sizeLabel && <span className="ml-1.5 text-accent/70">· {entry.sizeLabel}</span>}
+                        {' — '}
+                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <span className={isActive ? 'text-white' : 'text-text-secondary line-through'}>{entry.name}</span>
+                        {SOURCE_ICON[entry.source]}
                       </div>
                     </div>
                     {entry.confidence === 'low' && (
-                      <p className="text-xs text-warning mt-0.5">⚠ низкая точность — проверь вручную</p>
+                      <p className="text-xs text-warning mt-0.5">⚠ low confidence — verify manually</p>
                     )}
                   </td>
                   <td className="px-3 py-3 text-center">
                     <input
                       type="number" min={1} max={20} value={entry.quantity}
                       onChange={e => onQuantityChange(entry.id, parseInt(e.target.value) || 1)}
-                      className="w-12 bg-[#252340] border border-white/[0.07] rounded-lg text-center text-white text-sm py-1 focus:outline-none focus:border-accent/60"
+                      disabled={!isActive}
+                      className="w-12 bg-[#252340] border border-white/[0.07] rounded-lg text-center text-white text-sm py-1 focus:outline-none focus:border-accent/60 disabled:opacity-40 disabled:cursor-not-allowed"
                     />
                   </td>
                   <td className="px-3 py-3 text-right text-text-secondary text-xs">

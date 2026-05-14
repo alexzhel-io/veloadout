@@ -29,6 +29,10 @@ export interface GearEntry {
   confidence?: string;
   sourceUrl?: string;
   sizeLabel?: string;
+  /** `false` means the item is in the list but excluded from totals
+   *  (useful for what-if planning — "what if I leave my tent?").
+   *  Treated as `true` by default and when undefined for backward compat. */
+  active?: boolean;
 }
 
 interface Props {
@@ -67,7 +71,7 @@ export function GearCalculator({ user }: Props) {
         // push them. Otherwise apply the fetched list as-is.
         setEntries(current => {
           if (current.length === 0) {
-            return (list.items ?? []).map((item: { id?: string; name: string; volumeLiters: number; weightGrams?: number; category: string; quantity: number; sizeLabel?: string; source: GearEntry['source']; sourceUrl?: string }) => ({
+            return (list.items ?? []).map((item: { id?: string; name: string; volumeLiters: number; weightGrams?: number; category: string; quantity: number; sizeLabel?: string; source: GearEntry['source']; sourceUrl?: string; active?: boolean }) => ({
               id: item.id ?? uuidv4(),
               name: item.name,
               volumeLiters: item.volumeLiters,
@@ -77,6 +81,7 @@ export function GearCalculator({ user }: Props) {
               sizeLabel: item.sizeLabel,
               source: item.source ?? 'db',
               sourceUrl: item.sourceUrl,
+              active: item.active !== false, // legacy rows without the field default to active
             }));
           }
           return current;
@@ -105,6 +110,7 @@ export function GearCalculator({ user }: Props) {
           volumeLiters: e.volumeLiters,
           quantity: e.quantity,
           source: e.source,
+          active: e.active !== false, // explicit boolean — server can persist
         };
         if (typeof e.weightGrams === 'number' && Number.isFinite(e.weightGrams) && e.weightGrams > 0) {
           item.weightGrams = e.weightGrams;
@@ -174,6 +180,9 @@ export function GearCalculator({ user }: Props) {
   const updateQuantity = useCallback((id: string, quantity: number) => {
     setEntries(prev => prev.map(e => e.id === id ? { ...e, quantity: Math.max(1, quantity) } : e));
   }, []);
+  const toggleActive = useCallback((id: string, active: boolean) => {
+    setEntries(prev => prev.map(e => e.id === id ? { ...e, active } : e));
+  }, []);
 
   const addPreset = useCallback((preset: GearPreset) => {
     const name = preset.names[locale] ?? preset.names['en'];
@@ -185,7 +194,10 @@ export function GearCalculator({ user }: Props) {
 
   const isPresetActive = useCallback((id: string) => entries.some(e => e.id === id), [entries]);
 
-  const totalVolume = entries.reduce((sum, e) => sum + e.volumeLiters * e.quantity, 0);
+  const totalVolume = entries.reduce(
+    (sum, e) => (e.active === false ? sum : sum + e.volumeLiters * e.quantity),
+    0,
+  );
 
   // Bag setup is per-browser (localStorage), not per-user — it reflects the
   // physical bike, not the account.
@@ -285,7 +297,7 @@ export function GearCalculator({ user }: Props) {
           {entries.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
-                <GearList entries={entries} onRemove={removeEntry} onQuantityChange={updateQuantity} totalVolume={totalVolume} />
+                <GearList entries={entries} onRemove={removeEntry} onQuantityChange={updateQuantity} onActiveChange={toggleActive} totalVolume={totalVolume} />
               </div>
               {bagRec && (
                 <div>

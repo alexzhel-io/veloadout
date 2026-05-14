@@ -43,6 +43,7 @@ export class SupabaseGearListRepository {
       size_label: item.sizeLabel ?? null,
       source: item.source,
       source_url: item.sourceUrl ?? null,
+      active: item.active !== false,
     }));
 
     const { error } = await this.supabase.rpc('replace_gear_list_items', {
@@ -65,6 +66,7 @@ export class SupabaseGearListRepository {
       sizeLabel: i.size_label as string | undefined,
       source: i.source as GearListItem['source'],
       sourceUrl: i.source_url as string | undefined,
+      active: i.active !== false, // legacy rows without the column read as undefined → treat as active
     }));
 
     return {

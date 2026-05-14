@@ -42,7 +42,8 @@
     "remove": "Удалить",
     "total_label": "Общий объём",
     "weight_col": "Вес",
-    "total_weight": "Общий вес"
+    "total_weight": "Общий вес",
+    "inactive_count": "{count} исключено"
   },
   "bags": {
     "title": "Твои сумки",

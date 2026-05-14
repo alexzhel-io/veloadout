@@ -42,7 +42,8 @@
     "remove": "Remove",
     "total_label": "Total volume",
     "weight_col": "Weight",
-    "total_weight": "Total weight"
+    "total_weight": "Total weight",
+    "inactive_count": "{count} excluded"
   },
   "bags": {
     "title": "Your bags",

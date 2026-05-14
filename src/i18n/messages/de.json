@@ -42,7 +42,8 @@
     "remove": "Entfernen",
     "total_label": "Gesamtvolumen",
     "weight_col": "Gewicht",
-    "total_weight": "Gesamtgewicht"
+    "total_weight": "Gesamtgewicht",
+    "inactive_count": "{count} ausgeschlossen"
   },
   "bags": {
     "title": "Deine Taschen",
