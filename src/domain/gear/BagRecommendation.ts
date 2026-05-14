@@ -1,4 +1,4 @@
-export type BagSlotKey = 'handlebar' | 'frame' | 'seatpack' | 'fork';
+export type BagSlotKey = 'handlebar' | 'frame' | 'seatpack' | 'fork' | 'panniers';
 export type BagDistributionMode = 'cumulative' | 'each';
 
 export interface BagSlot {
@@ -19,6 +19,7 @@ export interface BagRecommendation {
   frame: BagSlot;
   seatpack: BagSlot;
   fork: BagSlot;
+  panniers: BagSlot;
   total: number;            // total gear volume
   totalCapacity: number;    // sum of bag capacities
   mode: BagDistributionMode;
@@ -60,6 +61,14 @@ export const SLOT_RANGES: Record<BagSlotKey, {
     multiplier: 2,
     names: { en: 'Fork Bags', de: 'Gabel­taschen', uk: 'Сумки на вилку', ru: 'Сумки на вилку' },
   },
+  panniers: {
+    // Per-bag rear-rack panniers. Typical single 10–20L → effective pair 20–40L.
+    range: [8, 25],
+    defaultCapacity: 15,
+    paired: true,
+    multiplier: 2,
+    names: { en: 'Panniers', de: 'Packtaschen', uk: 'Велобаули', ru: 'Велобаулы' },
+  },
 };
 
 export interface BagCapacities {
@@ -67,6 +76,7 @@ export interface BagCapacities {
   frame: number;
   seatpack: number;
   fork: number;
+  panniers: number;
 }
 
 export const DEFAULT_BAG_CAPACITIES: BagCapacities = {
@@ -74,6 +84,7 @@ export const DEFAULT_BAG_CAPACITIES: BagCapacities = {
   frame: SLOT_RANGES.frame.defaultCapacity,
   seatpack: SLOT_RANGES.seatpack.defaultCapacity,
   fork: SLOT_RANGES.fork.defaultCapacity,
+  panniers: SLOT_RANGES.panniers.defaultCapacity,
 };
 
 export interface BagActive {
@@ -81,13 +92,15 @@ export interface BagActive {
   frame: boolean;
   seatpack: boolean;
   fork: boolean;
+  panniers: boolean;
 }
 
 export const DEFAULT_BAG_ACTIVE: BagActive = {
   handlebar: true,
   frame: true,
   seatpack: true,
-  fork: false,   // fork bags are less common; default off so users opt-in
+  fork: false,      // fork bags are less common; default off so users opt-in
+  panniers: false,  // panniers belong to touring rigs more than bikepacking — opt-in too
 };
 
 /**
@@ -115,11 +128,11 @@ export function computeBagRecommendation(
   active: BagActive,
   mode: BagDistributionMode = 'cumulative',
 ): BagRecommendation {
-  const slotKeys: BagSlotKey[] = ['handlebar', 'frame', 'seatpack', 'fork'];
+  const slotKeys: BagSlotKey[] = ['handlebar', 'frame', 'seatpack', 'fork', 'panniers'];
 
   // Effective capacity per slot — paired bags counted ×2; inactive slots count as 0.
   const effectiveCapacities: Record<BagSlotKey, number> = {
-    handlebar: 0, frame: 0, seatpack: 0, fork: 0,
+    handlebar: 0, frame: 0, seatpack: 0, fork: 0, panniers: 0,
   };
   for (const k of slotKeys) {
     if (!active[k]) continue;
@@ -175,6 +188,7 @@ export function computeBagRecommendation(
     frame: slot('frame'),
     seatpack: slot('seatpack'),
     fork: slot('fork'),
+    panniers: slot('panniers'),
     total: totalL,
     totalCapacity,
     mode,

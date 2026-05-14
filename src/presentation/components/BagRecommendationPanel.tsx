@@ -217,6 +217,11 @@ export function BagRecommendationPanel({
           onCapacityChange={v => onCapacityChange('fork', v)}
           onActiveToggle={v => onActiveChange('fork', v)}
         />
+        <SlotCard
+          slot={recommendation.panniers}
+          onCapacityChange={v => onCapacityChange('panniers', v)}
+          onActiveToggle={v => onActiveChange('panniers', v)}
+        />
       </div>
 
     </div>
