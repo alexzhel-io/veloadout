@@ -394,6 +394,10 @@ function ConfirmCard({ candidate, locale, selectedIdx, onSelectIdx, onConfirm, o
 
       <div className="flex items-center justify-between gap-2">
         {(() => {
+          // Amazon DE only — other-locale visitors get a low-value experience
+          // (German interface, EUR pricing, cross-border shipping) so we hide
+          // the affiliate link entirely on /en, /uk, /ru.
+          if (locale !== 'de') return <span />;
           const buyUrl = trackedOutboundUrl(candidate.item.sourceUrl, candidate.item.id, name);
           if (!buyUrl) return <span />;
           return (

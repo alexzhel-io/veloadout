@@ -117,6 +117,9 @@ export function GearList({ entries, onRemove, onQuantityChange, onActiveChange, 
                   <td className="pr-3 py-3 text-right">
                     <div className="flex items-center justify-end gap-0.5">
                       {(() => {
+                        // Amazon affiliate links currently route to amazon.de only —
+                        // hide on non-DE locales to avoid wasted clicks.
+                        if (locale !== 'de') return null;
                         const buyUrl = trackedOutboundUrl(entry.sourceUrl, entry.id, entry.name);
                         if (!buyUrl) return null;
                         return (
