@@ -44,6 +44,12 @@ function SlotCard({
     slot.fillPercent >= 90 ? '#f0a400' :
     '#6d4aff';
 
+  // When a bag is picked, the affiliate buy link is built per-row;
+  // gated to /de like every other Amazon CTA.
+  const buyUrl = pickedBag && locale === 'de'
+    ? trackedOutboundUrl(pickedBag.sourceUrl, pickedBag.id, `${pickedBag.brand} ${pickedBag.model}`, pickedBag.amazonAsin)
+    : undefined;
+
   return (
     <div className={`rounded-xl border p-4 transition-opacity ${
       slot.active
@@ -56,9 +62,19 @@ function SlotCard({
             type="checkbox"
             checked={slot.active}
             onChange={e => onActiveToggle(e.target.checked)}
-            className="mt-0.5 w-4 h-4 rounded border-white/20 bg-[#252340] text-accent focus:ring-accent/40 cursor-pointer accent-accent"
+            className="mt-1 w-4 h-4 rounded border-white/20 bg-[#252340] text-accent focus:ring-accent/40 cursor-pointer accent-accent shrink-0"
             aria-label={`${slot.active ? 'Disable' : 'Enable'} ${name}`}
           />
+          {/* Inline thumbnail when a specific bag is picked — saves a row */}
+          {pickedBag && (
+            <div className="shrink-0 w-9 h-9 rounded-md bg-white/[0.05] flex items-center justify-center overflow-hidden mt-0.5">
+              {pickedBag.imageUrl ? (
+                <Image src={pickedBag.imageUrl} alt={`${pickedBag.brand} ${pickedBag.model}`} width={36} height={36} className="object-contain" unoptimized />
+              ) : (
+                <ShoppingBag size={14} className="text-text-muted" />
+              )}
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
               <p className="text-white text-sm font-medium truncate">{name}</p>
@@ -68,10 +84,39 @@ function SlotCard({
                 </span>
               )}
             </div>
-            <p className="text-text-muted text-xs mt-0.5">
-              {slot.typicalRangeL[0]}–{slot.typicalRangeL[1]}L {t('typical')}
-              {slot.paired && ` · ${t('per_bag_hint')}`}
-            </p>
+            {pickedBag ? (
+              <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
+                <p className="text-text-secondary text-xs truncate">
+                  <span className="text-white/80">{pickedBag.brand}</span> {pickedBag.model}
+                  {pickedBag.weightGrams && ` · ${pickedBag.weightGrams}g`}
+                  {pickedBag.priceEur && ` · ~€${pickedBag.priceEur}`}
+                </p>
+                {buyUrl && (
+                  <a
+                    href={buyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    title={t('buy_on_amazon')}
+                    className="shrink-0 p-0.5 rounded text-text-muted hover:text-accent transition-colors"
+                  >
+                    <ExternalLink size={11} />
+                  </a>
+                )}
+                <button
+                  onClick={onUnpick}
+                  title={t('unpick')}
+                  aria-label={t('unpick')}
+                  className="shrink-0 p-0.5 rounded text-text-muted hover:text-danger transition-colors"
+                >
+                  <XIcon size={11} />
+                </button>
+              </div>
+            ) : (
+              <p className="text-text-muted text-xs mt-0.5">
+                {slot.typicalRangeL[0]}–{slot.typicalRangeL[1]}L {t('typical')}
+                {slot.paired && ` · ${t('per_bag_hint')}`}
+              </p>
+            )}
           </div>
         </div>
         <div className="shrink-0 flex items-center gap-1">
@@ -112,63 +157,18 @@ function SlotCard({
         )}
       </div>
 
-      {/* Bag-pick footer — either a small "Pick a bag" link or the picked bag */}
-      {slot.active && (
-        <div className="mt-3 pt-3 border-t border-white/[0.04]">
-          {pickedBag ? (
-            <PickedBagStrip bag={pickedBag} onUnpick={onUnpick} locale={locale} />
-          ) : (
-            <button
-              onClick={onPickClick}
-              className="text-xs text-accent hover:text-accent-hover font-medium inline-flex items-center gap-1.5"
-            >
-              <ShoppingBag size={12} /> {t('pick_a_bag')}
-            </button>
-          )}
+      {/* Show "Pick a bag" link only when slot is active AND no bag picked yet.
+       *  Picked-bag info already lives inline in the header subtitle row. */}
+      {slot.active && !pickedBag && (
+        <div className="mt-2.5">
+          <button
+            onClick={onPickClick}
+            className="text-xs text-accent hover:text-accent-hover font-medium inline-flex items-center gap-1.5"
+          >
+            <ShoppingBag size={12} /> {t('pick_a_bag')}
+          </button>
         </div>
       )}
-    </div>
-  );
-}
-
-function PickedBagStrip({ bag, onUnpick, locale }: { bag: BagProduct; onUnpick: () => void; locale: string }) {
-  const t = useTranslations('bags');
-  const buyUrl = locale === 'de'
-    ? trackedOutboundUrl(bag.sourceUrl, bag.id, `${bag.brand} ${bag.model}`, bag.amazonAsin)
-    : undefined;
-
-  return (
-    <div className="flex items-center gap-2.5">
-      <div className="shrink-0 w-10 h-10 rounded-md bg-white/[0.05] flex items-center justify-center overflow-hidden">
-        {bag.imageUrl ? (
-          <Image src={bag.imageUrl} alt={`${bag.brand} ${bag.model}`} width={40} height={40} className="object-contain" unoptimized />
-        ) : (
-          <ShoppingBag size={16} className="text-text-muted" />
-        )}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-white text-xs font-medium truncate">{bag.brand}</p>
-        <p className="text-text-muted text-[11px] truncate">{bag.model}</p>
-      </div>
-      {buyUrl && (
-        <a
-          href={buyUrl}
-          target="_blank"
-          rel="noopener noreferrer sponsored"
-          title={t('buy_on_amazon')}
-          className="shrink-0 p-1.5 rounded-md text-text-muted hover:text-accent hover:bg-accent/10 transition-colors"
-        >
-          <ExternalLink size={12} />
-        </a>
-      )}
-      <button
-        onClick={onUnpick}
-        title={t('unpick')}
-        aria-label={t('unpick')}
-        className="shrink-0 p-1.5 rounded-md text-text-muted hover:text-danger hover:bg-danger/10 transition-colors"
-      >
-        <XIcon size={12} />
-      </button>
     </div>
   );
 }
