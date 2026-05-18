@@ -12,6 +12,7 @@ const schema = z.object({
   item: z.string().max(100).optional(),
   q:    z.string().max(200).optional(),       // product name for Amazon search
   asin: z.string().regex(/^[A-Z0-9]{10}$/).optional(), // direct Amazon product
+  mkt:  z.enum(['de', 'us']).optional(),      // which Amazon marketplace
 });
 
 let _redis: Redis | null = null;
@@ -43,6 +44,7 @@ export async function GET(req: NextRequest) {
     item: req.nextUrl.searchParams.get('item') ?? undefined,
     q:    req.nextUrl.searchParams.get('q')    ?? undefined,
     asin: req.nextUrl.searchParams.get('asin') ?? undefined,
+    mkt:  req.nextUrl.searchParams.get('mkt')  ?? undefined,
   });
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid redirect target' }, { status: 400 });
@@ -70,6 +72,6 @@ export async function GET(req: NextRequest) {
     ]).catch(err => console.warn('[r/redirect] click count failed:', err));
   }
 
-  const finalUrl = buildAffiliateUrl(target.toString(), parsed.data.q, parsed.data.asin);
+  const finalUrl = buildAffiliateUrl(target.toString(), parsed.data.q, parsed.data.asin, parsed.data.mkt);
   return NextResponse.redirect(finalUrl, 302);
 }

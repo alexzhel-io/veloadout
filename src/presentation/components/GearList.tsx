@@ -6,6 +6,7 @@ import { categoryIcon } from '@/domain/gear/GearCategoryIcon';
 import { CATEGORY_LABELS } from '@/domain/gear/GearCategory';
 import { GEAR_PRESETS } from '@/domain/gear/GearPreset';
 import { trackedOutboundUrl } from '@/presentation/utils/safeUrl';
+import { marketplaceForLocale } from '@/infrastructure/affiliate/affiliateUrl';
 import type { GearEntry } from './GearCalculator';
 
 /**
@@ -148,16 +149,15 @@ export function GearList({ entries, onRemove, onQuantityChange, onActiveChange, 
                   <td className="pr-3 py-3 text-right">
                     <div className="flex items-center justify-end gap-0.5">
                       {(() => {
-                        // Amazon affiliate links currently route to amazon.de only —
-                        // hide on non-DE locales to avoid wasted clicks.
-                        if (locale !== 'de') return null;
                         // Skip presets — generic names like "Sleeping bag" produce
                         // noisy Amazon search results with poor conversion. Only
                         // real products (db/ai with manufacturer + model) get the icon.
                         if (entry.source === 'preset') return null;
+                        // Marketplace per locale: /de → amazon.de, others → amazon.com.
                         // Always feed Amazon the English name — locale-specific
                         // preset names (e.g. "Спальник") would break the search.
-                        const buyUrl = trackedOutboundUrl(entry.sourceUrl, entry.id, englishName);
+                        const market = marketplaceForLocale(locale);
+                        const buyUrl = trackedOutboundUrl(entry.sourceUrl, entry.id, englishName, undefined, market);
                         if (!buyUrl) return null;
                         return (
                           <a

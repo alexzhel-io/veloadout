@@ -8,6 +8,7 @@ import { categoryIcon } from '@/domain/gear/GearCategoryIcon';
 import { CATEGORY_LABELS } from '@/domain/gear/GearCategory';
 import { matchVariantByQuery } from '@/domain/gear/GearVariant';
 import { trackedOutboundUrl } from '@/presentation/utils/safeUrl';
+import { marketplaceForLocale } from '@/infrastructure/affiliate/affiliateUrl';
 import { FeedbackButton } from './FeedbackButton';
 import type { GearEntry } from './GearCalculator';
 
@@ -394,11 +395,8 @@ function ConfirmCard({ candidate, locale, selectedIdx, onSelectIdx, onConfirm, o
 
       <div className="flex items-center justify-between gap-2">
         {(() => {
-          // Amazon DE only — other-locale visitors get a low-value experience
-          // (German interface, EUR pricing, cross-border shipping) so we hide
-          // the affiliate link entirely on /en, /uk, /ru.
-          if (locale !== 'de') return <span />;
-          const buyUrl = trackedOutboundUrl(candidate.item.sourceUrl, candidate.item.id, name);
+          const market = marketplaceForLocale(locale);
+          const buyUrl = trackedOutboundUrl(candidate.item.sourceUrl, candidate.item.id, name, undefined, market);
           if (!buyUrl) return <span />;
           return (
             <a

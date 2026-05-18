@@ -399,9 +399,11 @@ export function GearCalculator({ user }: Props) {
 
       <footer className="border-t border-white/[0.07] px-6 py-5 text-center text-text-muted text-sm space-y-1">
         <p>{t('footer.text')}</p>
-        {locale === 'de' && (
-          <p className="text-xs text-text-muted/80">{t('footer.affiliate_disclosure')}</p>
-        )}
+        {/* Affiliate disclosure required on any locale where we show
+         *  Amazon-tagged links. Currently DE (amazon.de) and EN (amazon.com).
+         *  uk/ru also route to amazon.com but it's a niche path — disclosure
+         *  still shown out of caution. */}
+        <p className="text-xs text-text-muted/80">{t('footer.affiliate_disclosure')}</p>
         <p className="space-x-3">
           <a href={`/${locale}/help`} className="hover:text-white transition-colors">{t('footer.help')}</a>
           <span>·</span>

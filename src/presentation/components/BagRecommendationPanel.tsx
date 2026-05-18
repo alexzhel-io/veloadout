@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { AlertTriangle, ShoppingBag, ExternalLink, X as XIcon } from 'lucide-react';
 import { trackedOutboundUrl } from '@/presentation/utils/safeUrl';
+import { marketplaceForLocale } from '@/infrastructure/affiliate/affiliateUrl';
 import type { BagProduct } from '@/domain/gear/BagProduct';
 import type { BagRecommendation, BagSlot, BagDistributionMode, BagCapacities, BagActive, BagSlotKey } from '@/domain/gear/BagRecommendation';
 
@@ -44,10 +45,16 @@ function SlotCard({
     slot.fillPercent >= 90 ? '#f0a400' :
     '#6d4aff';
 
-  // When a bag is picked, the affiliate buy link is built per-row;
-  // gated to /de like every other Amazon CTA.
-  const buyUrl = pickedBag && locale === 'de'
-    ? trackedOutboundUrl(pickedBag.sourceUrl, pickedBag.id, `${pickedBag.brand} ${pickedBag.model}`, pickedBag.amazonAsin)
+  // When a bag is picked, the affiliate buy link is built per-row.
+  // Marketplace per locale: /de → amazon.de, others → amazon.com.
+  const buyUrl = pickedBag
+    ? trackedOutboundUrl(
+        pickedBag.sourceUrl,
+        pickedBag.id,
+        `${pickedBag.brand} ${pickedBag.model}`,
+        pickedBag.amazonAsin,
+        marketplaceForLocale(locale),
+      )
     : undefined;
 
   return (

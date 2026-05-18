@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { X, ShoppingBag, ExternalLink } from 'lucide-react';
 import { trackedOutboundUrl } from '@/presentation/utils/safeUrl';
+import { marketplaceForLocale } from '@/infrastructure/affiliate/affiliateUrl';
 import type { BagProduct } from '@/domain/gear/BagProduct';
 import type { BagSlotKey } from '@/domain/gear/BagRecommendation';
 
@@ -112,9 +113,13 @@ function FamilyRow({ family, onPick, locale }: { family: BagFamily; onPick: (bag
   // Take image / price from the first variant — they're usually shared
   // across sizes of the same model.
   const sample = family.variants[0];
-  const buyUrl = locale === 'de'
-    ? trackedOutboundUrl(sample.sourceUrl, sample.id, `${sample.brand} ${family.family}`, sample.amazonAsin)
-    : undefined;
+  const buyUrl = trackedOutboundUrl(
+    sample.sourceUrl,
+    sample.id,
+    `${sample.brand} ${family.family}`,
+    sample.amazonAsin,
+    marketplaceForLocale(locale),
+  );
 
   // Range info — show "from XL" or "11L–16.5L" depending on variant count
   const minCap = family.variants[0].capacityPerBagL;
