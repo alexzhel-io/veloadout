@@ -26,7 +26,8 @@
     "confirm": "Add to list",
     "reject": "Not this",
     "select_size": "Select size",
-    "dig_deeper": "Search the web more thoroughly"
+    "dig_deeper": "Search the web more thoroughly",
+    "buy_on_amazon": "Buy on Amazon"
   },
   "presets": {
     "title": "Quick add presets",
@@ -147,6 +148,7 @@
   },
   "footer": {
     "text": "Volume data is crowd-sourced and AI-assisted. Always verify critical gear specs.",
+    "affiliate_disclosure": "As an Amazon Associate we earn from qualifying purchases. Outbound product links may be affiliate links.",
     "help": "Help",
     "privacy": "Privacy",
     "terms": "Terms"

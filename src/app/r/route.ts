@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic';
 const schema = z.object({
   to: z.string().url().max(2000),
   item: z.string().max(100).optional(),
+  q:   z.string().max(200).optional(), // product name for Amazon search
 });
 
 let _redis: Redis | null = null;
@@ -39,6 +40,7 @@ export async function GET(req: NextRequest) {
   const parsed = schema.safeParse({
     to: req.nextUrl.searchParams.get('to'),
     item: req.nextUrl.searchParams.get('item') ?? undefined,
+    q:   req.nextUrl.searchParams.get('q') ?? undefined,
   });
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid redirect target' }, { status: 400 });
@@ -66,6 +68,6 @@ export async function GET(req: NextRequest) {
     ]).catch(err => console.warn('[r/redirect] click count failed:', err));
   }
 
-  const finalUrl = buildAffiliateUrl(target.toString());
+  const finalUrl = buildAffiliateUrl(target.toString(), parsed.data.q);
   return NextResponse.redirect(finalUrl, 302);
 }

@@ -394,13 +394,16 @@ function ConfirmCard({ candidate, locale, selectedIdx, onSelectIdx, onConfirm, o
 
       <div className="flex items-center justify-between gap-2">
         {(() => {
-          const trackedUrl = trackedOutboundUrl(candidate.item.sourceUrl, candidate.item.id);
-          if (!trackedUrl) return <span />;
-          const hostname = candidate.item.sourceUrl!.replace(/^https?:\/\//, '').split('/')[0];
+          const buyUrl = trackedOutboundUrl(candidate.item.sourceUrl, candidate.item.id, name);
+          if (!buyUrl) return <span />;
           return (
-            <a href={trackedUrl} target="_blank" rel="noopener noreferrer sponsored"
-              className="text-xs text-accent/70 hover:text-accent underline truncate">
-              {hostname}
+            <a
+              href={buyUrl}
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              className="text-xs text-accent hover:text-accent-hover font-medium inline-flex items-center gap-1"
+            >
+              {t('buy_on_amazon')} ↗
             </a>
           );
         })()}

@@ -1,17 +1,31 @@
 /**
  * Wrap an outbound product URL for affiliate tracking.
  *
- * Today: identity — returns the URL unchanged.
- * Later: a domain-keyed lookup that appends partner tags (e.g.
- *   REI ?ic_id=, Amazon ?tag=, Backcountry ?CMP_ID=).
+ * Strategy:
+ * - If a `productName` is given, ALWAYS route to Amazon DE search with our
+ *   tag — captures the click for monetisation regardless of the original
+ *   sourceUrl (which usually points to manufacturer spec pages we earn
+ *   nothing from).
+ * - If the URL is already an Amazon domain, just append/replace the tag.
+ * - Otherwise, return as-is — defensive fallback when no product name is
+ *   known (rare path).
  *
- * Why exists today even though it does nothing: every product link in
- * the UI already goes through here, so plugging in real affiliate IDs
- * is a one-file change — no DB migration, no per-row rewrites.
+ * Tag policy: `veloadout-21` for amazon.de. Add new tags per marketplace
+ * when we register US/UK/etc. The Amazon DE program is "conditional
+ * approval" — we need 3 qualified sales within 180 days for full approval.
  */
-export function buildAffiliateUrl(rawUrl: string): string {
-  // Parse defensively. Invalid URLs are returned as-is so the redirect
-  // handler can decide whether to reject them.
+const AMAZON_DE_TAG = 'veloadout-21';
+
+export function buildAffiliateUrl(rawUrl: string, productName?: string): string {
+  // Best case: build an Amazon search URL by product name. This is what
+  // monetises most clicks since catalog sourceUrls typically point to
+  // manufacturer pages, not Amazon listings.
+  if (productName && productName.trim().length > 0) {
+    const q = encodeURIComponent(productName.trim());
+    return `https://www.amazon.de/s?k=${q}&tag=${AMAZON_DE_TAG}`;
+  }
+
+  // Fall back to URL-based handling.
   let u: URL;
   try {
     u = new URL(rawUrl);
@@ -19,10 +33,13 @@ export function buildAffiliateUrl(rawUrl: string): string {
     return rawUrl;
   }
 
-  // Hook point: switch on hostname when partner programs are signed.
-  // Example (not active yet):
-  //   if (u.hostname.endsWith('rei.com')) u.searchParams.set('ic_id', '<our-id>');
-  //   if (u.hostname.endsWith('amazon.de')) u.searchParams.set('tag', '<our-tag-21>');
+  // If already pointing at Amazon, just attach our tag.
+  if (u.hostname.endsWith('amazon.de') || u.hostname.endsWith('amazon.com.de')) {
+    u.searchParams.set('tag', AMAZON_DE_TAG);
+    return u.toString();
+  }
 
+  // Hook point for future programs (REI, Backcountry, etc.). For now,
+  // pass non-Amazon URLs through unchanged.
   return u.toString();
 }

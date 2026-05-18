@@ -26,7 +26,8 @@
     "confirm": "Zur Liste",
     "reject": "Nicht das",
     "select_size": "Größe wählen",
-    "dig_deeper": "Im Web gründlicher suchen"
+    "dig_deeper": "Im Web gründlicher suchen",
+    "buy_on_amazon": "Bei Amazon kaufen"
   },
   "presets": {
     "title": "Schnell hinzufügen",
@@ -147,6 +148,7 @@
   },
   "footer": {
     "text": "Volumendaten sind community-basiert und KI-unterstützt. Bitte überprüfe kritische Angaben selbst.",
+    "affiliate_disclosure": "Als Amazon-Partner verdienen wir an qualifizierten Käufen. Ausgehende Produktlinks können Affiliate-Links sein.",
     "help": "Hilfe",
     "privacy": "Datenschutz",
     "terms": "AGB"
