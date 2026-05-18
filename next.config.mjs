@@ -33,6 +33,15 @@ const nextConfig = {
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }];
   },
+  images: {
+    // Bag-picker thumbnails are hotlinked from Amazon's CDN. Whitelist
+    // explicitly so next/image's default loader doesn't reject them.
+    remotePatterns: [
+      { protocol: 'https', hostname: 'm.media-amazon.com' },
+      { protocol: 'https', hostname: 'images-na.ssl-images-amazon.com' },
+      { protocol: 'https', hostname: 'images-eu.ssl-images-amazon.com' },
+    ],
+  },
 };
 
 export default withNextIntl(nextConfig);

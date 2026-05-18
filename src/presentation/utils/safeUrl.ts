@@ -24,16 +24,18 @@ export function trackedOutboundUrl(
   rawUrl: string | undefined | null,
   itemId?: string,
   productName?: string,
+  amazonAsin?: string,
 ): string | undefined {
   const safe = safeHttpUrl(rawUrl);
-  // We always want a tracked link when a product name is known —
-  // even with no sourceUrl we can send the user to Amazon search.
-  // Use the Amazon DE homepage as a benign placeholder for `to` in that
-  // case (buildAffiliateUrl ignores `to` when productName is given).
-  const to = safe ?? (productName ? 'https://www.amazon.de/' : undefined);
+  // We always want a tracked link when a product name or ASIN is known —
+  // buildAffiliateUrl uses ASIN > productName > rawUrl in that order.
+  // Use the Amazon DE homepage as a benign placeholder for `to` when we
+  // have no real source URL.
+  const to = safe ?? ((productName || amazonAsin) ? 'https://www.amazon.de/' : undefined);
   if (!to) return undefined;
   const params = new URLSearchParams({ to });
   if (itemId) params.set('item', itemId);
   if (productName) params.set('q', productName);
+  if (amazonAsin) params.set('asin', amazonAsin);
   return `/r?${params.toString()}`;
 }

@@ -132,6 +132,35 @@ create trigger gear_lists_updated_at
   before update on gear_lists
   for each row execute function update_updated_at();
 
+-- Curated catalog of actual bikepacking bags users can pick per slot
+-- (Ortlieb, Apidura, Restrap, etc.). Separate from gear_items because
+-- bags are containers, not gear — and gear_items has a hard blocklist
+-- against bag brands.
+create table if not exists bag_products (
+  id                   text primary key,             -- slug: 'ortlieb-seat-pack-16'
+  brand                text not null,                -- 'Ortlieb'
+  model                text not null,                -- 'Seat-Pack QR 16L'
+  slot                 text not null,                -- handlebar | frame | seatpack | fork | panniers
+  paired               boolean not null default false, -- true when the listed product is one of a pair (fork, panniers)
+  capacity_per_bag_l   numeric(6,2) not null,        -- per single bag for paired; effective in panel = ×2
+  weight_grams         integer,                      -- optional, not always advertised
+  image_url            text,                         -- m.media-amazon.com or manufacturer CDN
+  amazon_asin          text,                         -- 10-char Amazon ID for direct affiliate link
+  source_url           text,                         -- manufacturer page (fallback when no ASIN)
+  price_eur            numeric(7,2),                 -- last known German price; informational only
+  created_at           timestamptz not null default now(),
+  updated_at           timestamptz not null default now()
+);
+
+create index if not exists idx_bag_products_slot on bag_products(slot);
+
+alter table bag_products enable row level security;
+
+-- Read-public, write-admin-only (seeded via SQL Editor which bypasses RLS).
+drop policy if exists "Anyone reads bag products" on bag_products;
+create policy "Anyone reads bag products"
+  on bag_products for select using (true);
+
 -- User feedback on individual catalog items. Anonymous-OK so any visitor
 -- can flag bad data without forcing a sign-up. Admin reviews via Supabase
 -- Table editor and applies fixes manually.

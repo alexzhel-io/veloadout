@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { v4 as uuidv4 } from 'uuid';
 import { Bike, Save, CheckCircle, Loader2 } from 'lucide-react';
@@ -11,9 +11,11 @@ import { BagRecommendationPanel } from './BagRecommendationPanel';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { AuthButton } from './AuthButton';
 import { ShareButton } from './ShareButton';
+import { BagPickerModal } from './BagPickerModal';
 import { WelcomeHint } from './WelcomeHint';
 import { useToast } from './Toast';
-import { computeBagRecommendation, DEFAULT_BAG_CAPACITIES, DEFAULT_BAG_ACTIVE, type BagCapacities, type BagActive, type BagDistributionMode } from '@/domain/gear/BagRecommendation';
+import { computeBagRecommendation, DEFAULT_BAG_CAPACITIES, DEFAULT_BAG_ACTIVE, type BagCapacities, type BagActive, type BagDistributionMode, type BagSlotKey } from '@/domain/gear/BagRecommendation';
+import type { BagProduct } from '@/domain/gear/BagProduct';
 import { GearCategory } from '@/domain/gear/GearCategory';
 
 const VALID_CATEGORIES = new Set<string>(Object.values(GearCategory));
@@ -219,7 +221,15 @@ export function GearCalculator({ user }: Props) {
   const [bagCapacities, setBagCapacities] = useState<BagCapacities>(DEFAULT_BAG_CAPACITIES);
   const [bagActive, setBagActive] = useState<BagActive>(DEFAULT_BAG_ACTIVE);
   const [bagMode, setBagMode] = useState<BagDistributionMode>('cumulative');
+  // bagPicks: slot → bag_products.id. Fully optional; empty when user hasn't
+  // picked any specific bag (Mode A — manual capacity).
+  const [bagPickIds, setBagPickIds] = useState<Partial<Record<BagSlotKey, string>>>({});
   const bagSetupLoaded = useRef(false);
+
+  // Bag catalog cache. Fetched lazily — only when the user opens a picker or
+  // when a pre-existing pick needs to be rendered after page reload.
+  const [bagCatalog, setBagCatalog] = useState<BagProduct[] | null>(null);
+  const [pickerOpenFor, setPickerOpenFor] = useState<BagSlotKey | null>(null);
 
   useEffect(() => {
     try {
@@ -227,8 +237,6 @@ export function GearCalculator({ user }: Props) {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed.capacities && typeof parsed.capacities.handlebar === 'number') {
-          // Merge with defaults so newly added slots (e.g. fork) get a default
-          // value for users who saved a setup before the slot existed.
           setBagCapacities({ ...DEFAULT_BAG_CAPACITIES, ...parsed.capacities });
         }
         if (parsed.active && typeof parsed.active.handlebar === 'boolean') {
@@ -236,6 +244,9 @@ export function GearCalculator({ user }: Props) {
         }
         if (parsed.mode === 'cumulative' || parsed.mode === 'each') {
           setBagMode(parsed.mode);
+        }
+        if (parsed.picks && typeof parsed.picks === 'object') {
+          setBagPickIds(parsed.picks);
         }
       }
     } catch { /* ignore malformed storage */ }
@@ -249,9 +260,25 @@ export function GearCalculator({ user }: Props) {
         capacities: bagCapacities,
         active: bagActive,
         mode: bagMode,
+        picks: bagPickIds,
       }));
     } catch { /* localStorage full / unavailable */ }
-  }, [bagCapacities, bagActive, bagMode]);
+  }, [bagCapacities, bagActive, bagMode, bagPickIds]);
+
+  // Lazy bag catalog fetch: fire on first picker open OR when we have
+  // pre-existing picks from localStorage that need to be rendered.
+  useEffect(() => {
+    if (bagCatalog !== null) return;
+    const needForPicks = Object.keys(bagPickIds).length > 0;
+    const needForPicker = pickerOpenFor !== null;
+    if (!needForPicks && !needForPicker) return;
+    let cancelled = false;
+    fetch('/api/bags')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then((data: { bags: BagProduct[] }) => { if (!cancelled) setBagCatalog(data.bags); })
+      .catch(err => console.warn('[bags fetch] failed:', err));
+    return () => { cancelled = true; };
+  }, [bagCatalog, bagPickIds, pickerOpenFor]);
 
   const updateBagCapacity = useCallback((key: keyof BagCapacities, value: number) => {
     setBagCapacities(prev => ({ ...prev, [key]: Math.max(0, Math.min(50, value)) }));
@@ -260,6 +287,36 @@ export function GearCalculator({ user }: Props) {
   const updateBagActive = useCallback((key: keyof BagActive, value: boolean) => {
     setBagActive(prev => ({ ...prev, [key]: value }));
   }, []);
+
+  const pickBag = useCallback((slot: BagSlotKey, bag: BagProduct) => {
+    setBagPickIds(prev => ({ ...prev, [slot]: bag.id }));
+    // Lock slot capacity to the picked bag's spec
+    setBagCapacities(prev => ({ ...prev, [slot]: bag.capacityPerBagL }));
+    // Force-activate the slot if it was off — picking implies use
+    setBagActive(prev => ({ ...prev, [slot]: true }));
+    setPickerOpenFor(null);
+  }, []);
+
+  const unpickBag = useCallback((slot: BagSlotKey) => {
+    setBagPickIds(prev => {
+      const next = { ...prev };
+      delete next[slot];
+      return next;
+    });
+    // Keep capacity at its current value — user can edit it again
+  }, []);
+
+  // Resolve picked bag objects from the cached catalog. Returns undefined
+  // entries until the catalog is loaded, which is fine — UI shows the link
+  // ("Pick a bag") instead of the picked-bag strip.
+  const picksResolved = useMemo<Partial<Record<BagSlotKey, BagProduct | undefined>>>(() => {
+    if (!bagCatalog) return {};
+    const out: Partial<Record<BagSlotKey, BagProduct | undefined>> = {};
+    for (const [slot, id] of Object.entries(bagPickIds) as [BagSlotKey, string][]) {
+      out[slot] = bagCatalog.find(b => b.id === id);
+    }
+    return out;
+  }, [bagCatalog, bagPickIds]);
 
   const bagRec = totalVolume > 0 ? computeBagRecommendation(totalVolume, bagCapacities, bagActive, bagMode) : null;
 
@@ -327,6 +384,9 @@ export function GearCalculator({ user }: Props) {
                     onCapacityChange={updateBagCapacity}
                     active={bagActive}
                     onActiveChange={updateBagActive}
+                    picks={picksResolved}
+                    onPickClick={setPickerOpenFor}
+                    onUnpick={unpickBag}
                   />
                 </div>
               )}
@@ -352,6 +412,16 @@ export function GearCalculator({ user }: Props) {
           <a href={`/${locale}/impressum`} className="hover:text-white transition-colors">Impressum</a>
         </p>
       </footer>
+
+      {pickerOpenFor && bagCatalog && (
+        <BagPickerModal
+          slot={pickerOpenFor}
+          slotName={pickerOpenFor}
+          bags={bagCatalog}
+          onPick={bag => pickBag(pickerOpenFor, bag)}
+          onClose={() => setPickerOpenFor(null)}
+        />
+      )}
     </div>
   );
 }

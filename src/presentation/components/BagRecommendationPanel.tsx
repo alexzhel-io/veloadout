@@ -1,8 +1,11 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { AlertTriangle } from 'lucide-react';
-import type { BagRecommendation, BagSlot, BagDistributionMode, BagCapacities, BagActive } from '@/domain/gear/BagRecommendation';
+import Image from 'next/image';
+import { AlertTriangle, ShoppingBag, ExternalLink, X as XIcon } from 'lucide-react';
+import { trackedOutboundUrl } from '@/presentation/utils/safeUrl';
+import type { BagProduct } from '@/domain/gear/BagProduct';
+import type { BagRecommendation, BagSlot, BagDistributionMode, BagCapacities, BagActive, BagSlotKey } from '@/domain/gear/BagRecommendation';
 
 interface Props {
   recommendation: BagRecommendation;
@@ -12,16 +15,25 @@ interface Props {
   onCapacityChange: (key: keyof BagCapacities, value: number) => void;
   active: BagActive;
   onActiveChange: (key: keyof BagActive, value: boolean) => void;
+  picks: Partial<Record<BagSlotKey, BagProduct | undefined>>;
+  onPickClick: (slot: BagSlotKey) => void;
+  onUnpick: (slot: BagSlotKey) => void;
 }
 
 function SlotCard({
   slot,
+  pickedBag,
   onCapacityChange,
   onActiveToggle,
+  onPickClick,
+  onUnpick,
 }: {
   slot: BagSlot;
+  pickedBag?: BagProduct;
   onCapacityChange: (value: number) => void;
   onActiveToggle: (next: boolean) => void;
+  onPickClick: () => void;
+  onUnpick: () => void;
 }) {
   const t = useTranslations('bags');
   const locale = useLocale();
@@ -70,9 +82,10 @@ function SlotCard({
             step={0.5}
             value={slot.capacityPerBagL}
             onChange={e => onCapacityChange(parseFloat(e.target.value) || 0)}
-            disabled={!slot.active}
+            disabled={!slot.active || !!pickedBag}
             className="w-16 bg-[#252340] border border-white/[0.07] rounded-md px-2 py-1 text-white text-sm text-right focus:outline-none focus:border-accent/60 disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label={`${name} capacity in litres`}
+            title={pickedBag ? t('capacity_locked') : undefined}
           />
           <span className="text-text-muted text-xs">L</span>
         </div>
@@ -98,6 +111,64 @@ function SlotCard({
           </span>
         )}
       </div>
+
+      {/* Bag-pick footer — either a small "Pick a bag" link or the picked bag */}
+      {slot.active && (
+        <div className="mt-3 pt-3 border-t border-white/[0.04]">
+          {pickedBag ? (
+            <PickedBagStrip bag={pickedBag} onUnpick={onUnpick} locale={locale} />
+          ) : (
+            <button
+              onClick={onPickClick}
+              className="text-xs text-accent hover:text-accent-hover font-medium inline-flex items-center gap-1.5"
+            >
+              <ShoppingBag size={12} /> {t('pick_a_bag')}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PickedBagStrip({ bag, onUnpick, locale }: { bag: BagProduct; onUnpick: () => void; locale: string }) {
+  const t = useTranslations('bags');
+  const buyUrl = locale === 'de'
+    ? trackedOutboundUrl(bag.sourceUrl, bag.id, `${bag.brand} ${bag.model}`, bag.amazonAsin)
+    : undefined;
+
+  return (
+    <div className="flex items-center gap-2.5">
+      <div className="shrink-0 w-10 h-10 rounded-md bg-white/[0.05] flex items-center justify-center overflow-hidden">
+        {bag.imageUrl ? (
+          <Image src={bag.imageUrl} alt={`${bag.brand} ${bag.model}`} width={40} height={40} className="object-contain" unoptimized />
+        ) : (
+          <ShoppingBag size={16} className="text-text-muted" />
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-white text-xs font-medium truncate">{bag.brand}</p>
+        <p className="text-text-muted text-[11px] truncate">{bag.model}</p>
+      </div>
+      {buyUrl && (
+        <a
+          href={buyUrl}
+          target="_blank"
+          rel="noopener noreferrer sponsored"
+          title={t('buy_on_amazon')}
+          className="shrink-0 p-1.5 rounded-md text-text-muted hover:text-accent hover:bg-accent/10 transition-colors"
+        >
+          <ExternalLink size={12} />
+        </a>
+      )}
+      <button
+        onClick={onUnpick}
+        title={t('unpick')}
+        aria-label={t('unpick')}
+        className="shrink-0 p-1.5 rounded-md text-text-muted hover:text-danger hover:bg-danger/10 transition-colors"
+      >
+        <XIcon size={12} />
+      </button>
     </div>
   );
 }
@@ -108,6 +179,9 @@ export function BagRecommendationPanel({
   onModeChange,
   onCapacityChange,
   onActiveChange,
+  picks,
+  onPickClick,
+  onUnpick,
 }: Props) {
   const t = useTranslations('bags');
   const gear = recommendation.total;
@@ -197,31 +271,17 @@ export function BagRecommendationPanel({
       </div>
 
       <div className="p-4 space-y-3">
-        <SlotCard
-          slot={recommendation.handlebar}
-          onCapacityChange={v => onCapacityChange('handlebar', v)}
-          onActiveToggle={v => onActiveChange('handlebar', v)}
-        />
-        <SlotCard
-          slot={recommendation.frame}
-          onCapacityChange={v => onCapacityChange('frame', v)}
-          onActiveToggle={v => onActiveChange('frame', v)}
-        />
-        <SlotCard
-          slot={recommendation.seatpack}
-          onCapacityChange={v => onCapacityChange('seatpack', v)}
-          onActiveToggle={v => onActiveChange('seatpack', v)}
-        />
-        <SlotCard
-          slot={recommendation.fork}
-          onCapacityChange={v => onCapacityChange('fork', v)}
-          onActiveToggle={v => onActiveChange('fork', v)}
-        />
-        <SlotCard
-          slot={recommendation.panniers}
-          onCapacityChange={v => onCapacityChange('panniers', v)}
-          onActiveToggle={v => onActiveChange('panniers', v)}
-        />
+        {(['handlebar', 'frame', 'seatpack', 'fork', 'panniers'] as const).map(key => (
+          <SlotCard
+            key={key}
+            slot={recommendation[key]}
+            pickedBag={picks[key] ?? undefined}
+            onCapacityChange={v => onCapacityChange(key, v)}
+            onActiveToggle={v => onActiveChange(key, v)}
+            onPickClick={() => onPickClick(key)}
+            onUnpick={() => onUnpick(key)}
+          />
+        ))}
       </div>
 
     </div>

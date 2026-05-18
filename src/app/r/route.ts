@@ -8,9 +8,10 @@ export const dynamic = 'force-dynamic';
 
 // `to` must be a real http(s) URL, capped at 2000 chars (Supabase column limit too)
 const schema = z.object({
-  to: z.string().url().max(2000),
+  to:   z.string().url().max(2000),
   item: z.string().max(100).optional(),
-  q:   z.string().max(200).optional(), // product name for Amazon search
+  q:    z.string().max(200).optional(),       // product name for Amazon search
+  asin: z.string().regex(/^[A-Z0-9]{10}$/).optional(), // direct Amazon product
 });
 
 let _redis: Redis | null = null;
@@ -38,9 +39,10 @@ function redis(): Redis | null {
  */
 export async function GET(req: NextRequest) {
   const parsed = schema.safeParse({
-    to: req.nextUrl.searchParams.get('to'),
+    to:   req.nextUrl.searchParams.get('to'),
     item: req.nextUrl.searchParams.get('item') ?? undefined,
-    q:   req.nextUrl.searchParams.get('q') ?? undefined,
+    q:    req.nextUrl.searchParams.get('q')    ?? undefined,
+    asin: req.nextUrl.searchParams.get('asin') ?? undefined,
   });
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid redirect target' }, { status: 400 });
@@ -68,6 +70,6 @@ export async function GET(req: NextRequest) {
     ]).catch(err => console.warn('[r/redirect] click count failed:', err));
   }
 
-  const finalUrl = buildAffiliateUrl(target.toString(), parsed.data.q);
+  const finalUrl = buildAffiliateUrl(target.toString(), parsed.data.q, parsed.data.asin);
   return NextResponse.redirect(finalUrl, 302);
 }
