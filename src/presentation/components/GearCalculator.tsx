@@ -10,6 +10,7 @@ import { GearList } from './GearList';
 import { BagRecommendationPanel } from './BagRecommendationPanel';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { AuthButton } from './AuthButton';
+import { ShareButton } from './ShareButton';
 import { WelcomeHint } from './WelcomeHint';
 import { useToast } from './Toast';
 import { computeBagRecommendation, DEFAULT_BAG_CAPACITIES, DEFAULT_BAG_ACTIVE, type BagCapacities, type BagActive, type BagDistributionMode } from '@/domain/gear/BagRecommendation';
@@ -261,14 +262,17 @@ export function GearCalculator({ user }: Props) {
           </div>
           <div className="flex items-center gap-3">
             {user && entries.length > 0 && (
-              <button
-                onClick={saveList}
-                disabled={saving}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/[0.07] text-text-secondary hover:text-white hover:border-white/20 text-xs transition-colors"
-              >
-                {saving ? <Loader2 size={12} className="animate-spin" /> : saved ? <CheckCircle size={12} className="text-success" /> : <Save size={12} />}
-                {saved ? t('auth.list_saved') : t('auth.save_list')}
-              </button>
+              <>
+                <ShareButton listId={listId} bagSetup={{ capacities: bagCapacities, active: bagActive, mode: bagMode }} />
+                <button
+                  onClick={saveList}
+                  disabled={saving}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/[0.07] text-text-secondary hover:text-white hover:border-white/20 text-xs transition-colors"
+                >
+                  {saving ? <Loader2 size={12} className="animate-spin" /> : saved ? <CheckCircle size={12} className="text-success" /> : <Save size={12} />}
+                  {saved ? t('auth.list_saved') : t('auth.save_list')}
+                </button>
+              </>
             )}
             {!user && entries.length > 0 && (
               <span className="text-text-muted text-xs hidden sm:block">{t('auth.sign_in_to_save')}</span>

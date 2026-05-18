@@ -65,8 +65,18 @@ create table if not exists gear_lists (
   user_id     uuid not null references auth.users(id) on delete cascade,
   name        text not null default 'My Gear List',
   created_at  timestamptz not null default now(),
-  updated_at  timestamptz not null default now()
+  updated_at  timestamptz not null default now(),
+  -- Public sharing: when share_slug is set, the list is readable via
+  -- /api/list/<slug> by anyone (including anon). Set to null to revoke.
+  share_slug             text unique,
+  shared_at              timestamptz,
+  shared_bag_setup_json  jsonb        -- snapshot of bag capacities + active flags + mode at share time
 );
+
+-- Migration-safe for existing deployments
+alter table gear_lists add column if not exists share_slug text unique;
+alter table gear_lists add column if not exists shared_at timestamptz;
+alter table gear_lists add column if not exists shared_bag_setup_json jsonb;
 
 create table if not exists gear_list_items (
   id            uuid primary key default gen_random_uuid(),
@@ -97,6 +107,19 @@ drop policy if exists "Users see own list items" on gear_list_items;
 create policy "Users see own list items"
   on gear_list_items for all
   using (list_id in (select id from gear_lists where user_id = auth.uid()));
+
+-- Public-share read access. ORed with the owner policies above —
+-- anyone (anon included) can read a list (and its items) when the
+-- list's share_slug is set. Writes still require ownership.
+drop policy if exists "Anyone can read shared lists" on gear_lists;
+create policy "Anyone can read shared lists"
+  on gear_lists for select
+  using (share_slug is not null);
+
+drop policy if exists "Anyone can read items of shared lists" on gear_list_items;
+create policy "Anyone can read items of shared lists"
+  on gear_list_items for select
+  using (list_id in (select id from gear_lists where share_slug is not null));
 
 -- Auto-update updated_at on gear_lists
 create or replace function update_updated_at()

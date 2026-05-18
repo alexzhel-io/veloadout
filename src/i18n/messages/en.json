@@ -107,6 +107,22 @@
     "tip_2": "All numbers are estimates. For trip-critical gear, verify against manufacturer specs.",
     "tip_3": "Found something missing? Sign in and search — confirmed AI results are saved to the shared catalog for everyone."
   },
+  "share": {
+    "share_list": "Share",
+    "share_description": "Create a public link so anyone can view your gear list. Read-only — they can't change anything.",
+    "generate_link": "Create share link",
+    "copy": "Copy",
+    "copied": "Copied",
+    "revoke": "Revoke link",
+    "readonly_note": "Public links are read-only.",
+    "anyone_can_see": "Anyone with this link can see the list.",
+    "network_error": "Network error, please try again",
+    "shared_title": "Shared gear list",
+    "shared_description": "A public bikepacking gear list shared via Veloadout.",
+    "shared_gear_list": "Shared gear list",
+    "shared_on": "shared on {date}",
+    "build_your_own": "Build your own"
+  },
   "feedback": {
     "report": "Report incorrect data",
     "report_short": "Report",

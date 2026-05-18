@@ -107,6 +107,22 @@
     "tip_2": "Alle Zahlen sind Schätzwerte. Bei tour-kritischer Ausrüstung mit Herstellerangaben abgleichen.",
     "tip_3": "Etwas fehlt? Melde dich an und suche — bestätigte KI-Ergebnisse landen im gemeinsamen Katalog für alle."
   },
+  "share": {
+    "share_list": "Teilen",
+    "share_description": "Erstelle einen öffentlichen Link, damit andere deine Liste sehen können. Nur lesbar — nichts wird verändert.",
+    "generate_link": "Link erstellen",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "revoke": "Link widerrufen",
+    "readonly_note": "Öffentliche Links sind schreibgeschützt.",
+    "anyone_can_see": "Jeder mit diesem Link kann die Liste sehen.",
+    "network_error": "Netzwerkfehler, bitte erneut versuchen",
+    "shared_title": "Geteilte Ausrüstungsliste",
+    "shared_description": "Eine öffentliche Bikepacking-Liste geteilt via Veloadout.",
+    "shared_gear_list": "Geteilte Liste",
+    "shared_on": "geteilt am {date}",
+    "build_your_own": "Eigene erstellen"
+  },
   "feedback": {
     "report": "Fehlerhafte Daten melden",
     "report_short": "Melden",
