@@ -186,12 +186,14 @@ export function GearCalculator({ user }: Props) {
   }, []);
 
   const addPreset = useCallback((preset: GearPreset) => {
-    const name = preset.names[locale] ?? preset.names['en'];
+    // Always store the English name as the canonical snapshot. The UI
+    // localises preset names dynamically at render time (see GearList),
+    // and the affiliate URL needs an English search term anyway.
     setEntries(prev => {
       if (prev.find(e => e.id === preset.id)) return prev.filter(e => e.id !== preset.id);
-      return [...prev, { id: preset.id, name, volumeLiters: preset.volumeLiters, category: preset.category, quantity: 1, source: 'preset' }];
+      return [...prev, { id: preset.id, name: preset.names['en'], volumeLiters: preset.volumeLiters, category: preset.category, quantity: 1, source: 'preset' }];
     });
-  }, [locale]);
+  }, []);
 
   const isPresetActive = useCallback((id: string) => entries.some(e => e.id === id), [entries]);
 

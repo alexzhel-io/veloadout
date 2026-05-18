@@ -4,8 +4,29 @@ import { useLocale, useTranslations } from 'next-intl';
 import { X, Sparkles, Database, Layers, ShoppingCart } from 'lucide-react';
 import { categoryIcon } from '@/domain/gear/GearCategoryIcon';
 import { CATEGORY_LABELS } from '@/domain/gear/GearCategory';
+import { GEAR_PRESETS } from '@/domain/gear/GearPreset';
 import { trackedOutboundUrl } from '@/presentation/utils/safeUrl';
 import type { GearEntry } from './GearCalculator';
+
+/**
+ * For preset-sourced entries, resolve the display name from the preset
+ * definition (so locale switches re-render). For other sources, fall
+ * back to the stored snapshot.
+ *
+ * Returns both `display` (localised) and `english` (for Amazon search).
+ */
+function entryNames(entry: GearEntry, locale: string): { display: string; english: string } {
+  if (entry.source === 'preset') {
+    const preset = GEAR_PRESETS.find(p => p.id === entry.id);
+    if (preset) {
+      return {
+        display: preset.names[locale] ?? preset.names['en'],
+        english: preset.names['en'],
+      };
+    }
+  }
+  return { display: entry.name, english: entry.name };
+}
 
 interface Props {
   entries: GearEntry[];
@@ -65,6 +86,7 @@ export function GearList({ entries, onRemove, onQuantityChange, onActiveChange, 
               const lineVol = entry.volumeLiters * entry.quantity;
               const catLabels = CATEGORY_LABELS[entry.category as keyof typeof CATEGORY_LABELS];
               const catLabel = catLabels ? (catLabels[locale] ?? catLabels['en']) : entry.category;
+              const { display: displayName, english: englishName } = entryNames(entry, locale);
               return (
                 <tr
                   key={entry.id}
@@ -89,7 +111,7 @@ export function GearList({ entries, onRemove, onQuantityChange, onActiveChange, 
                         {' — '}
                       </p>
                       <div className="flex items-center gap-1.5">
-                        <span className={isActive ? 'text-white' : 'text-text-secondary line-through'}>{entry.name}</span>
+                        <span className={isActive ? 'text-white' : 'text-text-secondary line-through'}>{displayName}</span>
                         {SOURCE_ICON[entry.source]}
                       </div>
                     </div>
@@ -120,7 +142,9 @@ export function GearList({ entries, onRemove, onQuantityChange, onActiveChange, 
                         // Amazon affiliate links currently route to amazon.de only —
                         // hide on non-DE locales to avoid wasted clicks.
                         if (locale !== 'de') return null;
-                        const buyUrl = trackedOutboundUrl(entry.sourceUrl, entry.id, entry.name);
+                        // Always feed Amazon the English name — locale-specific
+                        // preset names (e.g. "Спальник") would break the search.
+                        const buyUrl = trackedOutboundUrl(entry.sourceUrl, entry.id, englishName);
                         if (!buyUrl) return null;
                         return (
                           <a
@@ -128,7 +152,7 @@ export function GearList({ entries, onRemove, onQuantityChange, onActiveChange, 
                             target="_blank"
                             rel="noopener noreferrer sponsored"
                             title={t('buy_hint')}
-                            aria-label={`${t('buy_hint')}: ${entry.name}`}
+                            aria-label={`${t('buy_hint')}: ${englishName}`}
                             className="p-1.5 rounded-lg text-text-muted hover:text-accent hover:bg-accent/10 transition-colors"
                           >
                             <ShoppingCart size={14} />

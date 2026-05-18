@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Sparkles, Database, Layers, AlertTriangle } from 'lucide-react';
 import { categoryIcon } from '@/domain/gear/GearCategoryIcon';
 import { CATEGORY_LABELS } from '@/domain/gear/GearCategory';
+import { GEAR_PRESETS } from '@/domain/gear/GearPreset';
 import {
   computeBagRecommendation,
   DEFAULT_BAG_CAPACITIES,
@@ -98,6 +99,12 @@ export function SharedListView({ data }: Props) {
                   const lineVol = entry.volumeLiters * entry.quantity;
                   const catLabels = CATEGORY_LABELS[entry.category as keyof typeof CATEGORY_LABELS];
                   const catLabel = catLabels ? (catLabels[locale] ?? catLabels['en']) : entry.category;
+                  // Preset names: resolve from the canonical preset definition
+                  // so the shared view shows the viewer's locale, not the sharer's.
+                  const preset = entry.source === 'preset'
+                    ? GEAR_PRESETS.find(p => p.id === entry.id)
+                    : undefined;
+                  const displayName = preset ? (preset.names[locale] ?? preset.names['en']) : entry.name;
                   return (
                     <tr
                       key={entry.id}
@@ -109,7 +116,7 @@ export function SharedListView({ data }: Props) {
                           {entry.sizeLabel && <span className="ml-1.5 text-accent/70">· {entry.sizeLabel}</span>}
                         </p>
                         <div className="flex items-center gap-1.5">
-                          <span className={isActive ? 'text-white' : 'text-text-secondary line-through'}>{entry.name}</span>
+                          <span className={isActive ? 'text-white' : 'text-text-secondary line-through'}>{displayName}</span>
                           {entry.source && SOURCE_ICON[entry.source]}
                         </div>
                       </td>
