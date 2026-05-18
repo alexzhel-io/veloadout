@@ -10,20 +10,29 @@ import type { GearEntry } from './GearCalculator';
 
 /**
  * For preset-sourced entries, resolve the display name from the preset
- * definition (so locale switches re-render). For other sources, fall
- * back to the stored snapshot.
+ * definition (so locale switches re-render).
  *
- * Returns both `display` (localised) and `english` (for Amazon search).
+ * Tricky bit: after a save round-trip, entry.id is a fresh Postgres uuid
+ * (gear_list_items.id), not the original preset.id. So we match by a
+ * pair that survives round-trip — (category, volumeLiters) — which is
+ * unique across our 14 presets. The id check is kept for unsaved local
+ * entries within the same session.
  */
+function findPreset(entry: GearEntry) {
+  if (entry.source !== 'preset') return undefined;
+  return GEAR_PRESETS.find(p =>
+    p.id === entry.id ||
+    (p.category === entry.category && Math.abs(p.volumeLiters - entry.volumeLiters) < 0.01),
+  );
+}
+
 function entryNames(entry: GearEntry, locale: string): { display: string; english: string } {
-  if (entry.source === 'preset') {
-    const preset = GEAR_PRESETS.find(p => p.id === entry.id);
-    if (preset) {
-      return {
-        display: preset.names[locale] ?? preset.names['en'],
-        english: preset.names['en'],
-      };
-    }
+  const preset = findPreset(entry);
+  if (preset) {
+    return {
+      display: preset.names[locale] ?? preset.names['en'],
+      english: preset.names['en'],
+    };
   }
   return { display: entry.name, english: entry.name };
 }

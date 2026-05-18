@@ -101,8 +101,13 @@ export function SharedListView({ data }: Props) {
                   const catLabel = catLabels ? (catLabels[locale] ?? catLabels['en']) : entry.category;
                   // Preset names: resolve from the canonical preset definition
                   // so the shared view shows the viewer's locale, not the sharer's.
+                  // Match by (category, volumeLiters) because entry.id is a fresh
+                  // Postgres uuid after the save round-trip, not the original preset id.
                   const preset = entry.source === 'preset'
-                    ? GEAR_PRESETS.find(p => p.id === entry.id)
+                    ? GEAR_PRESETS.find(p =>
+                        p.id === entry.id ||
+                        (p.category === entry.category && Math.abs(p.volumeLiters - entry.volumeLiters) < 0.01),
+                      )
                     : undefined;
                   const displayName = preset ? (preset.names[locale] ?? preset.names['en']) : entry.name;
                   return (

@@ -17,7 +17,7 @@ import { computeBagRecommendation, DEFAULT_BAG_CAPACITIES, DEFAULT_BAG_ACTIVE, t
 import { GearCategory } from '@/domain/gear/GearCategory';
 
 const VALID_CATEGORIES = new Set<string>(Object.values(GearCategory));
-import type { GearPreset } from '@/domain/gear/GearPreset';
+import { GEAR_PRESETS, type GearPreset } from '@/domain/gear/GearPreset';
 
 export interface GearEntry {
   id: string;
@@ -190,12 +190,24 @@ export function GearCalculator({ user }: Props) {
     // localises preset names dynamically at render time (see GearList),
     // and the affiliate URL needs an English search term anyway.
     setEntries(prev => {
-      if (prev.find(e => e.id === preset.id)) return prev.filter(e => e.id !== preset.id);
+      // Match by id (unsaved) OR (source, category, volume) tuple (round-tripped).
+      const matchesPreset = (e: GearEntry) =>
+        e.id === preset.id ||
+        (e.source === 'preset' && e.category === preset.category && Math.abs(e.volumeLiters - preset.volumeLiters) < 0.01);
+      if (prev.some(matchesPreset)) return prev.filter(e => !matchesPreset(e));
       return [...prev, { id: preset.id, name: preset.names['en'], volumeLiters: preset.volumeLiters, category: preset.category, quantity: 1, source: 'preset' }];
     });
   }, []);
 
-  const isPresetActive = useCallback((id: string) => entries.some(e => e.id === id), [entries]);
+  // Match by id (unsaved local entries) OR by category+volume (entries that
+  // round-tripped through DB and now carry a fresh uuid instead of the preset id).
+  const isPresetActive = useCallback((id: string) => {
+    const def = GEAR_PRESETS.find(p => p.id === id);
+    return entries.some(e =>
+      e.id === id ||
+      (def && e.source === 'preset' && e.category === def.category && Math.abs(e.volumeLiters - def.volumeLiters) < 0.01),
+    );
+  }, [entries]);
 
   const totalVolume = entries.reduce(
     (sum, e) => (e.active === false ? sum : sum + e.volumeLiters * e.quantity),
