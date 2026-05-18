@@ -44,7 +44,8 @@
     "total_label": "Загальний обʼєм",
     "weight_col": "Вага",
     "total_weight": "Загальна вага",
-    "inactive_count": "{count} виключено"
+    "inactive_count": "{count} виключено",
+    "buy_hint": "Купити на Amazon"
   },
   "bags": {
     "title": "Твої сумки",

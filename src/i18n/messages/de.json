@@ -44,7 +44,8 @@
     "total_label": "Gesamtvolumen",
     "weight_col": "Gewicht",
     "total_weight": "Gesamtgewicht",
-    "inactive_count": "{count} ausgeschlossen"
+    "inactive_count": "{count} ausgeschlossen",
+    "buy_hint": "Bei Amazon kaufen"
   },
   "bags": {
     "title": "Deine Taschen",

@@ -1,9 +1,10 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { X, Sparkles, Database, Layers } from 'lucide-react';
+import { X, Sparkles, Database, Layers, ShoppingCart } from 'lucide-react';
 import { categoryIcon } from '@/domain/gear/GearCategoryIcon';
 import { CATEGORY_LABELS } from '@/domain/gear/GearCategory';
+import { trackedOutboundUrl } from '@/presentation/utils/safeUrl';
 import type { GearEntry } from './GearCalculator';
 
 interface Props {
@@ -55,7 +56,7 @@ export function GearList({ entries, onRemove, onQuantityChange, onActiveChange, 
               <th className="px-3 py-2.5 text-right text-text-muted font-normal text-xs">{t('weight_col')}</th>
               <th className="px-3 py-2.5 text-right text-text-muted font-normal text-xs">{t('volume_col')}</th>
               <th className="px-4 py-2.5 text-right text-text-muted font-normal text-xs">{t('total_col')}</th>
-              <th className="w-8"></th>
+              <th className="w-16"></th>
             </tr>
           </thead>
           <tbody>
@@ -114,12 +115,30 @@ export function GearList({ entries, onRemove, onQuantityChange, onActiveChange, 
                     {lineVol.toFixed(1)}L
                   </td>
                   <td className="pr-3 py-3 text-right">
-                    <button
-                      onClick={() => onRemove(entry.id)}
-                      className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-danger/10 transition-colors"
-                    >
-                      <X size={14} />
-                    </button>
+                    <div className="flex items-center justify-end gap-0.5">
+                      {(() => {
+                        const buyUrl = trackedOutboundUrl(entry.sourceUrl, entry.id, entry.name);
+                        if (!buyUrl) return null;
+                        return (
+                          <a
+                            href={buyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer sponsored"
+                            title={t('buy_hint')}
+                            aria-label={`${t('buy_hint')}: ${entry.name}`}
+                            className="p-1.5 rounded-lg text-text-muted hover:text-accent hover:bg-accent/10 transition-colors"
+                          >
+                            <ShoppingCart size={14} />
+                          </a>
+                        );
+                      })()}
+                      <button
+                        onClick={() => onRemove(entry.id)}
+                        className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-danger/10 transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );

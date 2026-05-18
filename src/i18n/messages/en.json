@@ -44,7 +44,8 @@
     "total_label": "Total volume",
     "weight_col": "Weight",
     "total_weight": "Total weight",
-    "inactive_count": "{count} excluded"
+    "inactive_count": "{count} excluded",
+    "buy_hint": "Buy on Amazon"
   },
   "bags": {
     "title": "Your bags",
