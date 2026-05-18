@@ -76,46 +76,63 @@ function SlotCard({
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <p className="text-white text-sm font-medium truncate">{name}</p>
-              {slot.paired && (
-                <span className="shrink-0 text-[10px] font-semibold text-accent bg-accent/15 rounded px-1.5 py-0.5">
-                  ×2
-                </span>
-              )}
-            </div>
             {pickedBag ? (
-              <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
-                <p className="text-text-secondary text-xs truncate">
-                  <span className="text-white/80">{pickedBag.brand}</span> {pickedBag.model}
-                  {pickedBag.weightGrams && ` · ${pickedBag.weightGrams}g`}
-                  {pickedBag.priceEur && ` · ~€${pickedBag.priceEur}`}
-                </p>
-                {buyUrl && (
-                  <a
-                    href={buyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer sponsored"
-                    title={t('buy_on_amazon')}
-                    className="shrink-0 p-0.5 rounded text-text-muted hover:text-accent transition-colors"
+              <>
+                {/* Title row replaced with brand+model. Slot name is dropped
+                 *  here — bag's own name is the strongest identifier and the
+                 *  positional context is implicit via the panel order. */}
+                <div className="flex items-center gap-1.5">
+                  <p className="text-white text-sm font-medium truncate">
+                    {pickedBag.brand} <span className="font-normal text-text-secondary">{pickedBag.model}</span>
+                  </p>
+                  {slot.paired && (
+                    <span className="shrink-0 text-[10px] font-semibold text-accent bg-accent/15 rounded px-1.5 py-0.5">
+                      ×2
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
+                  <p className="text-text-muted text-[11px] truncate">
+                    {pickedBag.weightGrams ? `${pickedBag.weightGrams}g` : ''}
+                    {pickedBag.weightGrams && pickedBag.priceEur ? ' · ' : ''}
+                    {pickedBag.priceEur ? `~€${pickedBag.priceEur}` : ''}
+                  </p>
+                  {buyUrl && (
+                    <a
+                      href={buyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer sponsored"
+                      title={t('buy_on_amazon')}
+                      className="shrink-0 p-0.5 rounded text-text-muted hover:text-accent transition-colors"
+                    >
+                      <ExternalLink size={11} />
+                    </a>
+                  )}
+                  <button
+                    onClick={onUnpick}
+                    title={t('unpick')}
+                    aria-label={t('unpick')}
+                    className="shrink-0 p-0.5 rounded text-text-muted hover:text-danger transition-colors"
                   >
-                    <ExternalLink size={11} />
-                  </a>
-                )}
-                <button
-                  onClick={onUnpick}
-                  title={t('unpick')}
-                  aria-label={t('unpick')}
-                  className="shrink-0 p-0.5 rounded text-text-muted hover:text-danger transition-colors"
-                >
-                  <XIcon size={11} />
-                </button>
-              </div>
+                    <XIcon size={11} />
+                  </button>
+                </div>
+              </>
             ) : (
-              <p className="text-text-muted text-xs mt-0.5">
-                {slot.typicalRangeL[0]}–{slot.typicalRangeL[1]}L {t('typical')}
-                {slot.paired && ` · ${t('per_bag_hint')}`}
-              </p>
+              <>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-white text-sm font-medium truncate">{name}</p>
+                  {slot.paired && (
+                    <span className="shrink-0 text-[10px] font-semibold text-accent bg-accent/15 rounded px-1.5 py-0.5">
+                      ×2
+                    </span>
+                  )}
+                </div>
+                <p className="text-text-muted text-xs mt-0.5">
+                  {slot.typicalRangeL[0]}–{slot.typicalRangeL[1]}L {t('typical')}
+                  {slot.paired && ` · ${t('per_bag_hint')}`}
+                </p>
+              </>
             )}
           </div>
         </div>
