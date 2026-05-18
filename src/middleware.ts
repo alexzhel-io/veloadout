@@ -31,8 +31,12 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Skip /api, /_next, /_vercel, static files (.*), and /r (the affiliate
-  // redirect — needs to work without a locale prefix because the URLs are
-  // shared in copy-paste contexts where locale routing would corrupt them).
-  matcher: ['/((?!api|_next|_vercel|r|r/.*|.*\\..*).*)'],
+  // Skip /api, /_next, /_vercel, static files (.*), and /r (affiliate
+  // redirect — locale-agnostic so copy-pasted share links don't get
+  // corrupted).
+  //
+  // The `r(?=$|/)` lookahead is important: bare `r` in the alternation
+  // would also exclude /ru/... because regex anchors at position 0 only.
+  // The lookahead requires the `r` to be a whole path segment.
+  matcher: ['/((?!api|_next|_vercel|r(?=$|/)|.*\\..*).*)'],
 };

@@ -151,6 +151,10 @@ export function GearList({ entries, onRemove, onQuantityChange, onActiveChange, 
                         // Amazon affiliate links currently route to amazon.de only —
                         // hide on non-DE locales to avoid wasted clicks.
                         if (locale !== 'de') return null;
+                        // Skip presets — generic names like "Sleeping bag" produce
+                        // noisy Amazon search results with poor conversion. Only
+                        // real products (db/ai with manufacturer + model) get the icon.
+                        if (entry.source === 'preset') return null;
                         // Always feed Amazon the English name — locale-specific
                         // preset names (e.g. "Спальник") would break the search.
                         const buyUrl = trackedOutboundUrl(entry.sourceUrl, entry.id, englishName);
