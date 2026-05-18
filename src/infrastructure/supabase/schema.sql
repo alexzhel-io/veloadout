@@ -109,6 +109,39 @@ create trigger gear_lists_updated_at
   before update on gear_lists
   for each row execute function update_updated_at();
 
+-- User feedback on individual catalog items. Anonymous-OK so any visitor
+-- can flag bad data without forcing a sign-up. Admin reviews via Supabase
+-- Table editor and applies fixes manually.
+create table if not exists gear_item_feedback (
+  id              uuid primary key default gen_random_uuid(),
+  item_id         text not null,                          -- matches gear_items.id; no FK so feedback survives item deletion
+  item_name       text not null,                          -- snapshot for context if item is later renamed
+  user_id         uuid references auth.users(id) on delete set null,  -- null = anonymous reporter
+  field           text not null,                          -- which attribute is wrong: volume / weight / name / url / variants / other
+  comment         text,                                   -- free text from the user
+  suggested_value numeric,                                -- when the user knows the correct number
+  status          text not null default 'pending',        -- pending / applied / rejected
+  reviewed_at     timestamptz,
+  created_at      timestamptz not null default now()
+);
+
+create index if not exists idx_gear_item_feedback_status on gear_item_feedback(status);
+create index if not exists idx_gear_item_feedback_item on gear_item_feedback(item_id);
+
+alter table gear_item_feedback enable row level security;
+
+-- Anyone (including anon) can submit feedback. Spam control lives at the
+-- API layer via Upstash rate limit.
+drop policy if exists "Anyone can submit feedback" on gear_item_feedback;
+create policy "Anyone can submit feedback"
+  on gear_item_feedback for insert with check (true);
+
+-- Users see only their own submissions. Admin/operator reads via the
+-- service-role-backed dashboard, bypassing RLS.
+drop policy if exists "Users see own feedback" on gear_item_feedback;
+create policy "Users see own feedback"
+  on gear_item_feedback for select using (auth.uid() = user_id);
+
 -- AI search miss cache. When the AI returns not_found for a query we write
 -- the normalised query here; future identical queries short-circuit without
 -- another AI call. Read-only for everyone, written by authenticated users only.

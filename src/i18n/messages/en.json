@@ -107,6 +107,28 @@
     "tip_2": "All numbers are estimates. For trip-critical gear, verify against manufacturer specs.",
     "tip_3": "Found something missing? Sign in and search — confirmed AI results are saved to the shared catalog for everyone."
   },
+  "feedback": {
+    "report": "Report incorrect data",
+    "report_short": "Report",
+    "title": "Help us improve the data",
+    "for_item": "Item",
+    "what_wrong": "What's wrong?",
+    "field_volume": "Volume is incorrect",
+    "field_weight": "Weight is incorrect",
+    "field_name": "Name / model is wrong",
+    "field_url": "Source URL is broken",
+    "field_variants": "Missing sizes / variants",
+    "field_other": "Something else",
+    "correct_volume": "Correct volume (L), if you know it",
+    "correct_weight": "Correct weight (g), if you know it",
+    "comment_label": "Comment",
+    "comment_placeholder": "What did you find? Link to manufacturer spec helps a lot.",
+    "submit": "Send feedback",
+    "thanks": "Thanks! We'll review it.",
+    "anonymous_ok": "No sign-in needed — feedback is anonymous if you're not logged in.",
+    "need_something": "Add a comment or a corrected value.",
+    "network_error": "Network error, please try again"
+  },
   "footer": {
     "text": "Volume data is crowd-sourced and AI-assisted. Always verify critical gear specs.",
     "help": "Help",

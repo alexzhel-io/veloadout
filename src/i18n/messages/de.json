@@ -107,6 +107,28 @@
     "tip_2": "Alle Zahlen sind Schätzwerte. Bei tour-kritischer Ausrüstung mit Herstellerangaben abgleichen.",
     "tip_3": "Etwas fehlt? Melde dich an und suche — bestätigte KI-Ergebnisse landen im gemeinsamen Katalog für alle."
   },
+  "feedback": {
+    "report": "Fehlerhafte Daten melden",
+    "report_short": "Melden",
+    "title": "Hilf uns die Daten zu verbessern",
+    "for_item": "Artikel",
+    "what_wrong": "Was stimmt nicht?",
+    "field_volume": "Volumen ist falsch",
+    "field_weight": "Gewicht ist falsch",
+    "field_name": "Name / Modell ist falsch",
+    "field_url": "Quell-URL ist defekt",
+    "field_variants": "Größen / Varianten fehlen",
+    "field_other": "Etwas anderes",
+    "correct_volume": "Richtiges Volumen (L), falls bekannt",
+    "correct_weight": "Richtiges Gewicht (g), falls bekannt",
+    "comment_label": "Kommentar",
+    "comment_placeholder": "Was hast du gefunden? Link zur Herstellerspezifikation hilft sehr.",
+    "submit": "Feedback senden",
+    "thanks": "Danke! Wir prüfen es.",
+    "anonymous_ok": "Keine Anmeldung nötig — Feedback ist anonym wenn nicht eingeloggt.",
+    "need_something": "Kommentar oder korrekten Wert hinzufügen.",
+    "network_error": "Netzwerkfehler, bitte erneut versuchen"
+  },
   "footer": {
     "text": "Volumendaten sind community-basiert und KI-unterstützt. Bitte überprüfe kritische Angaben selbst.",
     "help": "Hilfe",
