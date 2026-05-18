@@ -342,7 +342,12 @@ specific reason to Vercel function logs.
 | `/api/auth` | POST | none | 10/IP/10min + 5/email/10min | Send magic link |
 | `/api/auth` | DELETE | required | none | Sign out (browser also calls `supabase.auth.signOut()`) |
 | `/api/presets` | GET | none | none | Static preset list |
-| `/r?to=<url>&item=<id>` | GET | none | none | Outbound product-link redirect with click tracking (Upstash counters) and `buildAffiliateUrl()` hook |
+| `/api/bags` | GET | none | none | Curated bag catalogue (~52 rows) for the bag picker |
+| `/api/lists/share` | POST | required | none | Generate / refresh a public share slug for the user's list; snapshots bag setup |
+| `/api/lists/share` | DELETE | required | none | Revoke the share slug |
+| `/api/list/[slug]` | GET | none | none | Public read-only view of a shared list; RLS allows SELECT when `share_slug is not null` |
+| `/api/feedback` | POST | none | 10/IP/10min | Anonymous-OK feedback on catalogue items (volume/weight/name/etc.) |
+| `/r?to=<url>&item=<id>&q=<name>&asin=<asin>` | GET | none | none | Outbound product-link redirect with click tracking (Upstash counters). `buildAffiliateUrl` priority: ASIN > productName > rawUrl |
 
 The route catalog matches the user-facing flows. Each route name says
 what it does; the auth & rate limit columns are the audit trail.
@@ -417,6 +422,21 @@ Key invariants worth keeping in mind:
 
 - **`ai_search_misses` doesn't auto-clean.** Rows accumulate
   forever unless someone runs the cleanup query in §13.
+
+- **`bag_products` is hand-curated, RLS read-public / write-locked.**
+  Seeded via `src/infrastructure/supabase/seed-bags.sql` (idempotent
+  with `ON CONFLICT DO UPDATE`). Image URLs are populated separately
+  by `scripts/fetch-bag-images.ts` (2-stage: HTTP + Playwright). To
+  add a bag, edit the seed file and re-run in the SQL Editor, then
+  run the image fetcher.
+
+- **`gear_item_feedback`** never has a FK to `gear_items` — feedback
+  has to survive item renames/deletions. The `item_name` column is a
+  snapshot for context.
+
+- **`gear_lists.share_slug` is unique nullable.** A row is publicly
+  readable (via the `Anyone can read shared lists` policy) only when
+  the slug is set. Revoking = `update ... set share_slug = null`.
 
 ---
 
@@ -581,6 +601,40 @@ and the Anthropic Console alongside it.
 
 ---
 
+## 12.5 Bag-image fetcher — how to use it
+
+`scripts/fetch-bag-images.ts` keeps `bag_products.image_url` populated
+automatically. Two-stage pipeline: HTTP fast path (works for static
+sites like Ortlieb), then Playwright headless Chrome fallback (catches
+Shopify-style sites — Apidura, Restrap, Tailfin, Revelate, etc.).
+
+**Day-to-day commands:**
+
+```bash
+# After adding new bags to seed-bags.sql — fetch images only for new rows
+npx tsx --env-file=.env.local scripts/fetch-bag-images.ts
+
+# Quarterly refresh in case manufacturers rotated CDN paths
+npx tsx --env-file=.env.local scripts/fetch-bag-images.ts --force
+
+# One brand at a time (e.g. while adding new Apidura listings)
+npx tsx --env-file=.env.local scripts/fetch-bag-images.ts --brand=Apidura
+
+# One bag (debugging a specific failure)
+npx tsx --env-file=.env.local scripts/fetch-bag-images.ts --id=apidura-backcountry-saddle-14 --headed
+
+# CI / no-chromium environments
+npx tsx --env-file=.env.local scripts/fetch-bag-images.ts --no-browser
+```
+
+Output: `docs/bag-images.sql`. Paste into Supabase SQL Editor.
+
+Eventual automation paths (PATH A: GitHub Action that opens a PR with
+the SQL diff; PATH B: service-role-keyed direct UPDATE) are documented
+inline at the bottom of `scripts/fetch-bag-images.ts`.
+
+---
+
 ## 13. Routine maintenance — monthly checklist
 
 Run roughly monthly, or after an incident:
@@ -599,6 +653,17 @@ Run roughly monthly, or after an incident:
       `@anthropic-ai/sdk` to the latest patch versions.
 - [ ] **CSP violations.** Open the live site in DevTools → Console.
       Tighten `next.config.mjs` if no violations show up.
+- [ ] **Bag images.** Quarterly: `npx tsx --env-file=.env.local
+      scripts/fetch-bag-images.ts --force` to refresh in case
+      manufacturers rotated CDN paths. Paste the output SQL into
+      Supabase SQL Editor.
+- [ ] **Catalogue feedback.** Supabase Table editor →
+      `gear_item_feedback` filter `status = 'pending'`. Apply
+      legitimate fixes to `gear_items`, mark feedback row as
+      `applied` or `rejected`.
+- [ ] **Affiliate sales check.** Amazon Associates dashboard — track
+      progress toward the 3-sale conditional-approval threshold
+      (180-day rolling window).
 
 ---
 

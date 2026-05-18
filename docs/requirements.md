@@ -39,6 +39,8 @@ A web application for bikepacking riders: the user enters their gear, the system
 | FR-2.5 | Display weight of each item | ✅ |
 | FR-2.6 | Total volume and weight in the list footer | ✅ |
 | FR-2.7 | Format: `🏕️ Shelter · Regular — Product Name` | ✅ |
+| FR-2.8 | Per-item active/inactive checkbox in gear list — disabled items stay visible but excluded from totals and bag distribution | ✅ |
+| FR-2.9 | Per-row "Buy on Amazon" affiliate icon (gated to `/de` locale; hidden for preset entries) | ✅ |
 
 ### FR-3: Presets
 
@@ -47,6 +49,7 @@ A web application for bikepacking riders: the user enters their gear, the system
 | FR-3.1 | Quick preset panel with typical gear items | ✅ |
 | FR-3.2 | Clicking a preset toggles it on/off in the list | ✅ |
 | FR-3.3 | Active presets are visually highlighted | ✅ |
+| FR-3.4 | Preset display names re-localise dynamically when the UI locale changes (after save round-trip, lookup matches by `category + volumeLiters` since uuid replaces the original preset id) | ✅ |
 
 ### FR-4: Bag recommendations
 
@@ -55,6 +58,13 @@ A web application for bikepacking riders: the user enters their gear, the system
 | FR-4.1 | Based on total volume — recommend handlebar / frame / seat pack | ✅ |
 | FR-4.2 | Show recommended volume for each bag and fill percentage | ✅ |
 | FR-4.3 | Volumes are clamped to realistic ranges | ✅ |
+| FR-4.4 | Editable per-slot capacities (user enters the real size of bags they own); persists in localStorage `veloadout:bagSetup` | ✅ |
+| FR-4.5 | Distribution-mode toggle: `cumulative` (proportional split) vs `each` (every bag carries the full load) | ✅ |
+| FR-4.6 | Per-slot active/inactive checkbox — disabled slots contribute 0 to total capacity | ✅ |
+| FR-4.7 | Two extra slots: fork and panniers, both paired (×2 multiplier applied to entered per-bag capacity); off by default | ✅ |
+| FR-4.8 | Prominent gear-vs-capacity summary at the top of the panel (two big numbers + progress bar + remaining/overflow status) | ✅ |
+| FR-4.9 | Pick a specific bag per slot from a curated catalogue (`bag_products` table) — capacity locks to the picked bag, thumbnail + brand/model shown inline, optional buy CTA | ✅ |
+| FR-4.10 | Picker modal groups variants of the same model into one row with capacity chips | ✅ |
 
 ### FR-5: Auth and persistence
 
@@ -79,14 +89,30 @@ A web application for bikepacking riders: the user enters their gear, the system
 | FR-7.2 | `/[locale]/help` page with quick-start guide in EN / DE / UK / RU | ✅ |
 | FR-7.3 | Help link in the footer alongside Privacy / Terms / Impressum | ✅ |
 
-### FR-8: Outbound link tracking & monetisation readiness
+### FR-8: Outbound link tracking & monetisation
 
 | # | Requirement | Status |
 |---|---|---|
 | FR-8.1 | All product source links route through `/r?to=...&item=...` redirect for click tracking | ✅ |
 | FR-8.2 | Click counters (`clicks:total:<date>`, `clicks:item:<id>:<date>`) stored in Upstash | ✅ |
-| FR-8.3 | Centralised `buildAffiliateUrl()` hook lets future partner tags activate without DB migration | ✅ |
+| FR-8.3 | Centralised `buildAffiliateUrl()` hook lets new partner tags activate without DB migration | ✅ |
 | FR-8.4 | Outbound links carry `rel="sponsored noopener noreferrer"` to comply with Google guidelines | ✅ |
+| FR-8.5 | Amazon DE Partnernet active with tag `veloadout-21` — links to amazon.de search by product name | ✅ |
+| FR-8.6 | Direct ASIN affiliate URLs supported (`/dp/{asin}?tag=...`) for bag products with known ASIN; falls back to search | ✅ |
+| FR-8.7 | Affiliate buy CTAs hidden on non-DE locales (`/en`, `/uk`, `/ru`) to avoid wasted cross-border clicks | ✅ |
+| FR-8.8 | Footer disclosure "As an Amazon Associate we earn from qualifying purchases" on `/de` | ✅ |
+
+### FR-9: Sharing & feedback
+
+| # | Requirement | Status |
+|---|---|---|
+| FR-9.1 | Public read-only share link per gear list — `/[locale]/l/[slug]` | ✅ |
+| FR-9.2 | Share button in the header opens a modal: generate / copy / revoke link | ✅ |
+| FR-9.3 | Shared snapshot includes bag setup (capacities + active flags + mode) so the viewer sees the same distribution as the sharer | ✅ |
+| FR-9.4 | Shared list pages set `robots: noindex, nofollow` to keep user-generated content out of search | ✅ |
+| FR-9.5 | Crowd-sourced feedback: any visitor can flag wrong data on a catalogue item (volume / weight / name / URL / variants / other) | ✅ |
+| FR-9.6 | Feedback stored in `gear_item_feedback` table; admin reviews via Supabase Table editor with `status='pending'` | ✅ |
+| FR-9.7 | Rate limit 10 feedback submissions / IP / 10 min (Upstash) | ✅ |
 
 ### FR-6: Internationalisation
 
@@ -145,6 +171,7 @@ A web application for bikepacking riders: the user enters their gear, the system
 | NFR-3.5 | Tests for domain logic | 11 Vitest tests |
 | NFR-3.6 | Gear list save is atomic — partial failure cannot wipe the user's list | Postgres RPC `replace_gear_list_items(p_list_id, p_items jsonb)` runs delete+insert+bump in a single transaction |
 | NFR-3.7 | Repository errors surface as 500s, not silent `{ok:true}` | Every Supabase `{ error }` is checked and thrown; API routes catch and return 500 |
+| NFR-3.8 | Auto-save no longer loops on failure | Save effect depends only on `entries/listId/user`; latest `saveList` called via ref to avoid `t`/`toast` instability re-creating the callback every render |
 
 ### NFR-4: GDPR / Legal
 
